@@ -17,16 +17,8 @@
     },
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ],
-        "moduleDirectory": [
-          "node_modules",
-          "src/"
-        ]
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["node_modules", "src/"]
       }
     }
   },
@@ -37,11 +29,7 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": [
-    "react",
-    "react-hooks",
-    "prettier"
-  ],
+  "plugins": ["react", "react-hooks", "prettier"],
   "rules": {
     "react/react-in-jsx-scope": 0,
     "react/prefer-stateless-function": 0,
@@ -57,16 +45,10 @@
       "warn",
       {
         "groups": [
-          [
-            "builtin",
-            "external"
-          ],
+          ["builtin", "external"],
           "internal",
           "parent",
-          [
-            "sibling",
-            "index"
-          ],
+          ["sibling", "index"],
           "object"
         ],
         "newlines-between": "always",
@@ -77,8 +59,6 @@
       }
     ],
     "complexity": "warn",
-    "no-console": [
-      "error"
-    ]
+    "no-console": ["error"]
   }
 }
