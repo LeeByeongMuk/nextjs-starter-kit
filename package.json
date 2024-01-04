@@ -1,6 +1,6 @@
 {
   "name": "next-starter-kit",
-  "version": "0.1.2",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -24,8 +24,7 @@
     "next": "14.0.4",
     "npm-check-updates": "^16.14.12",
     "react": "^18",
-    "react-dom": "^18",
-    "swr": "^2.2.4"
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
