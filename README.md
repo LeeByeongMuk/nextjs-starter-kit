@@ -7,3 +7,20 @@
 - Node 20.x
 - Next.js 14.x
 - React 18.2
+
+## Installation
+
+```bash
+npm install
+```
+
+## Run the Development Server
+
+도커 설치 필요
+
+- https://www.docker.com/products/docker-desktop
+
+
+```bash
+docker compose up -d
+```
