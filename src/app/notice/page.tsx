@@ -1,4 +1,4 @@
-export default function Notice() {
+export default function NoticeList() {
   return (
     <section className="pb-8 pt-8">
       <div className="flex justify-between">
