@@ -1,4 +1,21 @@
+'use client';
+
+import { signIn } from 'next-auth/react';
+import React, { useRef } from 'react';
+
 export default function SignIn() {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await signIn('credentials', {
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value,
+      callbackUrl: '/',
+    });
+  };
+
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -13,7 +30,7 @@ export default function SignIn() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
               form="email"
@@ -23,6 +40,7 @@ export default function SignIn() {
             </label>
             <div className="mt-2">
               <input
+                ref={emailRef}
                 id="email"
                 name="email"
                 type="email"
@@ -52,6 +70,7 @@ export default function SignIn() {
             </div>
             <div className="mt-2">
               <input
+                ref={passwordRef}
                 id="password"
                 name="password"
                 type="password"

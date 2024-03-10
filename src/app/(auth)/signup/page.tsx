@@ -1,4 +1,42 @@
+'use client';
+
+import { signIn } from 'next-auth/react';
+import { useRef } from 'react';
+
 export default function Signup() {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const res = await fetch('http://localhost:80/api/accounts/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: emailRef.current?.value,
+        name: nameRef.current?.value,
+        password: passwordRef.current?.value,
+      }),
+    });
+
+    if (res.status !== 200) {
+      alert('Failed to sign up');
+      return;
+    }
+
+    alert('Signed up successfully');
+
+    await signIn('credentials', {
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value,
+      callbackUrl: '/',
+    });
+  };
+
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -13,7 +51,7 @@ export default function Signup() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST">
+        <form className="space-y-6" onSubmit={onSubmit}>
           <div>
             <label
               form="email"
@@ -23,6 +61,7 @@ export default function Signup() {
             </label>
             <div className="mt-2">
               <input
+                ref={emailRef}
                 id="email"
                 name="email"
                 type="email"
@@ -42,6 +81,7 @@ export default function Signup() {
             </label>
             <div className="mt-2">
               <input
+                ref={nameRef}
                 id="name"
                 name="name"
                 type="text"
@@ -63,6 +103,7 @@ export default function Signup() {
             </div>
             <div className="mt-2">
               <input
+                ref={passwordRef}
                 id="password"
                 name="password"
                 type="password"

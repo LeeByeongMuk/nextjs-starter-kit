@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "next": "14.0.4",
+    "next-auth": "^4.24.5",
     "npm-check-updates": "^16.14.12",
     "react": "^18",
     "react-dom": "^18",
