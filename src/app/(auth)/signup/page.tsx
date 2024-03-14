@@ -1,7 +1,9 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
+
+import { fetchSignUp } from '@/app/api/auth';
 
 export default function Signup() {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -11,30 +13,24 @@ export default function Signup() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const res = await fetch('http://localhost:80/api/accounts/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    try {
+      await fetchSignUp({
+        email: emailRef.current?.value || '',
+        name: nameRef.current?.value || '',
+        password: passwordRef.current?.value || '',
+      });
+
+      alert('Signed up successfully');
+
+      await signIn('credentials', {
         email: emailRef.current?.value,
-        name: nameRef.current?.value,
         password: passwordRef.current?.value,
-      }),
-    });
-
-    if (res.status !== 200) {
+        callbackUrl: '/',
+        redirect: false,
+      });
+    } catch {
       alert('Failed to sign up');
-      return;
     }
-
-    alert('Signed up successfully');
-
-    await signIn('credentials', {
-      email: emailRef.current?.value,
-      password: passwordRef.current?.value,
-      callbackUrl: '/',
-    });
   };
 
   return (

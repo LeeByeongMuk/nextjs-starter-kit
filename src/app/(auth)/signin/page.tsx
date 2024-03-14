@@ -1,19 +1,28 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import React, { useRef } from 'react';
 
 export default function SignIn() {
+  const router = useRouter();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await signIn('credentials', {
+
+    const res = await signIn('credentials', {
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
-      callbackUrl: '/',
+      redirect: false,
     });
+
+    if (res?.ok) {
+      router.push('/');
+    } else {
+      alert('Failed to sign in');
+    }
   };
 
   return (

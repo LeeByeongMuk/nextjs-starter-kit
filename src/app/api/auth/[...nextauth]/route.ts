@@ -1,6 +1,8 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
+import { fetchSignIn, fetchUser } from '@/app/api/auth';
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -15,28 +17,11 @@ const handler = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const signInRes = await fetch('http://localhost:80/api/accounts/signin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: credentials?.email || '',
-            password: credentials?.password || '',
-          }),
+        await fetchSignIn({
+          email: credentials?.email || '',
+          password: credentials?.password || '',
         });
-        const data = await signInRes.json();
-        const token = data?.data?.access_token;
-
-        const userRes = await fetch('http://localhost:80/api/accounts', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        const user = await userRes.json();
+        const user = await fetchUser();
 
         if (user) {
           return user.data;
