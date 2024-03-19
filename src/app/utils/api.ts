@@ -20,6 +20,7 @@ const fetchApi = async (url: string, options: RequestInit = {}) => {
           : '',
       },
     });
+
     return res.json();
   } catch (err) {
     return err;
