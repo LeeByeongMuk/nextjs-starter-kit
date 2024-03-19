@@ -22,7 +22,14 @@
       "pre-commit": "lint-staged"
     }
   },
+  "overrides": {
+    "@toast-ui/react-editor": {
+      "react": "^18"
+    }
+  },
   "dependencies": {
+    "@toast-ui/editor": "^3.2.2",
+    "@toast-ui/react-editor": "^3.2.3",
     "classnames": "^2.5.1",
     "next": "14.0.4",
     "next-auth": "^4.24.5",
