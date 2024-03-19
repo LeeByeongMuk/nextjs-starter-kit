@@ -22,12 +22,21 @@
       "pre-commit": "lint-staged"
     }
   },
+  "overrides": {
+    "@toast-ui/react-editor": {
+      "react": "^18"
+    }
+  },
   "dependencies": {
+    "@toast-ui/editor": "^3.2.2",
+    "@toast-ui/react-editor": "^3.2.3",
+    "classnames": "^2.5.1",
     "next": "14.0.4",
     "next-auth": "^4.24.5",
     "npm-check-updates": "^16.14.12",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.51.1",
     "swr": "^2.2.4"
   },
   "devDependencies": {

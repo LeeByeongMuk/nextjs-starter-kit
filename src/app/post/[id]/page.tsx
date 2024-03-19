@@ -1,0 +1,63 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
+import useSWR from 'swr';
+
+import ListFilter from '@/app/components/Post/ListFilter';
+import { fetchApi } from '@/app/utils/api';
+
+export default function PostDetail() {
+  const router = useRouter();
+  const params = useParams<{ id: string }>();
+
+  const {
+    data: { data: post },
+  } = useSWR(
+    `/api/posts/${params.id}`,
+    async url => {
+      return await fetchApi(url, {
+        method: 'GET',
+      });
+    },
+    {
+      fallbackData: {
+        data: {
+          title: '',
+          contents: '',
+          user: {
+            name: '',
+            nickname: '',
+          },
+        },
+      },
+      onError: () => {
+        alert('Failed to fetch post');
+        router.back();
+      }
+    }
+  );
+
+  return (
+    <section className="pb-8 pt-8">
+      <ListFilter />
+
+      <div className="mt-5">
+        <div>
+          <h4 className="border-b-2 border-b-teal-600 p-2 text-xl font-bold">
+            {post.title}
+          </h4>
+
+          <div className="flex justify-between bg-teal-100 p-2 text-base">
+            <span>{post.user.name || post.user.nickname}</span>
+            <span>1분 전</span>
+          </div>
+        </div>
+
+        <div
+          className="border-b-2 pb-5 pl-2 pr-2 pt-5 text-base"
+          dangerouslySetInnerHTML={{ __html: post.contents }}
+        />
+      </div>
+    </section>
+  );
+}
