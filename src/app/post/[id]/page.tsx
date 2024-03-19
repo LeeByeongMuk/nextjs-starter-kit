@@ -1,13 +1,15 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import useSWR from 'swr';
 
 import ListFilter from '@/app/components/Post/ListFilter';
 import { fetchApi } from '@/app/utils/api';
 
 export default function PostDetail() {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
+
   const {
     data: { data: post },
   } = useSWR(
@@ -28,6 +30,10 @@ export default function PostDetail() {
           },
         },
       },
+      onError: () => {
+        alert('Failed to fetch post');
+        router.back();
+      }
     }
   );
 
