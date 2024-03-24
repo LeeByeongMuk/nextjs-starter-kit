@@ -40,7 +40,6 @@ export default function Signup() {
         email: data.email,
         password: data.password,
         callbackUrl: '/',
-        redirect: false,
       });
     } catch {
       alert('Failed to sign up');
