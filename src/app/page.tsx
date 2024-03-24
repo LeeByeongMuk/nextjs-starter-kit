@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 
 export default function Home() {
   return (
@@ -11,6 +12,10 @@ export default function Home() {
       <Link href="/signin">signin</Link>
       <br />
       <Link href="/signup">signup</Link>
+      <br />
+      <button type="button" onClick={() => signOut()}>
+        Sign out
+      </button>
     </div>
   );
 }
