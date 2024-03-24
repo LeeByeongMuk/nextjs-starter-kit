@@ -1,8 +1,13 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import ValidationError from '@/app/components/Error/ValidationError';
+
 export default function PwInput() {
-  const { register } = useFormContext();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <div>
@@ -29,9 +34,25 @@ export default function PwInput() {
           id="password"
           type="password"
           autoComplete="current-password"
-          required
           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          {...register('password', { required: true })}
+          {...register('password', {
+            required: {
+              value: true,
+              message: 'Password is required',
+            },
+            minLength: {
+              value: 8,
+              message: 'Password must be at least 8 characters long',
+            },
+            maxLength: {
+              value: 20,
+              message: 'Password must be at most 20 characters long',
+            },
+          })}
+        />
+        <ValidationError
+          isError={!!errors.password}
+          message={errors.password?.message?.toString()}
         />
       </div>
     </div>
