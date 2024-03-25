@@ -1,41 +1,41 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import useSWR from 'swr';
+import { useEffect } from 'react';
 
+import { fetchPost } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
-import { fetchApi } from '@/app/utils/api';
 
 export default function PostDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const id = params.id;
 
   const {
     data: { data: post },
-  } = useSWR(
-    `/api/posts/${params.id}`,
-    async url => {
-      return await fetchApi(url, {
-        method: 'GET',
-      });
-    },
-    {
-      fallbackData: {
-        data: {
-          title: '',
-          contents: '',
-          user: {
-            name: '',
-            nickname: '',
-          },
+    isError,
+  } = useQuery({
+    queryKey: ['posts', { id }],
+    queryFn: () => fetchPost({ id }),
+    initialData: {
+      data: {
+        title: '',
+        contents: '',
+        user: {
+          name: '',
+          nickname: '',
         },
       },
-      onError: () => {
-        alert('Failed to fetch post');
-        router.back();
-      }
+    },
+  });
+
+  useEffect(() => {
+    if (isError) {
+      alert('Failed to fetch post');
+      router.back();
     }
-  );
+  }, [isError, router]);
 
   return (
     <section className="pb-8 pt-8">

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -22,28 +23,36 @@ interface SignUpInput {
 }
 
 export default function Signup() {
+  const { mutate } = useMutation({
+    mutationFn: fetchSignUp,
+  });
+
   const methods = useForm<SignUpInput>();
   const { handleSubmit } = methods;
 
   const onSubmit: SubmitHandler<SignUpInput> = async data => {
-    try {
-      await fetchSignUp({
+    mutate(
+      {
         email: data.email,
         name: data.name,
         nickname: data.nickname || null,
         password: data.password,
-      });
+      },
+      {
+        onSuccess: async () => {
+          alert('Signed up successfully');
 
-      alert('Signed up successfully');
-
-      await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        callbackUrl: '/',
-      });
-    } catch {
-      alert('Failed to sign up');
-    }
+          await signIn('credentials', {
+            email: data.email,
+            password: data.password,
+            callbackUrl: '/',
+          });
+        },
+        onError: () => {
+          alert('Failed to sign up');
+        },
+      }
+    );
   };
 
   return (

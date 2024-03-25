@@ -28,6 +28,7 @@
     }
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.28.8",
     "@toast-ui/editor": "^3.2.2",
     "@toast-ui/react-editor": "^3.2.3",
     "classnames": "^2.5.1",
@@ -36,11 +37,11 @@
     "npm-check-updates": "^16.14.12",
     "react": "^18",
     "react-dom": "^18",
-    "react-hook-form": "^7.51.1",
-    "swr": "^2.2.4"
+    "react-hook-form": "^7.51.1"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@tanstack/eslint-plugin-query": "^5.28.6",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
     "@types/node": "^20",

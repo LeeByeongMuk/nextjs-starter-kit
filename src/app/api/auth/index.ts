@@ -1,4 +1,4 @@
-"use server";
+'use server';
 
 import { cookies } from 'next/headers';
 
@@ -13,14 +13,14 @@ const fetchUser = async () => {
 interface SignUpReq {
   email: string;
   name: string;
-  nickname?: string | null
+  nickname?: string | null;
   password: string;
 }
 
-const fetchSignUp = async (param: SignUpReq) => {
+const fetchSignUp = async (req: SignUpReq) => {
   return await fetchApi('/api/accounts/signup', {
     method: 'POST',
-    body: JSON.stringify(param),
+    body: JSON.stringify(req),
   });
 };
 
@@ -29,10 +29,10 @@ interface SignInReq {
   password: string;
 }
 
-const fetchSignIn = async (param: SignInReq) => {
+const fetchSignIn = async (req: SignInReq) => {
   const res = await fetchApi('/api/accounts/signin', {
     method: 'POST',
-    body: JSON.stringify(param),
+    body: JSON.stringify(req),
   });
 
   const { access_token } = res.data;
@@ -44,3 +44,4 @@ const fetchSignIn = async (param: SignInReq) => {
 };
 
 export { fetchUser, fetchSignUp, fetchSignIn };
+export type { SignUpReq };
