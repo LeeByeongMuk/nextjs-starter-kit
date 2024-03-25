@@ -13,7 +13,7 @@ const fetchUser = async () => {
 interface SignUpReq {
   email: string;
   name: string;
-  nickname?: string;
+  nickname?: string | null
   password: string;
 }
 
