@@ -1,16 +1,16 @@
 'use client';
 
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import useSWR from 'swr';
 
+import { fetchPost, fetchPostUpdate, PostUpdateReq } from '@/app/api/post';
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
 import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
-import { fetchApi } from '@/app/utils/api';
 
 interface PostFormInput {
   title: string;
@@ -20,67 +20,73 @@ interface PostFormInput {
 }
 
 export default function PostUpdate() {
-  const params = useParams<{ id: string }>();
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
 
   const methods = useForm<PostFormInput>();
   const { handleSubmit, setValue } = methods;
 
   const {
     data: { data: post },
+    isSuccess,
+    isError,
     isLoading,
-    error,
-  } = useSWR(
-    `/api/posts/${params.id}`,
-    async url => {
-      return await fetchApi(url, {
-        method: 'GET',
-      });
+  } = useQuery({
+    queryKey: ['posts', { id }],
+    queryFn: () => fetchPost({ id }),
+    initialData: {
+      data: {
+        title: '',
+        contents: '',
+        type: null,
+        is_open: null,
+      },
     },
-    {
-      fallbackData: {
-        data: {
-          title: '',
-          contents: '',
-          type: null,
-          is_open: null,
-        },
-      },
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-      onSuccess: ({ data: post }) => {
-        setValue('title', post.title);
-        setValue('contents', post.contents);
-        setValue('type', post.type);
-        setValue('isOpen', post.is_open);
-      },
-      onError: () => {
-        alert('Failed to fetch post');
-        router.push('/post');
-      }
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setValue('title', post.title);
+      setValue('contents', post.contents);
+      setValue('type', post.type);
+      setValue('isOpen', post.is_open);
     }
-  );
+  }, [isSuccess, setValue, post]);
+
+  useEffect(() => {
+    if (isError) {
+      alert('Failed to fetch post');
+      router.push('/post');
+    }
+  }, [isError, router]);
+
+  const { mutate } = useMutation({
+    mutationFn: (req: PostUpdateReq) => fetchPostUpdate(req),
+  });
 
   const onSubmit: SubmitHandler<PostFormInput> = async data => {
-    try {
-      const res = await fetchApi(`/api/posts/${params.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          title: data.title,
-          type: data.type || null,
-          contents: data.contents,
-          is_open: data.isOpen,
-        }),
-      });
-
-      alert('Notice created successfully');
-      router.push(`/post/${res.data.id}`);
-    } catch (err) {
-      alert('Failed to create notice');
-    }
+    mutate(
+      {
+        id,
+        title: data.title,
+        type: data.type || null,
+        contents: data.contents,
+        is_open: data.isOpen,
+      },
+      {
+        onSuccess: async () => {
+          alert('Notice updated successfully');
+          router.push(`/post/${id}`);
+        },
+        onError: () => {
+          alert('Failed to update notice');
+        },
+      }
+    );
   };
 
-  if (isLoading || error) return <div>Loading...</div>;
+  if (isLoading || isError) return <div>Loading...</div>;
 
   return (
     <FormProvider {...methods}>
@@ -88,7 +94,7 @@ export default function PostUpdate() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <TitleInput defaultValue={post.title} />
 
-          <TypeSelect selectedValue={post.type}  />
+          <TypeSelect selectedValue={post.type} />
 
           <ContentsEditor defaultValue={post.contents} />
 
