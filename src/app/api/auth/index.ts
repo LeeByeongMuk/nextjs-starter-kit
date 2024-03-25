@@ -1,4 +1,4 @@
-"use server";
+'use server';
 
 import { cookies } from 'next/headers';
 
@@ -13,7 +13,7 @@ const fetchUser = async () => {
 interface SignUpReq {
   email: string;
   name: string;
-  nickname?: string | null
+  nickname?: string | null;
   password: string;
 }
 
@@ -44,3 +44,4 @@ const fetchSignIn = async (param: SignInReq) => {
 };
 
 export { fetchUser, fetchSignUp, fetchSignIn };
+export type { SignUpReq };
