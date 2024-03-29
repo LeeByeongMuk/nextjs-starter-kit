@@ -5,12 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import { fetchPost, fetchPostUpdate, PostUpdateReq } from '@/app/api/post';
+import { fetchPostUpdateResource, fetchPostUpdate, PostUpdateReq } from '@/app/api/post';
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
 import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
+import Spinner from '@/app/components/Spinner';
 
 interface PostFormInput {
   title: string;
@@ -22,7 +23,7 @@ interface PostFormInput {
 export default function PostUpdate() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = Number(params.id);
 
   const methods = useForm<PostFormInput>();
   const { handleSubmit, setValue } = methods;
@@ -32,9 +33,10 @@ export default function PostUpdate() {
     isSuccess,
     isError,
     isLoading,
+    isFetching
   } = useQuery({
     queryKey: ['posts', { id }],
-    queryFn: () => fetchPost({ id }),
+    queryFn: () => fetchPostUpdateResource({ id }),
     initialData: {
       data: {
         title: '',
@@ -86,7 +88,7 @@ export default function PostUpdate() {
     );
   };
 
-  if (isLoading || isError) return <div>Loading...</div>;
+  if (isFetching || isLoading || isError) return <Spinner />;
 
   return (
     <FormProvider {...methods}>
