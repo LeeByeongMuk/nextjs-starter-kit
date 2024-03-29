@@ -19,7 +19,7 @@ export default function TypeSelect({ selectedValue }: Props) {
       <select
         id="type"
         className="mt-1.5 w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-        value={selectedValue || ''}
+        defaultValue={selectedValue}
         {...register('type')}
       >
         {TYPE_OPTIONS.map(({ value, label }) => (
