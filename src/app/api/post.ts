@@ -11,7 +11,7 @@ const fetchPosts = async ({ page }: PostsReq) => {
 };
 
 interface PostReq {
-  id: string;
+  id: number;
 }
 
 const fetchPost = async ({ id }: PostReq) => {

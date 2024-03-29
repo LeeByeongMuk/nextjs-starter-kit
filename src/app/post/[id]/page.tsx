@@ -10,7 +10,7 @@ import ListFilter from '@/app/components/Post/ListFilter';
 export default function PostDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = Number(params.id);
 
   const {
     data: { data: post },
