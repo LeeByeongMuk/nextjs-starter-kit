@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 
 import { fetchPost } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
-import Spinner from '@/app/components/Spinner';
+import Detail from '@/app/components/Post/PostDetail';
 
 export default function PostDetail() {
   const router = useRouter();
@@ -19,18 +19,22 @@ export default function PostDetail() {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['posts', { id }],
-    queryFn: () => fetchPost({ id }),
     initialData: {
       data: {
-        title: '',
         contents: '',
+        created_at: '',
+        hit: 0,
+        id: 0,
+        title: '',
+        type: '',
         user: {
           name: '',
           nickname: '',
         },
       },
     },
+    queryFn: () => fetchPost({ id }),
+    queryKey: ['posts', { id }],
   });
 
   useEffect(() => {
@@ -40,29 +44,11 @@ export default function PostDetail() {
     }
   }, [isError, router]);
 
-  if (isFetching || isLoading || isError) return <Spinner />;
-
   return (
     <section className="pb-8 pt-8">
       <ListFilter />
 
-      <div className="mt-5">
-        <div>
-          <h4 className="border-b-2 border-b-teal-600 p-2 text-xl font-bold">
-            {post.title}
-          </h4>
-
-          <div className="flex justify-between bg-teal-100 p-2 text-base">
-            <span>{post.user.name || post.user.nickname}</span>
-            <span>1분 전</span>
-          </div>
-        </div>
-
-        <div
-          className="border-b-2 pb-5 pl-2 pr-2 pt-5 text-base"
-          dangerouslySetInnerHTML={{ __html: post.contents }}
-        />
-      </div>
+      <Detail post={post} isLoading={isFetching || isLoading || isError} />
     </section>
   );
 }
