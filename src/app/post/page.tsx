@@ -7,6 +7,7 @@ import { fetchPosts } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
 import ListTable from '@/app/components/Post/ListTable';
 import Pagination from '@/app/components/Post/Pagination';
+import { PostsRes } from '@/app/types/post';
 
 export default function PostList() {
   const [page, setPage] = useState(1);
@@ -26,7 +27,7 @@ export default function PostList() {
         last_page: 1,
       },
       links: {},
-    },
+    } as unknown as PostsRes,
   });
 
   return (

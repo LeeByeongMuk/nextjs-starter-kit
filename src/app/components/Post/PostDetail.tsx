@@ -1,21 +1,11 @@
 import React from 'react';
 
+import { PostData } from '@/app/types/post';
 import { getFormattedDate } from '@/app/utils/date';
 
 interface PostDetailProps {
   isLoading: boolean;
-  post: {
-    id: number;
-    title: string;
-    contents: string;
-    created_at: string;
-    hit: number;
-    type: 'notice' | 'faq' | null;
-    user: {
-      name: string;
-      nickname: string;
-    };
-  };
+  post: PostData;
 }
 
 export default function PostDetail({ isLoading, post }: PostDetailProps) {

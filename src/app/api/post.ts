@@ -1,31 +1,28 @@
+import {
+  PostCreateReq,
+  PostCreateRes,
+  PostReq,
+  PostRes,
+  PostsReq,
+  PostsRes,
+  PostUpdateReq,
+  PostUpdateRes,
+  PostUpdateResourceReq,
+  PostUpdateResourceRes,
+} from '@/app/types/post';
 import { fetchApi } from '@/app/utils/api';
 
-interface PostsReq {
-  page: number;
-}
-
 const fetchPosts = async ({ page }: PostsReq) => {
-  return await fetchApi(`/api/posts?page=${page}`, {
+  return (await fetchApi(`/api/posts?page=${page}`, {
     method: 'GET',
-  });
+  })) as PostsRes;
 };
-
-interface PostReq {
-  id: number;
-}
 
 const fetchPost = async ({ id }: PostReq) => {
-  return await fetchApi(`/api/posts/${id}`, {
+  return (await fetchApi(`/api/posts/${id}`, {
     method: 'GET',
-  });
+  })) as PostRes;
 };
-
-interface PostCreateReq {
-  title: string;
-  type: string | null;
-  contents: string;
-  is_open: boolean | null;
-}
 
 const fetchPostCreate = async ({
   title,
@@ -33,7 +30,7 @@ const fetchPostCreate = async ({
   contents,
   is_open,
 }: PostCreateReq) => {
-  return await fetchApi('/api/posts', {
+  return (await fetchApi('/api/posts', {
     method: 'POST',
     body: JSON.stringify({
       title,
@@ -41,16 +38,8 @@ const fetchPostCreate = async ({
       contents,
       is_open,
     }),
-  });
+  })) as PostCreateRes;
 };
-
-interface PostUpdateReq {
-  id: number;
-  title: string;
-  type: string | null;
-  contents: string;
-  is_open: boolean | null;
-}
 
 const fetchPostUpdate = async ({
   id,
@@ -59,7 +48,7 @@ const fetchPostUpdate = async ({
   contents,
   is_open,
 }: PostUpdateReq) => {
-  return await fetchApi(`/api/posts/${id}`, {
+  return (await fetchApi(`/api/posts/${id}`, {
     method: 'PUT',
     body: JSON.stringify({
       title,
@@ -67,17 +56,13 @@ const fetchPostUpdate = async ({
       contents,
       is_open,
     }),
-  });
+  })) as PostUpdateRes;
 };
 
-interface PostUpdateResource {
-  id: number;
-}
-
-const fetchPostUpdateResource = async ({ id }: PostUpdateResource) => {
-  return await fetchApi(`/api/posts/${id}/edit`, {
+const fetchPostUpdateResource = async ({ id }: PostUpdateResourceReq) => {
+  return (await fetchApi(`/api/posts/${id}/edit`, {
     method: 'GET',
-  });
+  })) as PostUpdateResourceRes;
 };
 
 export {

@@ -1,20 +1,11 @@
 import Link from 'next/link';
 import React from 'react';
 
+import { PostListData } from '@/app/types/post';
 import { getFormattedDate } from '@/app/utils/date';
 
 interface Props {
-  posts: {
-    id: number;
-    title: string;
-    type: string;
-    hit: number;
-    created_at: string;
-    user: {
-      id: number;
-      name: string;
-    };
-  }[];
+  posts: PostListData[];
   isLoading: boolean;
 }
 
