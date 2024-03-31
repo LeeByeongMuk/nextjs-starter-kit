@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 
+import { getFormattedDate } from '@/app/utils/date';
+
 interface Props {
   posts: {
     id: number;
@@ -23,25 +25,21 @@ const DUMMY_DATA = Array.from({ length: 10 }, (_, i) => ({
 }));
 
 export default function ListTable({ posts, isLoading }: Props) {
-  const getFormattedDate = (date: string) => {
-    return new Intl.DateTimeFormat('ko-KR').format(new Date(date));
-  }
-
   const renderPostList = () => {
     if (isLoading) {
       return DUMMY_DATA.map(post => (
         <tr key={post.id} className="odd:bg-gray-50">
-          <td className="px-4 py-3.5 w-8/12">
-            <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+          <td className="w-8/12 px-4 py-3.5">
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700"></div>
           </td>
           <td className="px-4 py-3.5">
-            <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700"></div>
           </td>
           <td className="px-4 py-3.5">
-            <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700"></div>
           </td>
           <td className="px-4 py-3.5">
-            <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700"></div>
           </td>
         </tr>
       ));
@@ -49,17 +47,17 @@ export default function ListTable({ posts, isLoading }: Props) {
 
     return posts.map(post => (
       <tr key={post.id} className="odd:bg-gray-50">
-        <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 w-8/12">
+        <td className="w-8/12 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
           <Link href={`/post/${post.id}`}>{post.title}</Link>
         </td>
         <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-          <Link href={`/post/${post.id}`}>{post.hit}</Link>
+          {post.hit}
         </td>
         <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-          <Link href={`/post/${post.id}`}>{post.user.name}</Link>
+          {post.user.name}
         </td>
         <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-          <Link href={`/post/${post.id}`}>{getFormattedDate(post.created_at)  }</Link>
+          {getFormattedDate(post.created_at)}
         </td>
       </tr>
     ));
@@ -70,7 +68,7 @@ export default function ListTable({ posts, isLoading }: Props) {
       <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
         <thead className="ltr:text-left">
           <tr>
-            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 w-8/12">
+            <th className="w-8/12 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
               Title
             </th>
 
