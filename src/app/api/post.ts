@@ -11,7 +11,7 @@ const fetchPosts = async ({ page }: PostsReq) => {
 };
 
 interface PostReq {
-  id: string;
+  id: number;
 }
 
 const fetchPost = async ({ id }: PostReq) => {
@@ -45,7 +45,7 @@ const fetchPostCreate = async ({
 };
 
 interface PostUpdateReq {
-  id: string;
+  id: number;
   title: string;
   type: string | null;
   contents: string;
@@ -70,5 +70,21 @@ const fetchPostUpdate = async ({
   });
 };
 
-export { fetchPosts, fetchPost, fetchPostCreate, fetchPostUpdate };
+interface PostUpdateResource {
+  id: number;
+}
+
+const fetchPostUpdateResource = async ({ id }: PostUpdateResource) => {
+  return await fetchApi(`/api/posts/${id}/edit`, {
+    method: 'GET',
+  });
+};
+
+export {
+  fetchPosts,
+  fetchPost,
+  fetchPostCreate,
+  fetchPostUpdate,
+  fetchPostUpdateResource,
+};
 export type { PostCreateReq, PostUpdateReq };

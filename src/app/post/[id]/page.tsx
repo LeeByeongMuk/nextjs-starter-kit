@@ -2,19 +2,22 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import { fetchPost } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
+import Spinner from '@/app/components/Spinner';
 
 export default function PostDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const id = params.id;
+  const id = Number(params.id);
 
   const {
     data: { data: post },
     isError,
+    isLoading,
+    isFetching,
   } = useQuery({
     queryKey: ['posts', { id }],
     queryFn: () => fetchPost({ id }),
@@ -36,6 +39,8 @@ export default function PostDetail() {
       router.back();
     }
   }, [isError, router]);
+
+  if (isFetching || isLoading || isError) return <Spinner />;
 
   return (
     <section className="pb-8 pt-8">
