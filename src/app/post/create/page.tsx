@@ -11,6 +11,7 @@ import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
 import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
+import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 
 interface PostFormInput {
   title: string;
@@ -24,7 +25,7 @@ export default function PostCreate() {
   const methods = useForm<PostFormInput>();
   const { handleSubmit } = methods;
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (req: PostCreateReq) => fetchPostCreate(req),
   });
   const onSubmit: SubmitHandler<PostFormInput> = async data => {
@@ -62,6 +63,8 @@ export default function PostCreate() {
           <ButtonBox />
         </form>
       </section>
+
+      {isPending && <LayerSpinner />}
     </FormProvider>
   );
 }

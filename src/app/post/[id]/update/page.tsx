@@ -16,6 +16,7 @@ import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
+import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import { PostUpdateResourceRes } from '@/app/types/post';
 
 interface PostFormInput {
@@ -68,7 +69,7 @@ export default function PostUpdate() {
     }
   }, [isError, router]);
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (req: PostUpdateReq) => fetchPostUpdate(req),
   });
 
@@ -110,6 +111,7 @@ export default function PostUpdate() {
           <ButtonBox />
         </form>
       </section>
+      {isPending && <LayerSpinner />}
     </FormProvider>
   );
 }
