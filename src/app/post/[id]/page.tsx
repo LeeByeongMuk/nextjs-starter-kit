@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 
 import { fetchPost } from '@/app/api/post';
-import ListFilter from '@/app/components/Post/ListFilter';
 import Detail from '@/app/components/Post/PostDetail';
 import { PostRes } from '@/app/types/post';
 
@@ -47,7 +46,7 @@ export default function PostDetail() {
 
   return (
     <section className="pb-8 pt-8">
-      <ListFilter />
+      {/*<ListFilter />*/}
 
       <Detail post={post} isLoading={isFetching || isLoading || isError} />
     </section>
