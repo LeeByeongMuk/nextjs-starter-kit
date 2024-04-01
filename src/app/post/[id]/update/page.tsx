@@ -5,13 +5,19 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import { fetchPostUpdateResource, fetchPostUpdate, PostUpdateReq } from '@/app/api/post';
+import {
+  fetchPostUpdateResource,
+  fetchPostUpdate,
+  PostUpdateReq,
+} from '@/app/api/post';
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
 import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
+import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
+import { PostUpdateResourceRes } from '@/app/types/post';
 
 interface PostFormInput {
   title: string;
@@ -33,7 +39,7 @@ export default function PostUpdate() {
     isSuccess,
     isError,
     isLoading,
-    isFetching
+    isFetching,
   } = useQuery({
     queryKey: ['posts', { id }],
     queryFn: () => fetchPostUpdateResource({ id }),
@@ -44,7 +50,7 @@ export default function PostUpdate() {
         type: null,
         is_open: null,
       },
-    },
+    } as unknown as PostUpdateResourceRes,
   });
 
   useEffect(() => {
@@ -63,7 +69,7 @@ export default function PostUpdate() {
     }
   }, [isError, router]);
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (req: PostUpdateReq) => fetchPostUpdate(req),
   });
 
@@ -105,6 +111,7 @@ export default function PostUpdate() {
           <ButtonBox />
         </form>
       </section>
+      {isPending && <LayerSpinner />}
     </FormProvider>
   );
 }

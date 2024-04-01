@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
@@ -10,6 +10,7 @@ import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import PwInput from '@/app/components/Auth/Form/PwInput';
 import Social from '@/app/components/Auth/Form/Social';
 import AuthHeader from '@/app/components/Auth/Header';
+import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 
 interface SignInInput {
   email: string;
@@ -17,12 +18,14 @@ interface SignInInput {
 }
 
 export default function SignIn() {
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
+  const router = useRouter();
   const methods = useForm<SignInInput>();
   const { handleSubmit } = methods;
 
   const onSubmit: SubmitHandler<SignInInput> = async data => {
+    setIsLoading(true);
     const res = await signIn('credentials', {
       email: data.email,
       password: data.password,
@@ -33,6 +36,7 @@ export default function SignIn() {
       router.push('/');
     } else {
       alert('Failed to sign in');
+      setIsLoading(false);
     }
   };
 
@@ -53,6 +57,7 @@ export default function SignIn() {
           </form>
         </div>
       </div>
+      {isLoading && <LayerSpinner />}
     </FormProvider>
   );
 }

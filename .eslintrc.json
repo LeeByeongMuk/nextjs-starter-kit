@@ -61,6 +61,9 @@
         "argsIgnorePattern": "^_"
       }
     ],
+    "@typescript-eslint/no-explicit-any": [
+      "warn"
+    ],
     "no-nested-ternary": 0,
     "no-alert": "off",
     "import/order": [

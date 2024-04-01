@@ -7,7 +7,7 @@ import { fetchPosts } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
 import ListTable from '@/app/components/Post/ListTable';
 import Pagination from '@/app/components/Post/Pagination';
-import Spinner from '@/app/components/Spinner';
+import { PostsRes } from '@/app/types/post';
 
 export default function PostList() {
   const [page, setPage] = useState(1);
@@ -16,7 +16,7 @@ export default function PostList() {
     data: { data: posts, meta },
     isLoading,
     isError,
-    isFetching
+    isFetching,
   } = useQuery({
     queryKey: ['posts', { page }],
     queryFn: () => fetchPosts({ page }),
@@ -27,16 +27,14 @@ export default function PostList() {
         last_page: 1,
       },
       links: {},
-    },
+    } as unknown as PostsRes,
   });
-
-  if (isFetching|| isLoading || isError) return <Spinner />;
 
   return (
     <section className="pb-8 pt-8">
       <ListFilter />
 
-      <ListTable posts={posts} />
+      <ListTable posts={posts} isLoading={isFetching || isLoading || isError} />
 
       <Pagination meta={meta} setPage={setPage} />
     </section>

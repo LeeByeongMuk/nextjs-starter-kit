@@ -2,7 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { fetchSignUp } from '@/app/api/auth';
@@ -13,6 +13,7 @@ import NickNameInput from '@/app/components/Auth/Form/NickNameInput';
 import PwConfInput from '@/app/components/Auth/Form/PwConfInput';
 import PwInput from '@/app/components/Auth/Form/PwInput';
 import AuthHeader from '@/app/components/Auth/Header';
+import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 
 interface SignUpInput {
   email: string;
@@ -23,6 +24,7 @@ interface SignUpInput {
 }
 
 export default function Signup() {
+  const [isLoading, setIsLoading] = useState(false);
   const { mutate } = useMutation({
     mutationFn: fetchSignUp,
   });
@@ -31,6 +33,7 @@ export default function Signup() {
   const { handleSubmit } = methods;
 
   const onSubmit: SubmitHandler<SignUpInput> = async data => {
+    setIsLoading(true);
     mutate(
       {
         email: data.email,
@@ -50,6 +53,7 @@ export default function Signup() {
         },
         onError: () => {
           alert('Failed to sign up');
+          setIsLoading(false);
         },
       }
     );
@@ -76,6 +80,8 @@ export default function Signup() {
           </form>
         </div>
       </div>
+
+      {isLoading && <LayerSpinner />}
     </FormProvider>
   );
 }

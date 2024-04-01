@@ -24,7 +24,10 @@ const handler = NextAuth({
         const user = await fetchUser();
 
         if (user) {
-          return user.data;
+          return {
+            ...user.data,
+            id: user.data.id.toString(),
+          };
         } else {
           return null;
         }
@@ -43,6 +46,6 @@ const handler = NextAuth({
   },
   pages: {
     signIn: '/signin',
-  }
+  },
 } as NextAuthOptions);
 export { handler as GET, handler as POST };

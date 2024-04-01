@@ -1,8 +1,11 @@
-"use server";
+'use server';
 
 import { cookies } from 'next/headers';
 
-const fetchApi = async (url: string, options: RequestInit = {}) => {
+const fetchApi = async <Response = any>(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> => {
   const cookieStore = cookies();
   const requestUrl = url.startsWith('http')
     ? url
@@ -21,8 +24,8 @@ const fetchApi = async (url: string, options: RequestInit = {}) => {
       },
     });
 
-    return res.json();
-  } catch (err) {
+    return (await res.json()) as Response;
+  } catch (err: any) {
     return err;
   }
 };
