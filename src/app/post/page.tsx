@@ -7,10 +7,14 @@ import { fetchPosts } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
 import ListTable from '@/app/components/Post/ListTable';
 import Pagination from '@/app/components/Post/Pagination';
-import { PostsRes } from '@/app/types/post';
+import { PostsReq, PostsRes } from '@/app/types/post';
 
 export default function PostList() {
-  const [page, setPage] = useState(1);
+  const [searchFilters, setSearchFilters] = useState<PostsReq>({
+    type: '',
+    q: '',
+    page: 1,
+  });
 
   const {
     data: { data: posts, meta },
@@ -18,8 +22,8 @@ export default function PostList() {
     isError,
     isFetching,
   } = useQuery({
-    queryKey: ['posts', { page }],
-    queryFn: () => fetchPosts({ page }),
+    queryKey: ['posts', searchFilters],
+    queryFn: () => fetchPosts(searchFilters),
     initialData: {
       data: [],
       meta: {
@@ -32,11 +36,11 @@ export default function PostList() {
 
   return (
     <section className="pb-8 pt-8">
-      <ListFilter />
+      <ListFilter setSearchFilters={setSearchFilters} />
 
       <ListTable posts={posts} isLoading={isFetching || isLoading || isError} />
 
-      <Pagination meta={meta} setPage={setPage} />
+      <Pagination meta={meta} setSearchFilters={setSearchFilters} />
     </section>
   );
 }
