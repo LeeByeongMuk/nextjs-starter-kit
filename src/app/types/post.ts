@@ -1,6 +1,10 @@
 interface PostsReq {
   page: number;
+  type: 'notice' | 'faq' | '';
+  q: string;
 }
+
+type PostListSearch = Omit<PostsReq, 'page'>;
 
 interface PostListData {
   created_at: string;
@@ -104,6 +108,7 @@ interface PostUpdateResourceRes {
 
 export type {
   PostsReq,
+  PostListSearch,
   PostListData,
   PostsRes,
   PostReq,
