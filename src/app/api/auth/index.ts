@@ -2,35 +2,30 @@
 
 import { cookies } from 'next/headers';
 
+import {
+  SignInReq,
+  SignInRes,
+  SignUpReq,
+  SignUpRes,
+  UserRes,
+} from '@/app/types/auth';
 import { fetchApi } from '@/app/utils/api';
 
 const fetchUser = async () => {
-  return await fetchApi('/api/accounts', {
+  return (await fetchApi('/api/accounts', {
     method: 'GET',
-  });
+  })) as UserRes;
 };
-
-interface SignUpReq {
-  email: string;
-  name: string;
-  nickname?: string | null;
-  password: string;
-}
 
 const fetchSignUp = async (req: SignUpReq) => {
-  return await fetchApi('/api/accounts/signup', {
+  return (await fetchApi('/api/accounts/signup', {
     method: 'POST',
     body: JSON.stringify(req),
-  });
+  })) as SignUpRes;
 };
 
-interface SignInReq {
-  email: string;
-  password: string;
-}
-
 const fetchSignIn = async (req: SignInReq) => {
-  const res = await fetchApi('/api/accounts/signin', {
+  const res: SignInRes = await fetchApi('/api/accounts/signin', {
     method: 'POST',
     body: JSON.stringify(req),
   });
@@ -44,4 +39,3 @@ const fetchSignIn = async (req: SignInReq) => {
 };
 
 export { fetchUser, fetchSignUp, fetchSignIn };
-export type { SignUpReq };
