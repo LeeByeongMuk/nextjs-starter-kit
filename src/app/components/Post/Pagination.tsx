@@ -1,17 +1,19 @@
 import classNames from 'classnames';
 import React from 'react';
 
+import { PostsReq } from '@/app/types/post';
+
 interface Props {
   meta: {
     current_page: number;
     last_page: number;
   };
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;
 }
 
-const PAGE_GROUP_NUMBER = 5;
+const PAGE_GROUP_NUMBER = 10;
 
-export default function Pagination({ meta, setPage }: Props) {
+export default function Pagination({ meta, setSearchFilters }: Props) {
   const getPageGroup = () => {
     const pageGroupNum = Math.ceil(meta.current_page / PAGE_GROUP_NUMBER);
     const firstPageNum = (pageGroupNum - 1) * PAGE_GROUP_NUMBER + 1;
@@ -19,22 +21,22 @@ export default function Pagination({ meta, setPage }: Props) {
 
     return Array.from(
       { length: lastPageNum - firstPageNum + 1 },
-      (_, i) => i + 1
+      (_, i) => firstPageNum + i
     );
   };
 
   const onUpdatePage = (page: number) => {
-    setPage(page);
+    setSearchFilters(prev => ({ ...prev, page }));
   };
 
   const onPrevPage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
-    setPage(meta.current_page - 1);
+    setSearchFilters(prev => ({ ...prev, page: meta.current_page - 1 }));
   };
 
   const onNextPage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
-    setPage(meta.current_page + 1);
+    setSearchFilters(prev => ({ ...prev, page: meta.current_page + 1 }));
   };
 
   const pageGroup = getPageGroup();
