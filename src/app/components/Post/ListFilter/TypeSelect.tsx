@@ -1,13 +1,13 @@
 import classNames from 'classnames';
 import { useFormContext } from 'react-hook-form';
 
-const TYPE_OPTIONS = [
-  { value: '', label: 'all' },
-  { value: 'faq', label: 'faq' },
-  { value: 'notice', label: 'notice' },
-];
+import { LIST_TYPE_OPTIONS } from '@/app/constants/post';
 
-export default function TypeSelect() {
+interface Props {
+  onChange: () => void;
+}
+
+export default function TypeSelect({ onChange }: Props) {
   const { register, watch, setValue } = useFormContext();
 
   return (
@@ -22,8 +22,9 @@ export default function TypeSelect() {
           className="w-full rounded-md border-gray-200"
           defaultValue={''}
           {...register('type')}
+          onChange={onChange}
         >
-          {TYPE_OPTIONS.map(option => (
+          {LIST_TYPE_OPTIONS.map(option => (
             <option key={option.label} value={option.value}>
               {option.label}
             </option>
@@ -33,7 +34,7 @@ export default function TypeSelect() {
 
       <div className="hidden sm:block">
         <nav className="flex gap-6" aria-label="Tabs">
-          {TYPE_OPTIONS.map(option => (
+          {LIST_TYPE_OPTIONS.map(option => (
             <a
               key={option.label}
               href="#"
@@ -50,6 +51,7 @@ export default function TypeSelect() {
               onClick={e => {
                 e.preventDefault();
                 setValue('type', option.value);
+                onChange();
               }}
             >
               {option.label}

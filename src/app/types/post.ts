@@ -1,6 +1,8 @@
+type PostType = 'notice' | 'faq' | '';
+
 interface PostsReq {
   page: number;
-  type: 'notice' | 'faq' | '';
+  type: PostType;
   q: string;
 }
 
@@ -107,6 +109,7 @@ interface PostUpdateResourceRes {
 }
 
 export type {
+  PostType,
   PostsReq,
   PostListSearch,
   PostListData,
