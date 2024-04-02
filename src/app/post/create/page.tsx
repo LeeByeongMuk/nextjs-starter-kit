@@ -42,7 +42,7 @@ export default function PostCreate() {
           router.push(`/post/${res.data.id}`);
         },
         onError: () => {
-          alert('Failed to create notice');
+          alert('Failed to create post');
         },
       }
     );

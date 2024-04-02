@@ -88,7 +88,7 @@ export default function PostUpdate() {
           router.push(`/post/${id}`);
         },
         onError: () => {
-          alert('Failed to update notice');
+          alert('Failed to update post');
         },
       }
     );
