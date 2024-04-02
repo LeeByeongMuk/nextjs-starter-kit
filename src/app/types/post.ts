@@ -35,6 +35,7 @@ interface PostData {
   created_at: string;
   hit: number;
   id: number;
+  is_edit: boolean;
   title: string;
   type: 'notice' | 'post' | null;
   user: {

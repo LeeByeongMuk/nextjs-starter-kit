@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 
@@ -25,6 +26,7 @@ export default function PostDetail() {
         created_at: '',
         hit: 0,
         id: 0,
+        is_edit: false,
         title: '',
         type: '',
         user: {
@@ -50,8 +52,6 @@ export default function PostDetail() {
 
   return (
     <section className="pb-8 pt-8">
-      {/*<ListFilter />*/}
-
       <Detail post={post} isLoading={isFetching || isLoading || isError} />
 
       <div className="mt-5 flex justify-center gap-2.5">
@@ -62,6 +62,16 @@ export default function PostDetail() {
         >
           back
         </button>
+
+        {post.is_edit && (
+          <Link
+            href={`/post/${id}/update`}
+            className="inline-block rounded border border-teal-600 px-12 py-3 text-sm font-medium text-teal-600 hover:bg-teal-600 hover:text-white focus:outline-none focus:ring active:bg-teal-500"
+            passHref={false}
+          >
+            update
+          </Link>
+        )}
       </div>
     </section>
   );
