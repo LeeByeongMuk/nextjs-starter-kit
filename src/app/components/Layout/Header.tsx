@@ -1,10 +1,17 @@
+'use client';
+
+import Link from 'next/link';
+import { signOut, useSession } from 'next-auth/react';
+
 export default function Header() {
+  const { status } = useSession();
+
   return (
     <header className="bg-white">
-      <div className="max-w-screen-xl mx-auto">
+      <div className="mx-auto max-w-screen-xl">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
-            <a className="block text-teal-600" href="/">
+            <Link className="block text-teal-600" href="/">
               <span className="sr-only">Home</span>
               <svg
                 className="h-8"
@@ -17,70 +24,27 @@ export default function Header() {
                   fill="currentColor"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
 
-          <div className="hidden md:block">
+          <div className="md:block">
             <nav aria-label="Global">
               <ul className="flex items-center gap-6 text-sm">
                 <li>
-                  <a
+                  <Link
                     className="text-gray-500 transition hover:text-gray-500/75"
                     href="/"
                   >
-                    {' '}
-                    About{' '}
-                  </a>
+                    Home
+                  </Link>
                 </li>
-
                 <li>
-                  <a
+                  <Link
                     className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/"
+                    href="/post"
                   >
-                    {' '}
-                    Careers{' '}
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/"
-                  >
-                    {' '}
-                    History{' '}
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/"
-                  >
-                    {' '}
-                    Services{' '}
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/"
-                  >
-                    {' '}
-                    Projects{' '}
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/"
-                  >
-                    {' '}
-                    Blog{' '}
-                  </a>
+                    Post
+                  </Link>
                 </li>
               </ul>
             </nav>
@@ -88,40 +52,34 @@ export default function Header() {
 
           <div className="flex items-center gap-4">
             <div className="sm:flex sm:gap-4">
-              <a
-                className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow"
-                href="/"
-              >
-                Login
-              </a>
-
-              <div className="hidden sm:flex">
-                <a
-                  className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600"
-                  href="/"
+              {status !== 'loading' && status === 'authenticated' && (
+                <button
+                  className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow"
+                  onClick={() => signOut()}
                 >
-                  Register
-                </a>
-              </div>
-            </div>
+                  Sign Out
+                </button>
+              )}
 
-            <div className="block md:hidden">
-              <button className="rounded bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </button>
+              {status !== 'loading' && status !== 'authenticated' && (
+                <>
+                  <Link
+                    className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow"
+                    href="/signin"
+                  >
+                    Sign In
+                  </Link>
+
+                  <div className="hidden sm:flex">
+                    <a
+                      className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600"
+                      href="/signup"
+                    >
+                      Sign Up
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
