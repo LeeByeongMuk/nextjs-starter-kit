@@ -2,13 +2,11 @@ import classNames from 'classnames';
 import React from 'react';
 
 import { PAGE_GROUP_NUMBER } from '@/app/constants/post';
+import { PaginationMeta } from '@/app/types/pagination';
 import { PostsReq } from '@/app/types/post';
 
 interface Props {
-  meta: {
-    current_page: number;
-    last_page: number;
-  };
+  meta: PaginationMeta;
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;
 }
 
