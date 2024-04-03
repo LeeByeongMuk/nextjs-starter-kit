@@ -1,6 +1,10 @@
+import { PaginationData } from '@/app/types/pagination';
+
+type PostType = 'notice' | 'faq' | '';
+
 interface PostsReq {
   page: number;
-  type: 'notice' | 'faq' | '';
+  type: PostType;
   q: string;
 }
 
@@ -18,28 +22,8 @@ interface PostListData {
   };
 }
 
-interface PostsRes {
+interface PostsRes extends PaginationData {
   data: PostListData[];
-  links: {
-    first: string;
-    last: string;
-    next: string | null;
-    prev: string | null;
-  };
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    path: string;
-    per_page: number;
-    to: number;
-    total: number;
-  };
 }
 
 interface PostReq {
@@ -51,6 +35,7 @@ interface PostData {
   created_at: string;
   hit: number;
   id: number;
+  is_edit: boolean;
   title: string;
   type: 'notice' | 'post' | null;
   user: {
@@ -107,6 +92,7 @@ interface PostUpdateResourceRes {
 }
 
 export type {
+  PostType,
   PostsReq,
   PostListSearch,
   PostListData,

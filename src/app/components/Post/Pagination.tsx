@@ -1,23 +1,23 @@
 import classNames from 'classnames';
 import React from 'react';
 
+import { PAGE_GROUP_NUMBER } from '@/app/constants/post';
+import { PaginationMeta } from '@/app/types/pagination';
 import { PostsReq } from '@/app/types/post';
 
 interface Props {
-  meta: {
-    current_page: number;
-    last_page: number;
-  };
+  meta: PaginationMeta;
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;
 }
-
-const PAGE_GROUP_NUMBER = 10;
 
 export default function Pagination({ meta, setSearchFilters }: Props) {
   const getPageGroup = () => {
     const pageGroupNum = Math.ceil(meta.current_page / PAGE_GROUP_NUMBER);
     const firstPageNum = (pageGroupNum - 1) * PAGE_GROUP_NUMBER + 1;
-    const lastPageNum = Math.min(PAGE_GROUP_NUMBER * 2, meta.last_page);
+    const lastPageNum = Math.min(
+      firstPageNum + PAGE_GROUP_NUMBER - 1,
+      meta.last_page
+    );
 
     return Array.from(
       { length: lastPageNum - firstPageNum + 1 },

@@ -10,4 +10,6 @@ const LIST_TYPE_OPTIONS = [
   { value: 'faq', label: 'Faq' },
 ];
 
-export { TYPE_OPTIONS, LIST_TYPE_OPTIONS };
+const PAGE_GROUP_NUMBER = 10;
+
+export { TYPE_OPTIONS, LIST_TYPE_OPTIONS, PAGE_GROUP_NUMBER };
