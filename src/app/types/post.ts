@@ -1,6 +1,6 @@
 import { PaginationData } from '@/app/types/pagination';
 
-type PostType = 'notice' | 'faq' | '';
+type PostType = 'notice' | 'faq' | 'free';
 
 interface PostsReq {
   page: number;
@@ -15,7 +15,7 @@ interface PostListData {
   hit: number;
   id: number;
   title: string;
-  type: 'notice' | 'post' | null;
+  type: PostType | null;
   user: {
     id: number;
     name: string;
@@ -37,7 +37,7 @@ interface PostData {
   id: number;
   is_edit: boolean;
   title: string;
-  type: 'notice' | 'post' | null;
+  type: PostType | null;
   user: {
     name: string;
     nickname: string;
@@ -84,7 +84,7 @@ interface PostUpdateResourceReq {
 interface PostUpdateResourceRes {
   data: {
     id: number;
-    type: 'notice' | 'faq' | null;
+    type: PostType | null;
     title: string;
     contents: string;
     is_open: boolean;

@@ -17,11 +17,11 @@ import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
-import { PostUpdateResourceRes } from '@/app/types/post';
+import { PostType, PostUpdateResourceRes } from '@/app/types/post';
 
 interface PostFormInput {
   title: string;
-  type: string | null;
+  type: PostType | null;
   contents: string;
   isOpen: boolean | null;
 }
@@ -102,7 +102,7 @@ export default function PostUpdate() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <TitleInput defaultValue={post.title} />
 
-          <TypeSelect selectedValue={post.type} />
+          <TypeSelect selectedValue={post.type || undefined} />
 
           <ContentsEditor defaultValue={post.contents} />
 
