@@ -24,7 +24,6 @@ const handler = NextAuth({
           password: credentials?.password || '',
         });
         const user = await fetchUser();
-
         const id = access_token.split('|')[0] || '';
 
         if (user) {
@@ -39,7 +38,11 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      if (trigger === 'update') {
+        const updateUser = await fetchUser();
+        return { ...token, ...user, ...updateUser.data };
+      }
       return { ...token, ...user };
     },
 
