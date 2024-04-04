@@ -46,6 +46,16 @@ export default function Header() {
                     Post
                   </Link>
                 </li>
+                {status === 'authenticated' && (
+                  <li>
+                    <Link
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                      href="/account"
+                    >
+                      Account
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>

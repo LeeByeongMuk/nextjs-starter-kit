@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 
+import Layout from '@/app/components/Layout';
 import Provider from '@/app/components/Provider';
 
 import './globals.css';
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <Provider>
-          <div className="container mx-auto">{children}</div>
+          <div className="container mx-auto">
+            <Layout>{children}</Layout>
+          </div>
         </Provider>
       </body>
     </html>

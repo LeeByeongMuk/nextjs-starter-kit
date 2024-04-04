@@ -7,7 +7,11 @@ import {
   SignInRes,
   SignUpReq,
   SignUpRes,
+  UserDeleteReq,
+  UserDeleteRes,
   UserRes,
+  UserUpdateReq,
+  UserUpdateRes,
 } from '@/app/types/auth';
 import { fetchApi } from '@/app/utils/api';
 
@@ -38,4 +42,24 @@ const fetchSignIn = async (req: SignInReq) => {
   return res;
 };
 
-export { fetchUser, fetchSignUp, fetchSignIn };
+const fetchUserUpdate = async (req: UserUpdateReq) => {
+  return (await fetchApi('/api/accounts', {
+    method: 'PUT',
+    body: JSON.stringify(req),
+  })) as UserUpdateRes;
+};
+
+const fetchUserDelete = async (req: UserDeleteReq) => {
+  return (await fetchApi('/api/accounts', {
+    method: 'DELETE',
+    body: JSON.stringify(req),
+  })) as UserDeleteRes;
+};
+
+export {
+  fetchUser,
+  fetchSignUp,
+  fetchSignIn,
+  fetchUserUpdate,
+  fetchUserDelete,
+};

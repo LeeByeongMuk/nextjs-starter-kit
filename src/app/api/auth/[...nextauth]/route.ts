@@ -17,16 +17,19 @@ const handler = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        await fetchSignIn({
+        const {
+          data: { access_token },
+        } = await fetchSignIn({
           email: credentials?.email || '',
           password: credentials?.password || '',
         });
         const user = await fetchUser();
+        const id = access_token.split('|')[0] || '';
 
         if (user) {
           return {
             ...user.data,
-            id: user.data.id.toString(),
+            id,
           };
         } else {
           return null;
@@ -35,7 +38,11 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      if (trigger === 'update') {
+        const updateUser = await fetchUser();
+        return { ...token, ...user, ...updateUser.data };
+      }
       return { ...token, ...user };
     },
 
