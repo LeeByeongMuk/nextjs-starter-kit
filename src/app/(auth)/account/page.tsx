@@ -1,11 +1,11 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import { fetchUserUpdate } from '@/app/api/auth';
+import { fetchUserDelete, fetchUserUpdate } from '@/app/api/auth';
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
 import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import NameInput from '@/app/components/Auth/Form/NameInput';
@@ -28,6 +28,10 @@ export default function Account() {
 
   const { mutate } = useMutation({
     mutationFn: fetchUserUpdate,
+  });
+
+  const { mutate: deleteMutate } = useMutation({
+    mutationFn: fetchUserDelete,
   });
 
   const onSubmit: SubmitHandler<UserUpdateInput> = async data => {
@@ -53,6 +57,32 @@ export default function Account() {
     );
   };
 
+  const onUserDelete = () => {
+    const deletedReason = prompt('Are you sure you want to delete your account? Please enter a reason');
+    if (!deletedReason) return;
+
+    setIsLoading(true);
+    deleteMutate(
+      {
+        deleted_reason: deletedReason,
+      },
+      {
+        onSuccess: async () => {
+          alert('Account deleted successfully');
+          await signOut({
+            callbackUrl: '/',
+          });
+        },
+        onError: () => {
+          alert('Failed to delete account');
+        },
+        onSettled: () => {
+          setIsLoading(false);
+        },
+      }
+    );
+  };
+
   return (
     <FormProvider {...methods}>
       <div className="flex min-h-full flex-col justify-center px-6 py-10 lg:px-8">
@@ -68,6 +98,16 @@ export default function Account() {
 
             <ButtonBox buttonText="Account Update" />
           </form>
+
+          <div className="mt-3">
+            <button
+              type="button"
+              className="flex w-full justify-center rounded-md border border-teal-600 bg-teal-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-transparent hover:text-teal-600 focus:outline-none focus:ring active:text-teal-500"
+              onClick={onUserDelete}
+            >
+              Account Delete
+            </button>
+          </div>
         </div>
       </div>
       {isLoading && <LayerSpinner />}
