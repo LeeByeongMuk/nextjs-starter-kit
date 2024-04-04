@@ -1,7 +1,6 @@
 interface UserData {
   created_at: string;
   email: string;
-  id: number;
   name: string;
   nickname: string | null;
   phone: string | null;
