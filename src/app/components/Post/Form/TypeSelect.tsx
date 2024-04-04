@@ -2,9 +2,10 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { TYPE_OPTIONS } from '@/app/constants/post';
+import { PostType } from '@/app/types/post';
 
 interface Props {
-  selectedValue?: 'notice' | 'faq' | null;
+  selectedValue?: PostType;
 }
 
 export default function TypeSelect({ selectedValue }: Props) {
