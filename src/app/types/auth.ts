@@ -31,4 +31,34 @@ interface SignUpReq {
 
 interface SignUpRes extends SignInRes {}
 
-export type { UserData, UserRes, SignUpReq, SignUpRes, SignInReq, SignInRes };
+interface UserUpdateReq {
+  email: string;
+  name: string;
+  nickname: string;
+}
+
+interface UserUpdateRes {
+  data: {
+    id: string;
+    message: string;
+  };
+}
+
+interface UserDeleteReq {
+  deleted_reason: string;
+}
+
+interface UserDeleteRes extends UserUpdateRes {}
+
+export type {
+  UserData,
+  UserRes,
+  SignUpReq,
+  SignUpRes,
+  SignInReq,
+  SignInRes,
+  UserUpdateReq,
+  UserUpdateRes,
+  UserDeleteReq,
+  UserDeleteRes,
+};
