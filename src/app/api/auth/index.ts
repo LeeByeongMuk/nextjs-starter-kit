@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 
+import { TOKEN_KEY } from '@/app/constants/auth';
 import {
   SignInReq,
   SignInRes,
@@ -35,7 +36,7 @@ const fetchSignIn = async (req: SignInReq) => {
   });
 
   const { access_token } = res.data;
-  cookies().set('access_token', access_token, {
+  cookies().set(TOKEN_KEY, access_token, {
     path: '/',
   });
 
