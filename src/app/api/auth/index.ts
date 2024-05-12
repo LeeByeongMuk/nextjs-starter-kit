@@ -51,8 +51,8 @@ const fetchUserUpdate = async (req: UserUpdateReq) => {
 };
 
 const fetchUserDelete = async (req: UserDeleteReq) => {
-  return (await fetchApi('/api/accounts', {
-    method: 'DELETE',
+  return (await fetchApi('/api/accounts/delete', {
+    method: 'POST',
     body: JSON.stringify(req),
   })) as UserDeleteRes;
 };
