@@ -7,7 +7,7 @@ import { TOKEN_KEY } from '@/app/constants/auth';
 const fetchApi = async <Response>(
   url: string,
   options: RequestInit = {}
-): Promise<Response | Error> => {
+): Promise<Response> => {
   const cookieStore = cookies();
   const requestUrl = url.startsWith('http')
     ? url
