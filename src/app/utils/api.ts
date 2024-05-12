@@ -4,10 +4,10 @@ import { cookies } from 'next/headers';
 
 import { TOKEN_KEY } from '@/app/constants/auth';
 
-const fetchApi = async <Response = any>(
+const fetchApi = async <Response>(
   url: string,
   options: RequestInit = {}
-): Promise<Response> => {
+): Promise<Response | Error> => {
   const cookieStore = cookies();
   const requestUrl = url.startsWith('http')
     ? url
@@ -26,9 +26,13 @@ const fetchApi = async <Response = any>(
       },
     });
 
-    return (await res.json()) as Response;
-  } catch (err: any) {
-    return err;
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+
+    return res.json();
+  } catch (err: unknown) {
+    throw new Error((err as Error).message);
   }
 };
 
