@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "prettier": "prettier --check ./src",
+    "prettier:fix": "prettier --write ./src",
     "test": "jest",
     "test:watch": "jest --watch",
     "tsc": "tsc"
