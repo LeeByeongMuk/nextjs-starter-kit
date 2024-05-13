@@ -6,13 +6,12 @@ on:
     branches:
       - main
       - develop
-      - chore/*
   pull_request:
     branches:
       - main
       - develop
-#  schedule:
-#    - cron: '25 21 * * 5'
+  schedule:
+    - cron: '25 21 * * 5'
 
 jobs:
   build:
