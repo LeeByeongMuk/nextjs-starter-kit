@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - develop
+      - chore/*
   schedule:
     - cron: '25 21 * * 5'
 
