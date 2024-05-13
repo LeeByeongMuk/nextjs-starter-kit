@@ -4,10 +4,8 @@ name: code check workflow
 on:
   push:
     branches:
-      - [dm][ea][vi]*
-  pull_request:
-    types:
-      - opened
+      - main
+      - develop
   schedule:
     - cron: '25 21 * * 5'
 
