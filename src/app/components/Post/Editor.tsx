@@ -23,7 +23,7 @@ export default function Editor({ initialValue = '', onChange }: Props) {
 
   const onEditorChange = () => {
     onChange(editorRef.current?.getInstance().getHTML() || '');
-  }
+  };
 
   return (
     <TuiEditor

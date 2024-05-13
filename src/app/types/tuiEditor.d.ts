@@ -1,3 +1,3 @@
-import "@toast-ui/react-editor";
+import '@toast-ui/react-editor';
 
 declare module '@toast-ui/react-editor';
