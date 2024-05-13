@@ -1,6 +1,5 @@
 name: code check workflow
 
-
 on:
   push:
     branches:
@@ -14,8 +13,11 @@ on:
     - cron: '25 21 * * 5'
 
 permissions:
-  checks: write
   pull-requests: write
+  checks: write
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build:
