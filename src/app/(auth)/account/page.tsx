@@ -58,7 +58,9 @@ export default function Account() {
   };
 
   const onUserDelete = () => {
-    const deletedReason = prompt('Are you sure you want to delete your account? Please enter a reason');
+    const deletedReason = prompt(
+      'Are you sure you want to delete your account? Please enter a reason'
+    );
     if (!deletedReason) return;
 
     setIsLoading(true);
