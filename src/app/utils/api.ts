@@ -2,7 +2,9 @@
 
 import { cookies } from 'next/headers';
 
-const fetchApi = async <Response = any>(
+import { TOKEN_KEY } from '@/app/constants/auth';
+
+const fetchApi = async <Response>(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> => {
@@ -10,7 +12,7 @@ const fetchApi = async <Response = any>(
   const requestUrl = url.startsWith('http')
     ? url
     : `${process.env.APP_API_URL}${url}`;
-  const hasAccessToken = cookieStore.has('access_token');
+  const hasAccessToken = cookieStore.has(TOKEN_KEY);
 
   try {
     const res = await fetch(requestUrl, {
@@ -19,14 +21,18 @@ const fetchApi = async <Response = any>(
         ...options.headers,
         'Content-Type': 'application/json',
         Authorization: hasAccessToken
-          ? `Bearer ${cookieStore.get('access_token')?.value}`
+          ? `Bearer ${cookieStore.get(TOKEN_KEY)?.value}`
           : '',
       },
     });
 
-    return (await res.json()) as Response;
-  } catch (err: any) {
-    return err;
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+
+    return res.json();
+  } catch (err: unknown) {
+    throw new Error((err as Error).message);
   }
 };
 

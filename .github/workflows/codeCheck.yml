@@ -1,18 +1,24 @@
 name: code check workflow
 
-
 on:
   push:
     branches:
-      - [dm][ea][vi]*
+      - main
+      - develop
   pull_request:
-    types:
-      - opened
+    branches:
+      - main
+      - develop
   schedule:
     - cron: '25 21 * * 5'
 
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,16 +26,20 @@ jobs:
         node-version: [ 20.x ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
 
       - name: Install the project dependencies
         run: npm install
+
+      - name: fix code style issues with prettier & eslint
+        run: npm run lint:fix && npm run prettier:fix
 
       - name: Build the project
         run: npm run build
@@ -42,3 +52,23 @@ jobs:
 
       - name: TS check
         run: npm run tsc
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Fix styling
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results/**/*.xml
+            test-results/**/*.trx
+            test-results/**/*.json
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'build/test-results/test/TEST-*.xml'

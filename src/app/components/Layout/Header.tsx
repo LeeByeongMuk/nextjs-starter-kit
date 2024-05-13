@@ -3,8 +3,15 @@
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 
+import { TOKEN_KEY } from '@/app/constants/auth';
+
 export default function Header() {
   const { status } = useSession();
+
+  const onSignOut = async () => {
+    await signOut();
+    document.cookie = `${TOKEN_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  };
 
   return (
     <header className="bg-white">
@@ -65,7 +72,7 @@ export default function Header() {
               {status !== 'loading' && status === 'authenticated' && (
                 <button
                   className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow"
-                  onClick={() => signOut()}
+                  onClick={onSignOut}
                 >
                   Sign Out
                 </button>
