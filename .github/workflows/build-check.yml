@@ -1,6 +1,10 @@
 name: Build Check Workflow
 
-on: [ push ]
+on:
+  workflow_run:
+    workflows: [Code Lint Workflow]
+    types:
+      - requested
 
 jobs:
   build:
