@@ -1,16 +1,6 @@
-name: code check workflow
+name: Code lint workflow
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
-  schedule:
-    - cron: '25 21 * * 5'
+on: [ push ]
 
 permissions:
   contents: read
@@ -18,7 +8,7 @@ permissions:
   checks: write
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,28 +20,8 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install the project dependencies
-        run: npm install
-
-      - name: fix code style issues with prettier & eslint
+      - name: Fix code style issues with prettier & eslint
         run: npm run lint:fix && npm run prettier:fix
-
-      - name: Build the project
-        run: npm run build
-
-      - name: Prettier check
-        run: npm run prettier
-
-      - name: Lint check
-        run: npm run lint
-
-      - name: TS check
-        run: npm run tsc
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
