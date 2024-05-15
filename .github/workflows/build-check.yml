@@ -2,7 +2,7 @@ name: Build check workflow
 
 on:
   workflow_run:
-    workflows: ["Code lint workflow"]
+    workflows: [Code lint workflow]
     types:
       - completed
 
