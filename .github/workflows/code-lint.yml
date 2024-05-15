@@ -1,4 +1,4 @@
-name: Code Lint Workflow
+name: Code Lint
 
 on: [ push, pull_request ]
 
