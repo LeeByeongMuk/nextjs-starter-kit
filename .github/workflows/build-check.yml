@@ -1,16 +1,10 @@
-name: Build check workflow
+name: Build Check Workflow
 
 on:
   workflow_run:
-    workflows:
-      - Code lint workflow
+    workflows: ["Code Lint Workflow"]
     types:
       - completed
-
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
 
 jobs:
   build:

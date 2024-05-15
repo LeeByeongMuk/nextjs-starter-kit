@@ -1,11 +1,6 @@
-name: Code lint workflow
+name: Code Lint Workflow
 
 on: [ push ]
-
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
 
 jobs:
   lint:
