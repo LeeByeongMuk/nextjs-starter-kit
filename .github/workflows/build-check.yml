@@ -2,7 +2,7 @@ name: Build Check Workflow
 
 on:
   workflow_run:
-    workflows: ["Code Lint Workflow"]
+    workflows: [ "Code Lint Workflow" ]
     types:
       - completed
 
@@ -13,6 +13,8 @@ jobs:
     strategy:
       matrix:
         node-version: [ 20.x ]
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - uses: actions/checkouts@v4
