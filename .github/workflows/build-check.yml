@@ -2,6 +2,9 @@ name: Build Check
 
 on:
   workflow_run:
+    branches:
+      - main
+      - develop
     workflows: [Code Lint]
     types:
       - completed
