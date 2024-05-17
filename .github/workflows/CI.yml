@@ -4,6 +4,7 @@ on: [ push ]
 
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,18 +28,26 @@ jobs:
           commit_message: Fix styling
 
   build:
+    name: Build
     runs-on: ubuntu-latest
-    needs: [lint]
+    needs: [Lint]
 
     strategy:
       matrix:
         node-version: [ 20.x ]
 
     steps:
+      - uses: actions/checkouts@v4
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Install the project dependencies
+        run: npm install
 
       - name: Build the project
         run: npm run build
