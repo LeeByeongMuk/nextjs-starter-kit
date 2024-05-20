@@ -1,17 +1,17 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
 
 import { fetchPosts } from '@/app/api/post';
 import ListFilter from '@/app/components/Post/ListFilter';
 import ListTable from '@/app/components/Post/ListTable';
 import Pagination from '@/app/components/Post/Pagination';
+import useReplaceSearchParams from '@/app/hooks/post/useReplaceSearchParams';
 import { PostsReq, PostsRes, PostType } from '@/app/types/post';
 
 export default function PostList() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [searchFilters, setSearchFilters] = useState<PostsReq>({
@@ -38,15 +38,7 @@ export default function PostList() {
     } as unknown as PostsRes,
   });
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    params.append('type', searchFilters.type);
-    params.append('q', searchFilters.q);
-    params.append('page', searchFilters.page.toString());
-
-    const url = `?${params.toString()}`;
-    router.replace(url);
-  }, [searchFilters, router]);
+  useReplaceSearchParams({ searchFilters });
 
   return (
     <section className="pb-8 pt-8">
