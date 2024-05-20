@@ -4,10 +4,11 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
-import React from 'react';
-import { fetchPost, fetchPosts } from '@/app/api/post';
-import { PostData, PostReq, PostRes, PostsReq } from '@/app/types/post';
 import { renderHook, waitFor } from '@testing-library/react';
+import React from 'react';
+
+import { fetchPost } from '@/app/api/post';
+import { PostData, PostReq } from '@/app/types/post';
 
 const createTestQueryClient = () =>
   new QueryClient({
