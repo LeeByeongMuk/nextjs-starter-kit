@@ -79,4 +79,4 @@ export {
   fetchPostUpdate,
   fetchPostUpdateResource,
 };
-export type { PostCreateReq, PostUpdateReq }
+export type { PostCreateReq, PostUpdateReq };
