@@ -32,3 +32,7 @@ npm install
 cp .env.example .env
 docker compose up -d
 ```
+
+## Backend
+@kimchanhyung98 님의 Laravel Starter Kit 을 사용하였습니다.
+- https://github.com/kimchanhyung98/laravel-starter-kit
