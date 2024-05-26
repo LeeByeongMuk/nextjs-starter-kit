@@ -36,7 +36,7 @@ export default function PostDetail() {
       },
     } as unknown as PostRes,
     queryFn: () => fetchPost({ id }),
-    queryKey: ['posts', { id }],
+    queryKey: ['post', { id }],
   });
 
   useEffect(() => {
