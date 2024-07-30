@@ -13,7 +13,8 @@ export default function ValidationError({ isError, message, role }: Props) {
     <span
       role={role}
       data-testid="error-message"
-      className="ml-1 mt-1 flex items-center text-xs font-medium tracking-wide text-red-500">
+      className="ml-1 mt-1 flex items-center text-xs font-medium tracking-wide text-red-500"
+    >
       {message || 'Invalid field!'}
     </span>
   );
