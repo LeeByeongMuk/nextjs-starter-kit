@@ -18,7 +18,7 @@ import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 interface SignUpInput {
   email: string;
   name: string;
-  nickname: string | null;
+  nickname: string;
   password: string;
   passwordConfirmation: string;
 }
@@ -38,7 +38,7 @@ export default function Signup() {
       {
         email: data.email,
         name: data.name,
-        nickname: data.nickname || null,
+        nickname: data.nickname,
         password: data.password,
       },
       {
