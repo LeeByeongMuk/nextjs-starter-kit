@@ -40,6 +40,7 @@ export default function PwConfInput() {
         />
 
         <ValidationError
+          role="pw-confirm-error-message"
           isError={!!errors.passwordConfirmation}
           message={errors.passwordConfirmation?.message?.toString()}
         />
