@@ -26,7 +26,7 @@
     "classnames": "^2.5.1",
     "next": "14.0.4",
     "next-auth": "^4.24.7",
-    "npm-check-updates": "^16.14.18",
+    "npm-check-updates": "^17.0.2",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.2"
