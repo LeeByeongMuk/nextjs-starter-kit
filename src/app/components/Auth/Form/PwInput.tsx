@@ -49,7 +49,8 @@ export default function PwInput() {
               message: 'Password must be at most 20 characters long',
             },
             pattern: {
-              value: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+              value:
+                /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
               message:
                 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
             },

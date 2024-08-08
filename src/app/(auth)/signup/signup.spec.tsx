@@ -49,7 +49,6 @@ describe('회원가입 테스트', () => {
       get: jest.fn().mockReturnValue,
     });
 
-
     // given - 회원가입 페이지가 그려짐
     render(<Signup />, { wrapper });
   });
