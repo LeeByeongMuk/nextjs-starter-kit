@@ -1,11 +1,8 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { signIn } from 'next-auth/react';
-import React, { useState } from 'react';
+import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import { fetchSignUp } from '@/app/api/auth';
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
 import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import NameInput from '@/app/components/Auth/Form/NameInput';
@@ -14,6 +11,7 @@ import PwConfInput from '@/app/components/Auth/Form/PwConfInput';
 import PwInput from '@/app/components/Auth/Form/PwInput';
 import AuthHeader from '@/app/components/Auth/Header';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
+import useSignup from '@/app/hooks/auth/useSignup';
 
 interface SignUpInput {
   email: string;
@@ -24,39 +22,19 @@ interface SignUpInput {
 }
 
 export default function Signup() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { mutate } = useMutation({
-    mutationFn: fetchSignUp,
-  });
+  const { mutate, isPending } = useSignup();
 
   const methods = useForm<SignUpInput>();
   const { handleSubmit } = methods;
 
   const onSubmit: SubmitHandler<SignUpInput> = async data => {
-    setIsLoading(true);
-    mutate(
-      {
-        email: data.email,
-        name: data.name,
-        nickname: data.nickname,
-        password: data.password,
-      },
-      {
-        onSuccess: async () => {
-          alert('Signed up successfully');
-
-          await signIn('credentials', {
-            email: data.email,
-            password: data.password,
-            callbackUrl: '/',
-          });
-        },
-        onError: () => {
-          alert('Failed to sign up');
-          setIsLoading(false);
-        },
-      }
-    );
+    if (isPending) return;
+    mutate({
+      email: data.email,
+      name: data.name,
+      nickname: data.nickname,
+      password: data.password,
+    });
   };
 
   return (
@@ -81,7 +59,7 @@ export default function Signup() {
         </div>
       </div>
 
-      {isLoading && <LayerSpinner />}
+      {isPending && <LayerSpinner />}
     </FormProvider>
   );
 }
