@@ -9,6 +9,8 @@ export default function useSignup() {
     onSuccess: async (_, data) => {
       alert('Signed up successfully!');
 
+      console.info(process.env);
+
       await signIn('credentials', {
         email: data.email,
         password: data.password,
