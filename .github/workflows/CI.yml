@@ -48,6 +48,10 @@ jobs:
 
       - name: Run tests
         run: npm run jest
+        env:
+          APP_API_URL: ${{ secrets.APP_API_URL }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
   build:
     needs: lint
