@@ -7,7 +7,7 @@ export default function useSignup() {
   return useMutation({
     mutationFn: fetchSignUp,
     onSuccess: async (_, data) => {
-      alert('Signed up successfully');
+      alert('Signed up successfully!');
 
       await signIn('credentials', {
         email: data.email,

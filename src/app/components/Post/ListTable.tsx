@@ -45,7 +45,7 @@ export default function ListTable({ posts, isLoading }: Props) {
           {post.hit}
         </td>
         <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-          {post.user.name}
+          {post.user?.name}
         </td>
         <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
           {getFormattedDate(post.created_at)}

@@ -9,9 +9,10 @@ export const handlers = [
     });
   }),
   http.post(`/api/users/signup`, () => {
-    return new HttpResponse(null, {
-      status: 403,
-      statusText: 'Forbidden',
+    return HttpResponse.json({
+      data: {
+        access_token: '1|mockaccesstoken0000',
+      },
     });
   }),
 ];

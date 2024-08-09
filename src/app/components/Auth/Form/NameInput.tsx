@@ -46,6 +46,7 @@ export default function NameInput({ defaultValue }: Props) {
         />
 
         <ValidationError
+          role="name-error-message"
           isError={!!errors.name}
           message={errors.name?.message?.toString()}
         />

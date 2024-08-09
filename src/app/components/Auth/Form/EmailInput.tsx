@@ -41,6 +41,7 @@ export default function EmailInput({ defaultValue }: Props) {
         />
 
         <ValidationError
+          role="email-error-message"
           isError={!!errors.email}
           message={errors.email?.message?.toString()}
         />
