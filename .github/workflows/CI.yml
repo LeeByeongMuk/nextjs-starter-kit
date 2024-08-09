@@ -40,6 +40,7 @@ jobs:
 
       - name: .env setting
         run: |
+          touch .env
           echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
