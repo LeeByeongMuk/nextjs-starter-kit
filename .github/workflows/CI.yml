@@ -40,12 +40,12 @@ jobs:
 
       - name: .env setting
         run: |
-          echo "APP_API_URL=${{ vars.APP_API_URL }}" >> .env
-          echo "NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}" >> .env
+          echo "APP_API_URL=http://localhost:80" >> .env
+          echo "NEXTAUTH_URL=http://localhost:3000" >> .env
           echo "NEXTAUTH_SECRET=${{ vars.NEXTAUTH_SECRET }}" >> .env
         env:
-          APP_API_URL: ${{ vars.APP_API_URL }}
-          NEXTAUTH_URL: ${{ vars.NEXTAUTH_URL }}
+          APP_API_URL: http://localhost:80
+          NEXTAUTH_URL: http://localhost:3000
           NEXTAUTH_SECRET: ${{ vars.NEXTAUTH_SECRET }}
 
       - name: Use Node.js ${{ matrix.node-version }}
