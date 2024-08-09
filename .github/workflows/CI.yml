@@ -44,6 +44,8 @@ jobs:
           echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "${{ secrets.APP_API_URL }}"
+          echo "${{ secrets.NEXTAUTH_URL }}"
         env:
           APP_API_URL: ${{ secrets.APP_API_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
