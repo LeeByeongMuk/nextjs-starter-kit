@@ -7,8 +7,8 @@ import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
 import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import NameInput from '@/app/components/Auth/Form/NameInput';
 import NickNameInput from '@/app/components/Auth/Form/NickNameInput';
-import PwConfInput from '@/app/components/Auth/Form/PwConfInput';
-import PwInput from '@/app/components/Auth/Form/PwInput';
+import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
+import PasswordConfirmInput from '@/app/components/Auth/Form/PasswordConfirmInput';
 import AuthHeader from '@/app/components/Auth/Header';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useSignup from '@/app/hooks/auth/useSignup';
@@ -50,9 +50,9 @@ export default function Signup() {
 
             <NickNameInput />
 
-            <PwInput />
+            <PasswordInput />
 
-            <PwConfInput />
+            <PasswordConfirmInput />
 
             <ButtonBox buttonText="Sign up" />
           </form>

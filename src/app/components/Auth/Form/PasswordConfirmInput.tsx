@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import ValidationError from '@/app/components/Error/ValidationError';
 
-export default function PwConfInput() {
+export default function PasswordConfirmInput() {
   const {
     register,
     getValues,

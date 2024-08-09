@@ -7,7 +7,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
 import EmailInput from '@/app/components/Auth/Form/EmailInput';
-import PwInput from '@/app/components/Auth/Form/PwInput';
+import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
 import Social from '@/app/components/Auth/Form/Social';
 import AuthHeader from '@/app/components/Auth/Header';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
@@ -49,7 +49,7 @@ export default function SignIn() {
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <EmailInput />
 
-            <PwInput />
+            <PasswordInput />
 
             <ButtonBox buttonText="Sign in" />
 
