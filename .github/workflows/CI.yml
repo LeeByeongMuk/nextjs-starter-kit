@@ -28,10 +28,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    env:
-      APP_API_URL: ${{ secrets.APP_API_URL }}
-      NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
     strategy:
       matrix:
@@ -43,6 +39,10 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: .env setting
+        env:
+          APP_API_URL: ${{ secrets.APP_API_URL }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
         run: |
           echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
