@@ -39,14 +39,14 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: .env setting
+        run: |
+          echo "APP_API_URL=$APP_API_URL" >> .env
+          echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env
+          echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env
         env:
           APP_API_URL: ${{ secrets.APP_API_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-        run: |
-          echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
-          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
