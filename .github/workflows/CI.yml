@@ -1,6 +1,11 @@
 name: CI
 
-on: [ push ]
+on: [push, pull_request]
+
+env:
+  APP_API_URL: ${{ secrets.APP_API_URL }}
+  NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+  NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
 jobs:
   lint:
@@ -38,23 +43,17 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: .env setting
         run: |
           touch .env
           echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
-          echo "${{ secrets.APP_API_URL }}"
-          echo "${{ secrets.NEXTAUTH_URL }}"
-        env:
-          APP_API_URL: ${{ secrets.APP_API_URL }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
 
       - name: Install the project dependencies
         run: npm install
