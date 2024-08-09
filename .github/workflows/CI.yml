@@ -51,7 +51,11 @@ jobs:
           APP_API_URL: ${{ secrets.APP_API_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-        run: npm run jest
+        run: |
+          echo ${#APP_API_URL}
+          echo ${#NEXTAUTH_URL}
+          echo ${#NEXTAUTH_SECRET}
+          npm run jest
 
   build:
     needs: lint
