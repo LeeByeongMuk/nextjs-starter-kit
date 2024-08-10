@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
@@ -7,7 +8,6 @@ import React from 'react';
 
 import SignIn from '@/app/(auth)/signin/page';
 import { server } from '@/mocks/node';
-import { http, HttpResponse } from 'msw';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -101,7 +101,7 @@ describe('로그인 테스트', () => {
         target: { value: 'Password11!!' },
       });
       fireEvent.submit(screen.getByTestId('submit-button'));
-      
+
       // then - 회원가입 실패
       await waitFor(() =>
         expect(window.alert).toHaveBeenCalledWith('Failed to sign in')
