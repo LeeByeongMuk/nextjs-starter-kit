@@ -46,6 +46,7 @@ export default function NickNameInput({ defaultValue }: Props) {
         />
 
         <ValidationError
+          role="nickname-error-message"
           isError={!!errors.nickname}
           message={errors.nickname?.message?.toString()}
         />

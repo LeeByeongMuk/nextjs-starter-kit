@@ -2,7 +2,7 @@ interface UserData {
   created_at: string;
   email: string;
   name: string;
-  nickname: string | null;
+  nickname: string;
   phone: string | null;
   provider: string | null;
 }
@@ -25,7 +25,7 @@ interface SignInRes {
 interface SignUpReq {
   email: string;
   name: string;
-  nickname?: string | null;
+  nickname: string;
   password: string;
 }
 

@@ -12,3 +12,5 @@ Dockerfile
 .idea
 .yarn
 .pnp.*
+jest.setup.js
+jest.polyfills.js

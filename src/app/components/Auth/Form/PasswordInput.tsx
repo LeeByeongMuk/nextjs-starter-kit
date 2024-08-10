@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import ValidationError from '@/app/components/Error/ValidationError';
 
-export default function PwInput() {
+export default function PasswordInput() {
   const {
     register,
     formState: { errors },
@@ -48,9 +48,16 @@ export default function PwInput() {
               value: 20,
               message: 'Password must be at most 20 characters long',
             },
+            pattern: {
+              value:
+                /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+              message:
+                'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+            },
           })}
         />
         <ValidationError
+          role="password-error-message"
           isError={!!errors.password}
           message={errors.password?.message?.toString()}
         />
