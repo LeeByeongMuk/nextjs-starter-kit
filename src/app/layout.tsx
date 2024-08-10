@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 import Layout from '@/app/components/Layout';
-import { MockProvider } from '@/app/components/MSW/MockProvider';
 import Provider from '@/app/components/Provider';
 
 import './globals.css';
@@ -20,13 +19,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <MockProvider>
-          <Provider>
-            <div className="container mx-auto">
-              <Layout>{children}</Layout>
-            </div>
-          </Provider>
-        </MockProvider>
+        <Provider>
+          <div className="container mx-auto">
+            <Layout>{children}</Layout>
+          </div>
+        </Provider>
       </body>
     </html>
   );
