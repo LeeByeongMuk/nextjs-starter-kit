@@ -2,15 +2,16 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { signOut, useSession } from 'next-auth/react';
-import React, { useState } from 'react';
+import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import { fetchUserDelete, fetchUserUpdate } from '@/app/api/auth';
+import { fetchUserDelete } from '@/app/api/auth';
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
 import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import NameInput from '@/app/components/Auth/Form/NameInput';
 import NickNameInput from '@/app/components/Auth/Form/NickNameInput';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
+import useUserUpdate from '@/app/hooks/auth/useUserUpdate';
 
 interface UserUpdateInput {
   email: string;
@@ -19,24 +20,19 @@ interface UserUpdateInput {
 }
 
 export default function Account() {
-  const [isLoading, setIsLoading] = useState(false);
-
   const { data: session, update } = useSession();
 
   const methods = useForm<UserUpdateInput>();
   const { handleSubmit } = methods;
 
-  const { mutate } = useMutation({
-    mutationFn: fetchUserUpdate,
-  });
+  const updateMutate = useUserUpdate();
 
-  const { mutate: deleteMutate } = useMutation({
+  const deleteMutate = useMutation({
     mutationFn: fetchUserDelete,
   });
 
   const onSubmit: SubmitHandler<UserUpdateInput> = async data => {
-    setIsLoading(true);
-    mutate(
+    updateMutate.mutate(
       {
         email: data.email,
         name: data.name,
@@ -50,9 +46,6 @@ export default function Account() {
         onError: () => {
           alert('Failed to update account');
         },
-        onSettled: () => {
-          setIsLoading(false);
-        },
       }
     );
   };
@@ -63,8 +56,7 @@ export default function Account() {
     );
     if (!deletedReason) return;
 
-    setIsLoading(true);
-    deleteMutate(
+    deleteMutate.mutate(
       {
         deleted_reason: deletedReason,
       },
@@ -77,9 +69,6 @@ export default function Account() {
         },
         onError: () => {
           alert('Failed to delete account');
-        },
-        onSettled: () => {
-          setIsLoading(false);
         },
       }
     );
@@ -112,7 +101,7 @@ export default function Account() {
           </div>
         </div>
       </div>
-      {isLoading && <LayerSpinner />}
+      {(updateMutate.isPending || deleteMutate.isPending) && <LayerSpinner />}
     </FormProvider>
   );
 }
