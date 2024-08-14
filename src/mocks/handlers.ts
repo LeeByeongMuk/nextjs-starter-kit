@@ -34,11 +34,11 @@ export const handlers = [
       },
     });
   }),
-  // http.delete(`/api/users`, () => {
-  //   return HttpResponse.json({
-  //     data: {
-  //       message: 'Signed out successfully',
-  //     },
-  //   });
-  // }),
+  http.delete(`/api/users`, () => {
+    return HttpResponse.json({
+      data: {
+        message: 'Deleted successfully',
+      },
+    });
+  }),
 ];

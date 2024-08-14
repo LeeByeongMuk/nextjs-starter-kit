@@ -8,18 +8,20 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
+import { cookies } from 'next/headers';
 import { useSession } from 'next-auth/react';
 
 import Account from '@/app/(auth)/account/page';
-import useUserUpdate from '@/app/hooks/auth/useUserUpdate';
+import useDeleteAccount from '@/app/hooks/auth/useDeleteAccount';
+import useUpdateAccount from '@/app/hooks/auth/useUpdateAccount';
 import { server } from '@/mocks/node';
-import { cookies } from 'next/headers';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
 }));
 jest.mock('next-auth/react');
 global.alert = jest.fn();
+global.prompt = jest.fn();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,7 +61,7 @@ describe('마이페이지 페이지 테스트', () => {
         phone: null,
         provider: null,
       },
-      update: jest.fn()
+      update: jest.fn(),
     });
 
     // given - 마이페이지가 그려짐
@@ -90,7 +92,7 @@ describe('마이페이지 페이지 테스트', () => {
       fireEvent.click(screen.getByText('Account Update'));
 
       // then - 성공 메세지가 표시된다.
-      const { result } = renderHook(() => useUserUpdate(), { wrapper });
+      const { result } = renderHook(() => useUpdateAccount(), { wrapper });
 
       act(() => {
         result.current.mutate({
@@ -124,7 +126,7 @@ describe('마이페이지 페이지 테스트', () => {
       fireEvent.click(screen.getByText('Account Update'));
 
       // then - 에러 메세지가 표시된다.
-      const { result } = renderHook(() => useUserUpdate(), { wrapper });
+      const { result } = renderHook(() => useUpdateAccount(), { wrapper });
 
       act(() => {
         result.current.mutate({
@@ -139,13 +141,54 @@ describe('마이페이지 페이지 테스트', () => {
     });
   });
 
-  // describe('회원 탈퇴 테스트', () => {
-  //   test('회원 탈퇴 버튼 클릭 시 탈퇴 사유 입력 모달이 뜬다', async () => {});
-  //
-  //   test('탈퇴 사유를 입력하지 않으면 탈퇴 사유 입력 모달이 닫힌다', async () => {});
-  //
-  //   test('회원 탈퇴 성공 시 로그아웃 처리된다.', async () => {});
-  //
-  //   test('회원 탈퇴 실패 시 에러 메세지가 표시된다.', async () => {});
-  // });
+  describe('회원 탈퇴 테스트', () => {
+    test('회원 탈퇴 버튼 클릭 시 탈퇴 사유 입력 모달이 뜬다', async () => {
+      // when - 회원 탈퇴 버튼 클릭
+      fireEvent.click(screen.getByText('Delete Account'));
+
+      // then - 탈퇴 사유 입력 모달이 뜬다
+      expect(window.prompt).toHaveBeenCalledWith(
+        'Are you sure you want to delete your account? Please enter a reason'
+      );
+    });
+
+    test('회원 탈퇴 성공 시 로그아웃 처리된다.', async () => {
+      // when - 회원 탈퇴 버튼 클릭
+      fireEvent.click(screen.getByText('Delete Account'));
+
+      // then - 로그아웃 처리된다
+      const { result } = renderHook(() => useDeleteAccount(), { wrapper });
+
+      act(() => {
+        result.current.mutate({
+          deleted_reason: 'reason',
+        });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(window.alert).toHaveBeenCalledWith('Account deleted successfully');
+    });
+
+    test('회원 탈퇴 실패 시 에러 메세지가 표시된다.', async () => {
+      server.use(
+        http.delete('/api/users', () => {
+          return new HttpResponse(null, { status: 500 });
+        })
+      );
+      // when - 회원 탈퇴 버튼 클릭
+      fireEvent.click(screen.getByText('Delete Account'));
+
+      // then - 에러 메세지가 표시된다
+      const { result } = renderHook(() => useDeleteAccount(), { wrapper });
+
+      act(() => {
+        result.current.mutate({
+          deleted_reason: 'reason',
+        });
+      });
+
+      await waitFor(() => expect(result.current.isError).toBe(true));
+      expect(window.alert).toHaveBeenCalledWith('Failed to delete account');
+    });
+  });
 });
