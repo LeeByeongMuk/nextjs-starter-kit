@@ -12,13 +12,10 @@ import { server } from '@/mocks/node';
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
 }));
-
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
-
 jest.mock('next-auth/react');
-
 global.alert = jest.fn();
 
 const queryClient = new QueryClient({

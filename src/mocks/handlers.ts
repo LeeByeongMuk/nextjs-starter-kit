@@ -15,4 +15,30 @@ export const handlers = [
       },
     });
   }),
+  http.get(`/api/users`, () => {
+    return HttpResponse.json({
+      data: {
+        created_at: '2021-09-01T00:00:00',
+        email: 'test@email.com',
+        name: 'name',
+        nickname: 'nickname',
+        phone: null,
+        provider: null,
+      },
+    });
+  }),
+  http.put(`/api/users`, () => {
+    return HttpResponse.json({
+      data: {
+        message: 'Updated successfully',
+      },
+    });
+  }),
+  http.delete(`/api/users`, () => {
+    return HttpResponse.json({
+      data: {
+        message: 'Deleted successfully',
+      },
+    });
+  }),
 ];
