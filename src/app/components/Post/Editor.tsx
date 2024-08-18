@@ -27,6 +27,7 @@ export default function Editor({ initialValue = '', onChange }: Props) {
 
   return (
     <TuiEditor
+      id="contents"
       ref={editorRef}
       minHeight="400px"
       initialValue={initialValue || ' '}
