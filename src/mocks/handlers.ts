@@ -41,4 +41,12 @@ export const handlers = [
       },
     });
   }),
+  http.post(`/api/posts`, () => {
+    return HttpResponse.json({
+      data: {
+        id: 1,
+        message: 'Post created successfully',
+      },
+    });
+  }),
 ];
