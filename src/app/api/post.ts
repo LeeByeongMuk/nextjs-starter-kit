@@ -1,14 +1,14 @@
 import {
-  PostCreateReq,
-  PostCreateRes,
+  CreatePostReq,
+  CreatePostRes,
   PostReq,
   PostRes,
   PostsReq,
   PostsRes,
-  PostUpdateReq,
-  PostUpdateRes,
-  PostUpdateResourceReq,
-  PostUpdateResourceRes,
+  UpdatePostReq,
+  UpdatePostRes,
+  UpdatePostResourceReq,
+  UpdatePostResourceRes,
 } from '@/app/types/post';
 import { fetchApi } from '@/app/utils/api';
 
@@ -31,12 +31,12 @@ const fetchPost = async ({ id }: PostReq) => {
   })) as PostRes;
 };
 
-const fetchPostCreate = async ({
+const fetchCreatePost = async ({
   title,
   type,
   contents,
   is_open,
-}: PostCreateReq) => {
+}: CreatePostReq) => {
   return (await fetchApi('/api/posts', {
     method: 'POST',
     body: JSON.stringify({
@@ -45,16 +45,16 @@ const fetchPostCreate = async ({
       contents,
       is_open,
     }),
-  })) as PostCreateRes;
+  })) as CreatePostRes;
 };
 
-const fetchPostUpdate = async ({
+const fetchUpdatePost = async ({
   id,
   title,
   type,
   contents,
   is_open,
-}: PostUpdateReq) => {
+}: UpdatePostReq) => {
   return (await fetchApi(`/api/posts/${id}`, {
     method: 'PUT',
     body: JSON.stringify({
@@ -63,20 +63,20 @@ const fetchPostUpdate = async ({
       contents,
       is_open,
     }),
-  })) as PostUpdateRes;
+  })) as UpdatePostRes;
 };
 
-const fetchPostUpdateResource = async ({ id }: PostUpdateResourceReq) => {
+const fetchUpdatePostResource = async ({ id }: UpdatePostResourceReq) => {
   return (await fetchApi(`/api/posts/${id}/edit`, {
     method: 'GET',
-  })) as PostUpdateResourceRes;
+  })) as UpdatePostResourceRes;
 };
 
 export {
   fetchPosts,
   fetchPost,
-  fetchPostCreate,
-  fetchPostUpdate,
-  fetchPostUpdateResource,
+  fetchCreatePost,
+  fetchUpdatePost,
+  fetchUpdatePostResource,
 };
-export type { PostCreateReq, PostUpdateReq };
+export type { CreatePostReq, UpdatePostReq };

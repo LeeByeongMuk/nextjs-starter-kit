@@ -3,15 +3,15 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import { fetchPostCreate } from '@/app/api/post';
-import { PostCreateReq } from '@/app/types/post';
+import { fetchCreatePost } from '@/app/api/post';
+import { CreatePostReq } from '@/app/types/post';
 
 export default function useCreatePost() {
   const router = useRouter();
   return useMutation({
-    mutationFn: (req: PostCreateReq) => fetchPostCreate(req),
+    mutationFn: (req: CreatePostReq) => fetchCreatePost(req),
     onSuccess: res => {
-      alert('Notice created successfully');
+      alert('Post created successfully');
       router.push(`/post/${res.data.id}`);
     },
     onError: () => {
