@@ -1,15 +1,9 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import {
-  fetchPostUpdateResource,
-  fetchPostUpdate,
-  PostUpdateReq,
-} from '@/app/api/post';
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
 import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
@@ -17,7 +11,9 @@ import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
-import { PostType, PostUpdateResourceRes } from '@/app/types/post';
+import useUpdatePost from '@/app/hooks/post/useUpdatePost';
+import useUpdatePostResource from '@/app/hooks/post/useUpdatePostResource';
+import { PostType } from '@/app/types/post';
 
 interface PostFormInput {
   title: string;
@@ -26,8 +22,7 @@ interface PostFormInput {
   isOpen: boolean | null;
 }
 
-export default function PostUpdate() {
-  const router = useRouter();
+export default function UpdatePost() {
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
 
@@ -40,18 +35,7 @@ export default function PostUpdate() {
     isError,
     isLoading,
     isFetching,
-  } = useQuery({
-    queryKey: ['posts', { id }],
-    queryFn: () => fetchPostUpdateResource({ id }),
-    initialData: {
-      data: {
-        title: '',
-        contents: '',
-        type: null,
-        is_open: null,
-      },
-    } as unknown as PostUpdateResourceRes,
-  });
+  } = useUpdatePostResource();
 
   useEffect(() => {
     if (isSuccess) {
@@ -62,36 +46,16 @@ export default function PostUpdate() {
     }
   }, [isSuccess, setValue, post]);
 
-  useEffect(() => {
-    if (isError) {
-      alert('Failed to fetch post');
-      router.push('/post');
-    }
-  }, [isError, router]);
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: (req: PostUpdateReq) => fetchPostUpdate(req),
-  });
+  const { mutate, isPending } = useUpdatePost();
 
   const onSubmit: SubmitHandler<PostFormInput> = async data => {
-    mutate(
-      {
-        id,
-        title: data.title,
-        type: data.type || null,
-        contents: data.contents,
-        is_open: data.isOpen,
-      },
-      {
-        onSuccess: async () => {
-          alert('Notice updated successfully');
-          router.push(`/post/${id}`);
-        },
-        onError: () => {
-          alert('Failed to update post');
-        },
-      }
-    );
+    mutate({
+      id,
+      title: data.title,
+      type: data.type || null,
+      contents: data.contents,
+      is_open: data.isOpen,
+    });
   };
 
   if (isFetching || isLoading || isError) return <Spinner />;
