@@ -53,7 +53,7 @@ describe('게시글 수정 테스트', () => {
     server.resetHandlers();
 
     jest.spyOn(window, 'alert').mockImplementation(() => {});
-    // jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
     (cookies as jest.Mock).mockReturnValue({
       has: jest.fn().mockReturnValue(true),
