@@ -8,7 +8,6 @@ import React from 'react';
 import usePost from '@/app/hooks/post/usePost';
 import PostDetail from '@/app/post/[id]/page';
 import { server } from '@/mocks/node';
-import { useSession } from 'next-auth/react';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
