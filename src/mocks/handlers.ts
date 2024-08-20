@@ -73,12 +73,16 @@ export const handlers = [
   http.get(`/api/posts/:id`, () => {
     return HttpResponse.json({
       data: {
-        id: 1,
-        title: 'title',
         contents: 'contents',
-        type: 'notice',
-        is_open: true,
         created_at: '2021-09-01T00:00:00',
+        hit: 0,
+        is_edit: false,
+        title: 'title',
+        type: 'notice',
+        user: {
+          name: 'name',
+          nickname: 'nickname',
+        },
       },
     });
   }),
