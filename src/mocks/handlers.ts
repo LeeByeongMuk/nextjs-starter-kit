@@ -89,4 +89,23 @@ export const handlers = [
       },
     });
   }),
+  http.get(`/api/posts`, () => {
+    const data = Array.from({ length: 20 }, (_, index) => ({
+      id: index + 1,
+      title: `Title ${index + 1}`,
+      hit: 0,
+      user: {
+        name: 'name',
+      },
+      created_at: '2021-09-01T00:00:00',
+    }));
+    return HttpResponse.json({
+      data,
+      meta: {
+        total: 1,
+        current_page: 1,
+        last_page: 1,
+      },
+    });
+  }),
 ];

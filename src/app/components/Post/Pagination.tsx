@@ -59,6 +59,7 @@ export default function Pagination({ meta, setSearchFilters }: Props) {
         {pageGroup.map(d => (
           <li key={d}>
             <a
+              role={`pagination-${d}`}
               href={`/post/${d}`}
               className={classNames(
                 'flex h-8 items-center justify-center border px-3 leading-tight',
