@@ -1,13 +1,11 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { fetchPost } from '@/app/api/post';
 import Detail from '@/app/components/Post/PostDetail';
-import { PostRes } from '@/app/types/post';
+import usePost from '@/app/hooks/post/usePost';
 
 export default function PostDetail() {
   const router = useRouter();
@@ -19,32 +17,7 @@ export default function PostDetail() {
     isError,
     isLoading,
     isFetching,
-  } = useQuery({
-    initialData: {
-      data: {
-        contents: '',
-        created_at: '',
-        hit: 0,
-        id: 0,
-        is_edit: false,
-        title: '',
-        type: '',
-        user: {
-          name: '',
-          nickname: '',
-        },
-      },
-    } as unknown as PostRes,
-    queryFn: () => fetchPost({ id }),
-    queryKey: ['post', { id }],
-  });
-
-  useEffect(() => {
-    if (isError) {
-      alert('Failed to fetch post');
-      router.back();
-    }
-  }, [isError, router]);
+  } = usePost();
 
   const redirectBack = () => {
     router.back();
