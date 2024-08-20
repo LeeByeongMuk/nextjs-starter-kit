@@ -16,7 +16,7 @@ export default function PostList() {
     isLoading,
     isError,
     isFetching,
-  } = usePostiList({ searchFilters });
+  } = usePostList({ searchFilters });
 
   useReplaceSearchParams({ searchFilters });
 
