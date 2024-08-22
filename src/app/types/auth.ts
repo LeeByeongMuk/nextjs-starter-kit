@@ -31,24 +31,24 @@ interface SignUpReq {
 
 interface SignUpRes extends SignInRes {}
 
-interface UserUpdateReq {
+interface UpdateAccountReq {
   email: string;
   name: string;
   nickname: string;
 }
 
-interface UserUpdateRes {
+interface UpdateAccountRes {
   data: {
     id: string;
     message: string;
   };
 }
 
-interface UserDeleteReq {
+interface DeleteAccountReq {
   deleted_reason: string;
 }
 
-interface UserDeleteRes extends UserUpdateRes {}
+interface DeleteAccountRes extends UpdateAccountRes {}
 
 export type {
   UserData,
@@ -57,8 +57,8 @@ export type {
   SignUpRes,
   SignInReq,
   SignInRes,
-  UserUpdateReq,
-  UserUpdateRes,
-  UserDeleteReq,
-  UserDeleteRes,
+  UpdateAccountReq,
+  UpdateAccountRes,
+  DeleteAccountReq,
+  DeleteAccountRes,
 };
