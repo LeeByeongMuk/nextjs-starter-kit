@@ -174,6 +174,7 @@ describe('게시글 생성 테스트', () => {
       fireEvent.submit(screen.getByText('submit'));
 
       const { result } = renderHook(() => useCreatePost(), { wrapper });
+
       act(() => {
         result.current.mutate({
           title: '제목',
@@ -185,7 +186,7 @@ describe('게시글 생성 테스트', () => {
 
       // then - 성공 메시지가 출력되고 상세페이지로 이동한다
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Notice created successfully');
+      expect(window.alert).toHaveBeenCalledWith('Post created successfully');
       expect(mockPush).toHaveBeenCalledWith(`/post/1`);
     });
 
