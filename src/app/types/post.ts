@@ -48,21 +48,21 @@ interface PostRes {
   data: PostData;
 }
 
-interface PostCreateReq {
+interface CreatePostReq {
   title: string;
   type: string | null;
   contents: string;
   is_open: boolean | null;
 }
 
-interface PostCreateRes {
+interface CreatePostRes {
   data: {
     id: number;
     message: string;
   };
 }
 
-interface PostUpdateReq {
+interface UpdatePostReq {
   id: number;
   title: string;
   type: string | null;
@@ -70,18 +70,18 @@ interface PostUpdateReq {
   is_open: boolean | null;
 }
 
-interface PostUpdateRes {
+interface UpdatePostRes {
   data: {
     id: number;
     message: string;
   };
 }
 
-interface PostUpdateResourceReq {
+interface UpdatePostResourceReq {
   id: number;
 }
 
-interface PostUpdateResourceRes {
+interface UpdatePostResourceRes {
   data: {
     id: number;
     type: PostType | null;
@@ -100,10 +100,10 @@ export type {
   PostReq,
   PostData,
   PostRes,
-  PostCreateReq,
-  PostCreateRes,
-  PostUpdateReq,
-  PostUpdateRes,
-  PostUpdateResourceReq,
-  PostUpdateResourceRes,
+  CreatePostReq,
+  CreatePostRes,
+  UpdatePostReq,
+  UpdatePostRes,
+  UpdatePostResourceReq,
+  UpdatePostResourceRes,
 };

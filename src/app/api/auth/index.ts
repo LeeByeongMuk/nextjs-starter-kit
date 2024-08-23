@@ -8,11 +8,11 @@ import {
   SignInRes,
   SignUpReq,
   SignUpRes,
-  UserDeleteReq,
-  UserDeleteRes,
+  DeleteAccountReq,
+  DeleteAccountRes,
   UserRes,
-  UserUpdateReq,
-  UserUpdateRes,
+  UpdateAccountReq,
+  UpdateAccountRes,
 } from '@/app/types/auth';
 import { fetchApi } from '@/app/utils/api';
 
@@ -43,24 +43,28 @@ const fetchSignIn = async (req: SignInReq) => {
   return res;
 };
 
-const fetchUserUpdate = async (req: UserUpdateReq) => {
+const fetchUpdateAccount = async (req: UpdateAccountReq) => {
   return (await fetchApi('/api/users', {
     method: 'PUT',
     body: JSON.stringify(req),
-  })) as UserUpdateRes;
+  })) as UpdateAccountRes;
 };
 
-const fetchUserDelete = async (req: UserDeleteReq) => {
-  return (await fetchApi('/api/users/delete', {
-    method: 'POST',
+const fetchDeleteAccount = async (req: DeleteAccountReq) => {
+  const params = new URLSearchParams();
+  params.append('deleted_reason', req.deleted_reason.toString());
+  const url = `/api/users?${params.toString()}`;
+
+  return (await fetchApi(url, {
+    method: 'DELETE',
     body: JSON.stringify(req),
-  })) as UserDeleteRes;
+  })) as DeleteAccountRes;
 };
 
 export {
   fetchUser,
   fetchSignUp,
   fetchSignIn,
-  fetchUserUpdate,
-  fetchUserDelete,
+  fetchUpdateAccount,
+  fetchDeleteAccount,
 };
