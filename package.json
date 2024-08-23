@@ -63,7 +63,7 @@
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5",
-    "undici": "^5.28.4"
+    "undici": "^6.19.7"
   },
   "msw": {
     "workerDirectory": [
