@@ -35,13 +35,10 @@ interface PostData {
   created_at: string;
   hit: number;
   id: number;
-  is_edit: boolean;
+  is_editable: boolean;
   title: string;
   type: PostType | null;
-  user: {
-    name: string;
-    nickname: string;
-  };
+  user_name: string;
 }
 
 interface PostRes {
