@@ -17,7 +17,7 @@ export default function ContentsEditor() {
 
   register('contents', {
     required: 'Contents is required',
-    validate: (value: string) => value.replace(/<[^>]*>?/g, '') !== '',
+    validate: (value: string) => value.replace(/<!--|--!?>/g, '') !== '',
   });
 
   const onEditorChange = (contents: string) => {
