@@ -6,7 +6,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
-import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
+import IsPublishedCheckbox from '@/app/components/Post/Form/IsPublishedCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
@@ -19,7 +19,7 @@ interface PostFormInput {
   title: string;
   type: PostType | null;
   contents: string;
-  isOpen: boolean | null;
+  isPublished: '1' | '0';
 }
 
 export default function UpdatePost() {
@@ -42,7 +42,7 @@ export default function UpdatePost() {
       setValue('title', post.title);
       setValue('contents', post.contents);
       setValue('type', post.type);
-      setValue('isOpen', post.is_open);
+      setValue('isPublished', post.is_published ? '1' : '0');
     }
   }, [isSuccess, setValue, post]);
 
@@ -54,7 +54,7 @@ export default function UpdatePost() {
       title: data.title,
       type: data.type || null,
       contents: data.contents,
-      is_open: data.isOpen,
+      is_published: data.isPublished === '1',
     });
   };
 
@@ -64,13 +64,13 @@ export default function UpdatePost() {
     <FormProvider {...methods}>
       <section className="mt-5 flex min-h-full flex-col justify-center border-2 border-teal-600 px-6 py-12 lg:px-8">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <TitleInput defaultValue={post.title} />
+          <TitleInput />
 
-          <TypeSelect selectedValue={post.type || undefined} />
+          <TypeSelect />
 
-          <ContentsEditor defaultValue={post.contents} />
+          <ContentsEditor />
 
-          <IsOpenCheckbox checked={post.is_open} />
+          <IsPublishedCheckbox />
 
           <ButtonBox />
         </form>

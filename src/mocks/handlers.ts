@@ -76,7 +76,7 @@ export const handlers = [
         contents: 'contents',
         created_at: '2021-09-01T00:00:00',
         hit: 0,
-        is_edit: false,
+        is_editable: false,
         title: 'title',
         type: 'notice',
         user: {
