@@ -8,11 +8,7 @@ const Editor = dynamic(() => import('../Editor'), {
   ssr: false,
 });
 
-interface Props {
-  defaultValue?: string;
-}
-
-export default function ContentsEditor({ defaultValue }: Props) {
+export default function ContentsEditor() {
   const {
     setValue,
     register,
@@ -21,6 +17,7 @@ export default function ContentsEditor({ defaultValue }: Props) {
 
   register('contents', {
     required: 'Contents is required',
+    validate: (value: string) => value.replace(/<[^>]*>?/g, '') !== '',
   });
 
   const onEditorChange = (contents: string) => {
@@ -36,8 +33,7 @@ export default function ContentsEditor({ defaultValue }: Props) {
         Contents
       </label>
 
-      <Editor initialValue={defaultValue} onChange={onEditorChange} />
-
+      <Editor onChange={onEditorChange} />
       <ValidationError
         role="contents-error-message"
         isError={!!errors.contents}
