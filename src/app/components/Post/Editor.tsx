@@ -1,15 +1,17 @@
 import { Editor as TuiEditor } from '@toast-ui/react-editor';
 import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import '@toast-ui/editor/dist/toastui-editor.css';
 import '@toast-ui/editor/dist/i18n/ko-kr';
 
 interface Props {
-  initialValue?: string;
   onChange: (contents: string) => void;
 }
 
-export default function Editor({ initialValue = '', onChange }: Props) {
+export default function Editor({ onChange }: Props) {
+  const { getValues } = useFormContext();
+
   const editorRef = React.useRef<TuiEditor | null>(null);
   const toolbarItems = [
     ['heading', 'bold', 'italic', 'strike'],
@@ -30,7 +32,7 @@ export default function Editor({ initialValue = '', onChange }: Props) {
       id="contents"
       ref={editorRef}
       minHeight="400px"
-      initialValue={initialValue || ' '}
+      initialValue={getValues('contents') || ' '}
       initialEditType="wysiwyg"
       previewStyle={window.innerWidth > 1000 ? 'vertical' : 'tab'}
       theme={''}

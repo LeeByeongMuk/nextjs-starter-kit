@@ -24,7 +24,7 @@ export default function PostDetail({ isLoading, post }: PostDetailProps) {
           {isLoading ? (
             <div className="h-3 w-12 rounded-full bg-gray-200 dark:bg-gray-700" />
           ) : (
-            <span>{post.user.name || post.user.nickname}</span>
+            <span>{post.user_name}</span>
           )}
 
           {isLoading ? (

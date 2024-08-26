@@ -71,7 +71,7 @@ describe('게시글 상세 페이지 테스트', () => {
 
     // then - 수정 버튼이 보이지 않는다
     await waitFor(() => {
-      expect(result.current.data.data.is_edit).toBeFalsy();
+      expect(result.current.data.data.is_editable).toBeFalsy();
     });
     expect(screen.queryByRole('post-edit-link')).not.toBeInTheDocument();
   });
@@ -86,7 +86,7 @@ describe('게시글 상세 페이지 테스트', () => {
             contents: 'contents',
             created_at: '2021-09-01T00:00:00',
             hit: 0,
-            is_edit: true,
+            is_editable: true,
             title: 'title',
             type: 'notice',
             user: {
@@ -106,7 +106,7 @@ describe('게시글 상세 페이지 테스트', () => {
 
     // then - 수정 버튼이 보인다
     await waitFor(() => {
-      expect(result.current.data.data.is_edit).toBeTruthy();
+      expect(result.current.data.data.is_editable).toBeTruthy();
     });
     expect(screen.getByRole('post-edit-link')).toBeInTheDocument();
   });
@@ -122,7 +122,7 @@ describe('게시글 상세 페이지 테스트', () => {
         contents: 'contents',
         created_at: '2021-09-01T00:00:00',
         hit: 0,
-        is_edit: false,
+        is_editable: false,
         title: 'title',
         type: 'notice',
         user: {

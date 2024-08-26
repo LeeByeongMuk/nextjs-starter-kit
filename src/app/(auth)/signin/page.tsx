@@ -8,7 +8,6 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
 import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
-import Social from '@/app/components/Auth/Form/Social';
 import AuthHeader from '@/app/components/Auth/Header';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 
@@ -53,7 +52,7 @@ export default function SignIn() {
 
             <ButtonBox buttonText="Sign in" />
 
-            <Social />
+            {/* TODO: <Social /> */}
           </form>
         </div>
       </div>

@@ -20,7 +20,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Install the project dependencies
-        run: npm install
+        run: rm -rf node_modules && npm install
 
       - name: Fix code style issues with prettier & eslint
         run: npm run lint:fix && npm run prettier:fix
