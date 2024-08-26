@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import Layout from '@/app/components/Layout';
 import Provider from '@/app/components/Provider';
@@ -21,7 +21,9 @@ export default function RootLayout({
       <body>
         <Provider>
           <div className="container mx-auto">
-            <Layout>{children}</Layout>
+            <Suspense>
+              <Layout>{children}</Layout>
+            </Suspense>
           </div>
         </Provider>
       </body>
