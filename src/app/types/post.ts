@@ -49,7 +49,7 @@ interface CreatePostReq {
   title: string;
   type: string | null;
   contents: string;
-  is_open: boolean | null;
+  is_published: boolean;
 }
 
 interface CreatePostRes {
@@ -64,7 +64,7 @@ interface UpdatePostReq {
   title: string;
   type: string | null;
   contents: string;
-  is_open: boolean | null;
+  is_published: boolean;
 }
 
 interface UpdatePostRes {
@@ -84,7 +84,7 @@ interface UpdatePostResourceRes {
     type: PostType | null;
     title: string;
     contents: string;
-    is_open: boolean;
+    is_published: boolean;
   };
 }
 

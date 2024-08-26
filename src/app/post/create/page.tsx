@@ -15,7 +15,7 @@ interface PostFormInput {
   title: string;
   type: string | null;
   contents: string;
-  isOpen: boolean | null;
+  is_published: '1' | '0';
 }
 
 export default function CreatePost() {
@@ -28,7 +28,7 @@ export default function CreatePost() {
       title: data.title,
       type: data.type,
       contents: data.contents,
-      is_open: data.isOpen,
+      is_published: data.is_published === '1',
     });
   };
 
