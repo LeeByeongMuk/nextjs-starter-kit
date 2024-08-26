@@ -3,11 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import ValidationError from '@/app/components/Error/ValidationError';
 
-interface Props {
-  defaultValue?: string;
-}
-
-export default function TitleInput({ defaultValue = '' }: Props) {
+export default function TitleInput() {
   const {
     register,
     formState: { errors },
@@ -27,7 +23,6 @@ export default function TitleInput({ defaultValue = '' }: Props) {
         id="title"
         className="mt-1 w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
         placeholder="Post title..."
-        defaultValue={defaultValue}
         {...register('title', {
           required: {
             value: true,

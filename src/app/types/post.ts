@@ -35,13 +35,10 @@ interface PostData {
   created_at: string;
   hit: number;
   id: number;
-  is_edit: boolean;
+  is_editable: boolean;
   title: string;
   type: PostType | null;
-  user: {
-    name: string;
-    nickname: string;
-  };
+  user_name: string;
 }
 
 interface PostRes {
@@ -52,7 +49,7 @@ interface CreatePostReq {
   title: string;
   type: string | null;
   contents: string;
-  is_open: boolean | null;
+  is_published: boolean;
 }
 
 interface CreatePostRes {
@@ -67,7 +64,7 @@ interface UpdatePostReq {
   title: string;
   type: string | null;
   contents: string;
-  is_open: boolean | null;
+  is_published: boolean;
 }
 
 interface UpdatePostRes {
@@ -87,7 +84,7 @@ interface UpdatePostResourceRes {
     type: PostType | null;
     title: string;
     contents: string;
-    is_open: boolean;
+    is_published: boolean;
   };
 }
 

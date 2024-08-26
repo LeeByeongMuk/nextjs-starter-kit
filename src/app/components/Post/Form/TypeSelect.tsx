@@ -1,15 +1,14 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import ValidationError from '@/app/components/Error/ValidationError';
 import { TYPE_OPTIONS } from '@/app/constants/post';
-import { PostType } from '@/app/types/post';
 
-interface Props {
-  selectedValue?: PostType;
-}
-
-export default function TypeSelect({ selectedValue }: Props) {
-  const { register } = useFormContext();
+export default function TypeSelect() {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <div className="mt-5">
@@ -20,8 +19,9 @@ export default function TypeSelect({ selectedValue }: Props) {
       <select
         id="type"
         className="mt-1.5 w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-        defaultValue={selectedValue || ''}
-        {...register('type')}
+        {...register('type', {
+          required: 'Type is required',
+        })}
       >
         {TYPE_OPTIONS.map(({ value, label }) => (
           <option key={value} value={value}>
@@ -29,6 +29,11 @@ export default function TypeSelect({ selectedValue }: Props) {
           </option>
         ))}
       </select>
+
+      <ValidationError
+        isError={!!errors.type}
+        message={errors.type?.message?.toString()}
+      />
     </div>
   );
 }

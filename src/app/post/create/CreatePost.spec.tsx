@@ -180,7 +180,7 @@ describe('게시글 생성 테스트', () => {
           title: '제목',
           contents: '내용',
           type: 'notice',
-          is_open: true,
+          is_published: true,
         });
       });
 
@@ -204,7 +204,7 @@ describe('게시글 생성 테스트', () => {
           title: '제목',
           contents: '내용',
           type: 'notice',
-          is_open: true,
+          is_published: true,
         });
       });
 

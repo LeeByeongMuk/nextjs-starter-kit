@@ -36,7 +36,7 @@ export default function PostDetail() {
           back
         </button>
 
-        {post.is_edit && (
+        {post.is_editable && (
           <Link
             href={`/post/${id}/update`}
             role="post-edit-link"

@@ -19,7 +19,7 @@ export default function usePost() {
         created_at: '',
         hit: 0,
         id: 0,
-        is_edit: false,
+        is_editable: false,
         title: '',
         type: '',
         user: {
