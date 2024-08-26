@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
@@ -22,11 +22,19 @@ export default function Account() {
   const { data: session } = useSession();
 
   const methods = useForm<UserUpdateInput>();
-  const { handleSubmit } = methods;
+  const { handleSubmit, reset } = methods;
 
   const updateMutate = useUpdateAccount();
-
   const deleteMutate = useDeleteAccount();
+
+  useEffect(() => {
+    if (!session?.user) return;
+    reset({
+      email: session.user.email,
+      name: session.user.name,
+      nickname: session.user.nickname || '',
+    });
+  }, [reset, session?.user]);
 
   const onUpdateAccount: SubmitHandler<UserUpdateInput> = async data => {
     updateMutate.mutate({
