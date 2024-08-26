@@ -20,7 +20,7 @@ export default function ContentsEditor() {
     validate: (value: string) => {
       const ele = document.createElement('div');
       ele.innerHTML = value;
-      const text = ele.innerText;
+      const text = ele.innerText || '';
       return text.length > 0 ? true : 'Contents is required';
     },
   });
