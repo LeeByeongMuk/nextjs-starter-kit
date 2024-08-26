@@ -6,7 +6,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
-import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
+import IsPublishedCheckbox from '@/app/components/Post/Form/IsPublishedCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
@@ -70,7 +70,7 @@ export default function UpdatePost() {
 
           <ContentsEditor defaultValue={post.contents} />
 
-          <IsOpenCheckbox checked={post.is_open} />
+          <IsPublishedCheckbox />
 
           <ButtonBox />
         </form>
