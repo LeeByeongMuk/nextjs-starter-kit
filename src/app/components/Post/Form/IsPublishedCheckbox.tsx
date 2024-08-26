@@ -9,8 +9,6 @@ export default function IsPublishedCheckbox() {
     formState: { errors },
   } = useFormContext();
 
-  console.log(errors);
-
   return (
     <div className="mt-5">
       <label className="block text-xs font-medium text-gray-700">Is Open</label>
