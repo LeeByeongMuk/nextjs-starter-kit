@@ -17,7 +17,12 @@ export default function ContentsEditor() {
 
   register('contents', {
     required: 'Contents is required',
-    validate: (value: string) => value.replace(/<!--|--!?>/g, '') !== '',
+    validate: (value: string) => {
+      const ele = document.createElement('div');
+      ele.innerHTML = value;
+      const text = ele.innerText;
+      return text.length > 0 ? true : 'Contents is required';
+    },
   });
 
   const onEditorChange = (contents: string) => {
