@@ -3,7 +3,7 @@ import express from 'express';
 import 'dotenv/config';
 
 import postsRouter from '@/server/routes/posts';
-import usersRouter from '@/server/routes/users';
+import usersRouter from '@/server/routes/users_routes';
 
 const app = express();
 const port = process.env.APP_API_PORT || 80;
