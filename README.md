@@ -22,10 +22,9 @@ cp .env.example .env
 npm run dev
 ``` 
 
-
 #### 도커 설치 후 실행 방법
 
-- https://www.docker.com/products/docker-desktop
+https://www.docker.com/products/docker-desktop
 
 ```bash
 npm install
@@ -34,5 +33,6 @@ docker compose up -d
 ```
 
 ## Backend
-@kimchanhyung98 님의 Laravel Starter Kit 을 사용하였습니다.
-- https://github.com/kimchanhyung98/laravel-starter-kit
+
+[@kimchanhyung98](https://github.com/kimchanhyung98) - [laravel-starter-kit](https://github.com/kimchanhyung98/laravel-starter-kit)
+을 사용하였습니다.
