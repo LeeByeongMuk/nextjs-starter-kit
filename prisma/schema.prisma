@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+  casing   = "snake-case"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model user {
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(50)
+  nickname       String    @unique @db.VarChar(50)
+  email          String?   @unique @db.VarChar(100)
+  password       String?   @db.VarChar(200)
+  remember_token String?   @db.VarChar(100)
+  created_at     DateTime  @default(now()) @map("created_at")
+  updated_at     DateTime  @updatedAt @map("updated_at")
+  deleted_at     DateTime? @map("deleted_at")
+  deleted_reason String?   @db.VarChar(200)
+  posts          post[]
+  tokens         token[]
+}
+
+model token {
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  refresh_token String   @unique @db.VarChar(256)
+  createdAt     DateTime @default(now()) @map("created_at")
+  expires_at    DateTime @map("expires_at")
+  user          user     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+
+model post {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  type       PostType? @default(free)
+  title      String    @db.VarChar(100)
+  contents   String    @db.LongText
+  hit        Int       @default(0)
+  is_open    Boolean   @default(true)
+  created_at DateTime  @default(now()) @map("created_at")
+  updated_at DateTime  @map("updated_at")
+  deleted_at DateTime? @map("deleted_at")
+  user       user      @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+
+enum PostType {
+  free
+  notice
+  faq
+}
