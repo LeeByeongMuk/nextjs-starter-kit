@@ -6,6 +6,7 @@ export declare global {
       NEXTAUTH_URL: string;
       NEXTAUTH_SECRET: string;
       JWT_SECRET: string;
+      JWT_REFRESH_SECRET: string;
     }
   }
 }
