@@ -1,17 +1,21 @@
 import { Request, Response } from 'express';
 
 import usersServices from '@/server/services/users_services';
+import { handleError } from '@/server/utils/errorHandling';
 
 const users_controllers = {
-  getUser: (req: Request, res: Response) => {
-    return res.json({
-      created_at: '2024-01-01 00:00:00',
-      email: 'test@email.com',
-      name: 'name',
-      nickname: 'nickname',
-      phone: null,
-      provider: null,
-    });
+  getUser: async (req: Request, res: Response) => {
+    try {
+      const data = await usersServices.getUser(req);
+
+      return res.status(200).json({
+        ok: true,
+        message: 'success',
+        data,
+      });
+    } catch (err) {
+      handleError(err, res);
+    }
   },
 
   signIn: async (req: Request, res: Response) => {
@@ -19,15 +23,12 @@ const users_controllers = {
       const data = await usersServices.signIn(req);
 
       return res.status(200).json({
-        status: 200,
+        ok: true,
         message: 'success',
         data,
       });
     } catch (err) {
-      return res.status(400).json({
-        status: 400,
-        message: 'error',
-      });
+      handleError(err, res);
     }
   },
 
@@ -36,30 +37,41 @@ const users_controllers = {
       const data = await usersServices.createUser(req);
 
       return res.status(201).json({
-        status: 201,
+        ok: true,
         message: 'success',
         data,
       });
     } catch (err) {
-      return res.status(400).json({
-        status: 400,
-        message: 'error',
-      });
+      handleError(err, res);
     }
   },
 
-  updateUser: (req: Request, res: Response) => {
-    return res.json({
-      id: 1,
-      message: 'success',
-    });
+  updateUser: async (req: Request, res: Response) => {
+    try {
+      const data = await usersServices.updateUser(req);
+
+      return res.status(200).json({
+        ok: true,
+        message: 'success',
+        data,
+      });
+    } catch (err) {
+      handleError(err, res);
+    }
   },
 
-  deleteUser: (req: Request, res: Response) => {
-    return res.json({
-      id: 1,
-      message: 'success',
-    });
+  deleteUser: async (req: Request, res: Response) => {
+    try {
+      const data = await usersServices.deleteUser(req);
+
+      return res.status(200).json({
+        ok: true,
+        message: 'success',
+        data,
+      });
+    } catch (err) {
+      handleError(err, res);
+    }
   },
 };
 

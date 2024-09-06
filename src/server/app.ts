@@ -19,6 +19,4 @@ app.use(cors(corsOptions));
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 
-app.listen(port, () => {
-  console.info(`Server is listening on port ${port}`);
-});
+app.listen(port);
