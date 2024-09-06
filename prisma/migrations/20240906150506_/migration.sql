@@ -3,9 +3,8 @@ CREATE TABLE `user` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50) NOT NULL,
     `nickname` VARCHAR(50) NOT NULL,
-    `email` VARCHAR(100) NULL,
-    `password` VARCHAR(200) NULL,
-    `remember_token` VARCHAR(100) NULL,
+    `email` VARCHAR(100) NOT NULL,
+    `password` VARCHAR(200) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
     `deleted_at` DATETIME(3) NULL,
@@ -24,7 +23,7 @@ CREATE TABLE `token` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `expires_at` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `token_refresh_token_key`(`refresh_token`),
+    UNIQUE INDEX `token_user_id_key`(`user_id`),
     INDEX `token_user_id_idx`(`user_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
