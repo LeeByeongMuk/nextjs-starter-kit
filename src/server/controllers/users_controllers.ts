@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import usersServices from '@/server/services/users_services';
 import { handleError } from '@/server/utils/errorHandling';
 
-const users_controllers = {
+const usersControllers = {
   getUser: async (req: Request, res: Response) => {
     try {
       const data = await usersServices.getUser(req);
@@ -75,4 +75,4 @@ const users_controllers = {
   },
 };
 
-export default users_controllers;
+export default usersControllers;
