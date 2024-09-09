@@ -37,7 +37,7 @@ model token {
 model post {
   id         Int       @id @default(autoincrement())
   user_id    Int
-  type       PostType? @default(free)
+  type       PostType  @default(free)
   title      String    @db.VarChar(100)
   contents   String    @db.LongText
   hit        Int       @default(0)
