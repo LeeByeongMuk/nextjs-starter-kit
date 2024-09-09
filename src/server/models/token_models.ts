@@ -1,4 +1,5 @@
 import { prisma } from '@/server/utils/prisma';
+import { CustomError } from '@/server/utils/errorHandling';
 
 export default function Token() {}
 
@@ -26,7 +27,7 @@ Token.saveRefreshToken = async function ({
     });
 
     if (!result) {
-      return null;
+      throw new CustomError('Error saving refresh token', 500);
     }
 
     return {
@@ -43,7 +44,7 @@ Token.findRefreshToken = async function ({ userId }: { userId: number }) {
   });
 
   if (!result) {
-    return null;
+    throw new CustomError('Refresh token not found', 404);
   }
 
   return result;
@@ -58,7 +59,7 @@ Token.revokeRefreshToken = async function ({ userId }: { userId: number }) {
     });
 
     if (!result) {
-      return null;
+      throw new CustomError('Error deleting refresh token', 500);
     }
 
     return {

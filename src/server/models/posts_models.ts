@@ -1,15 +1,14 @@
-import {
-  CreatePostReq,
-  PostData,
-  PostListData,
-  PostsReq,
-  UpdatePostReq,
-} from '@/app/types/api/post';
+import { PostType } from '@/app/types/api/post';
+import { CustomError } from '@/server/utils/errorHandling';
 import { prisma } from '@/server/utils/prisma';
 
 export default function Posts() {}
 
-Posts.getPosts = async function (req: PostsReq): Promise<any | null> {
+Posts.getPosts = async function (req: {
+  page?: number;
+  type?: PostType;
+  q?: string;
+}) {
   const page = req.page || 1;
   const type = req.type || null;
   const q = req.q || '';
@@ -46,15 +45,14 @@ Posts.getPosts = async function (req: PostsReq): Promise<any | null> {
       },
     },
   });
-
   const lastPage = Math.ceil(totalPosts / pageSize);
 
   if (!totalPosts || !posts) {
-    return null;
+    throw new CustomError('Posts not found', 404);
   }
 
   return {
-    data: posts as unknown as PostListData[],
+    data: posts,
     meta: {
       current_page: page, // 현재 페이지
       last_page: lastPage, // 마지막 페이지
@@ -69,7 +67,7 @@ Posts.getPostById = async function ({
 }: {
   postId: number;
   userId: number;
-}): Promise<PostData | null> {
+}) {
   const post = await prisma.post.findUnique({
     where: {
       id: postId,
@@ -87,7 +85,7 @@ Posts.getPostById = async function ({
   });
 
   if (!post) {
-    return null;
+    throw new CustomError('Post not found', 404);
   }
 
   const isEditable = post.user_id === userId;
@@ -104,14 +102,16 @@ Posts.getPostById = async function ({
   };
 };
 
-interface CreatePostReqWithUserId extends CreatePostReq {
-  userId: number;
-}
-
 Posts.createPost = async function ({
   userId,
   ...req
-}: CreatePostReqWithUserId): Promise<number | null> {
+}: {
+  userId: number;
+  title: string;
+  contents: string;
+  type: PostType;
+  is_open: boolean;
+}) {
   return prisma.$transaction(async prisma => {
     const result = await prisma.post.create({
       data: {
@@ -125,25 +125,30 @@ Posts.createPost = async function ({
     });
 
     if (!result) {
-      return null;
+      throw new CustomError('Failed to create post', 500);
     }
 
-    return result.id;
+    return {
+      id: result.id,
+    };
   });
 };
-
-interface UpdatePostReqWithUserId extends UpdatePostReq {
-  userId: number;
-}
 
 Posts.updatePost = async function ({
   userId,
   ...req
-}: UpdatePostReqWithUserId): Promise<number | null> {
+}: {
+  userId: number;
+  postId: number;
+  title: string;
+  contents: string;
+  type: PostType;
+  is_open: boolean;
+}) {
   return prisma.$transaction(async prisma => {
     const result = await prisma.post.update({
       where: {
-        id: req.id,
+        id: req.postId,
         user_id: userId,
         deleted_at: null,
       },
@@ -157,10 +162,12 @@ Posts.updatePost = async function ({
     });
 
     if (!result) {
-      return null;
+      throw new CustomError('Failed to update post', 500);
     }
 
-    return result.id;
+    return {
+      id: result.id,
+    };
   });
 };
 
@@ -170,9 +177,7 @@ Posts.getPostUpdateResourceById = async function ({
 }: {
   postId: number;
   userId: number;
-}): Promise<{
-  id: number;
-} | null> {
+}) {
   const post = await prisma.post.findFirst({
     where: {
       id: postId,
@@ -189,7 +194,7 @@ Posts.getPostUpdateResourceById = async function ({
   });
 
   if (!post) {
-    return null;
+    throw new CustomError('Post not found', 404);
   }
 
   return {
@@ -203,7 +208,7 @@ Posts.deletePost = async function ({
 }: {
   userId: number;
   postId: number;
-}): Promise<number | null> {
+}) {
   return prisma.$transaction(async prisma => {
     const result = await prisma.post.update({
       where: {
@@ -217,9 +222,11 @@ Posts.deletePost = async function ({
     });
 
     if (!result) {
-      return null;
+      throw new CustomError('Failed to delete post', 500);
     }
 
-    return result.id;
+    return {
+      id: result.id,
+    };
   });
 };

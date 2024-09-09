@@ -1,10 +1,20 @@
+import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 
-import 'dotenv/config';
 import Token from '@/server/models/token_models';
 import { CustomError } from '@/server/utils/errorHandling';
 
+import 'dotenv/config';
+
 const tokenServices = {
+  checkAuthToken: (req: Request) => {
+    const token = req.headers.authorization;
+    if (!token) {
+      throw new CustomError('Token not found', 401);
+    }
+    return token;
+  },
+
   createAccessToken: (user: { id: number }) => {
     return jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
       algorithm: 'HS256',
@@ -23,14 +33,10 @@ const tokenServices = {
         }
       );
 
-      const result = await Token.saveRefreshToken({
+      await Token.saveRefreshToken({
         userId: user.id,
         refreshToken,
       });
-
-      if (!result) {
-        throw new CustomError('Error saving refresh token', 500);
-      }
 
       return refreshToken;
     } catch (err) {
@@ -49,11 +55,19 @@ const tokenServices = {
         process.env.JWT_SECRET as string
       ) as jwt.JwtPayload;
 
+      if (!decoded.id) {
+        throw new CustomError('Invalid access token', 401);
+      }
+
       return {
         id: decoded.id,
       };
     } catch (err) {
-      throw new CustomError('Invalid access token', 401);
+      if (err instanceof CustomError) {
+        throw err;
+      } else {
+        throw new CustomError('Invalid access token', 401);
+      }
     }
   },
 
@@ -95,17 +109,9 @@ const tokenServices = {
         process.env.JWT_REFRESH_SECRET as string
       ) as jwt.JwtPayload;
 
-      const result = await Token.revokeRefreshToken({
+      return await Token.revokeRefreshToken({
         userId: decoded.id,
       });
-
-      if (!result) {
-        throw new CustomError('Error deleting refresh token', 500);
-      }
-
-      return {
-        ok: true,
-      };
     } catch (err) {
       if (err instanceof CustomError) {
         throw err;

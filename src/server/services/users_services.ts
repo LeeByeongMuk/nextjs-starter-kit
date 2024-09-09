@@ -8,22 +8,12 @@ import { CustomError } from '@/server/utils/errorHandling';
 const usersServices = {
   getUser: async (req: Request) => {
     try {
-      const token = req.headers.authorization;
-      if (!token) {
-        throw new CustomError('Token not found', 401);
-      }
+      const token = tokenServices.checkAuthToken(req);
+      const decoded = tokenServices.verifyAccessToken(token);
 
-      const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded) {
-        throw new CustomError('Invalid token', 401);
-      }
-
-      const user = await Users.getUser(decoded.id);
-      if (!user) {
-        throw new CustomError('User not found', 404);
-      }
-
-      return user;
+      return await Users.getUser({
+        userId: decoded.id,
+      });
     } catch (err) {
       if (err instanceof CustomError) {
         throw err;
@@ -36,7 +26,6 @@ const usersServices = {
   signIn: async (req: { body: SignUpReq }) => {
     try {
       const user = await Users.signIn(req.body);
-
       const { accessToken } = await tokenServices.generateTokens(user.id);
 
       return {
@@ -55,10 +44,6 @@ const usersServices = {
   createUser: async (req: { body: SignUpReq }) => {
     try {
       const user = await Users.createUser(req.body);
-      if (!user) {
-        throw new CustomError('User not found', 404);
-      }
-
       const { accessToken, refreshToken } = await tokenServices.generateTokens(
         user.id
       );
@@ -78,25 +63,13 @@ const usersServices = {
 
   updateUser: async (req: Request) => {
     try {
-      const token = req.headers.authorization;
-      if (!token) {
-        throw new CustomError('Token not found', 401);
-      }
+      const token = tokenServices.checkAuthToken(req);
+      const decoded = tokenServices.verifyAccessToken(token);
 
-      const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded) {
-        throw new CustomError('Invalid token', 401);
-      }
-
-      const data = await Users.updateUser({
+      return await Users.updateUser({
         ...req.body,
-        id: decoded.id,
+        userId: decoded.id,
       });
-      if (!data) {
-        throw new CustomError('User not found', 404);
-      }
-
-      return data;
     } catch (err) {
       if (err instanceof CustomError) {
         throw err;
@@ -108,25 +81,13 @@ const usersServices = {
 
   deleteUser: async (req: Request) => {
     try {
-      const token = req.headers.authorization;
-      if (!token) {
-        throw new CustomError('Token not found', 401);
-      }
+      const token = tokenServices.checkAuthToken(req);
+      const decoded = tokenServices.verifyAccessToken(token);
 
-      const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded) {
-        throw new CustomError('Invalid token', 401);
-      }
-
-      const data = await Users.deleteUser({
+      return await Users.deleteUser({
         ...req.body,
         id: decoded.id,
       });
-      if (!data) {
-        throw new CustomError('User not found', 404);
-      }
-
-      return data;
     } catch (err) {
       if (err instanceof CustomError) {
         throw err;
