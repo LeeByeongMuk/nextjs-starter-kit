@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import usersServices from '@/server/services/users_services';
-import { handleError } from '@/server/utils/errorHandling';
+import { handleErrorResponse } from '@/server/utils/errorHandling';
 
 const usersControllers = {
   getUser: async (req: Request, res: Response) => {
@@ -14,7 +14,7 @@ const usersControllers = {
         data,
       });
     } catch (err) {
-      handleError(err, res);
+      handleErrorResponse(err, res);
     }
   },
 
@@ -28,7 +28,7 @@ const usersControllers = {
         data,
       });
     } catch (err) {
-      handleError(err, res);
+      handleErrorResponse(err, res);
     }
   },
 
@@ -42,7 +42,7 @@ const usersControllers = {
         data,
       });
     } catch (err) {
-      handleError(err, res);
+      handleErrorResponse(err, res);
     }
   },
 
@@ -56,7 +56,7 @@ const usersControllers = {
         data,
       });
     } catch (err) {
-      handleError(err, res);
+      handleErrorResponse(err, res);
     }
   },
 
@@ -70,7 +70,7 @@ const usersControllers = {
         data,
       });
     } catch (err) {
-      handleError(err, res);
+      handleErrorResponse(err, res);
     }
   },
 };

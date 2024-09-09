@@ -1,5 +1,5 @@
-import { prisma } from '@/server/utils/prisma';
 import { CustomError } from '@/server/utils/errorHandling';
+import { prisma } from '@/server/utils/prisma';
 
 export default function Token() {}
 

@@ -2,7 +2,7 @@ import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 
 import Token from '@/server/models/token_models';
-import { CustomError } from '@/server/utils/errorHandling';
+import { CustomError, handleError } from '@/server/utils/errorHandling';
 
 import 'dotenv/config';
 
@@ -16,10 +16,14 @@ const tokenServices = {
   },
 
   createAccessToken: (user: { id: number }) => {
-    return jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-      algorithm: 'HS256',
-      expiresIn: '1h',
-    });
+    try {
+      return jwt.sign({ ...user }, process.env.JWT_SECRET as string, {
+        algorithm: 'HS256',
+        expiresIn: '1h',
+      });
+    } catch (err) {
+      handleError(err);
+    }
   },
 
   createRefreshToken: async (user: { id: number }) => {
@@ -40,38 +44,26 @@ const tokenServices = {
 
       return refreshToken;
     } catch (err) {
-      if (err instanceof CustomError) {
-        throw err;
-      } else {
-        throw new CustomError('Error saving refresh token', 500);
-      }
+      handleError(err);
     }
   },
 
-  verifyAccessToken: (token: string) => {
-    try {
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET as string
-      ) as jwt.JwtPayload;
+  verifyAccessToken: ({ token }: { token: string }) => {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as jwt.JwtPayload;
 
-      if (!decoded.id) {
-        throw new CustomError('Invalid access token', 401);
-      }
-
-      return {
-        id: decoded.id,
-      };
-    } catch (err) {
-      if (err instanceof CustomError) {
-        throw err;
-      } else {
-        throw new CustomError('Invalid access token', 401);
-      }
+    if (!decoded.id) {
+      throw new CustomError('Invalid access token', 401);
     }
+
+    return {
+      id: decoded.id,
+    };
   },
 
-  verifyRefreshToken: async (refreshToken: string) => {
+  verifyRefreshToken: async ({ refreshToken }: { refreshToken: string }) => {
     try {
       const decoded = jwt.verify(
         refreshToken,
@@ -94,15 +86,11 @@ const tokenServices = {
         accessToken: newAccessToken,
       };
     } catch (err) {
-      if (err instanceof CustomError) {
-        throw err;
-      } else {
-        throw new CustomError('Invalid refresh token', 401);
-      }
+      handleError(err);
     }
   },
 
-  revokeRefreshToken: async (refreshToken: string) => {
+  revokeRefreshToken: async ({ refreshToken }: { refreshToken: string }) => {
     try {
       const decoded = jwt.verify(
         refreshToken,
@@ -113,18 +101,20 @@ const tokenServices = {
         userId: decoded.id,
       });
     } catch (err) {
-      if (err instanceof CustomError) {
-        throw err;
-      } else {
-        throw new CustomError('Error deleting refresh token', 500);
-      }
+      handleError(err);
     }
   },
 
-  generateTokens: async (userId: number) => {
+  generateTokens: async ({ userId }: { userId: number }) => {
     const accessToken = tokenServices.createAccessToken({ id: userId });
-    const refreshToken = await tokenServices.createRefreshToken({ id: userId });
-    return { accessToken, refreshToken };
+    const refreshToken = await tokenServices.createRefreshToken({
+      id: userId,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   },
 };
 
