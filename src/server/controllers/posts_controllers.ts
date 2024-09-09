@@ -17,6 +17,7 @@ const postsControllers = {
       handleError(err, res);
     }
   },
+
   getPostById: async (req: Request, res: Response) => {
     try {
       const data = await postsServices.getPostById(req);
@@ -30,6 +31,7 @@ const postsControllers = {
       handleError(err, res);
     }
   },
+
   createPost: async (req: Request, res: Response) => {
     try {
       const data = await postsServices.createPost(req);
@@ -43,6 +45,7 @@ const postsControllers = {
       handleError(err, res);
     }
   },
+
   updatePost: async (req: Request, res: Response) => {
     try {
       const data = await postsServices.updatePost(req);
@@ -56,6 +59,7 @@ const postsControllers = {
       handleError(err, res);
     }
   },
+
   getPostUpdateResourceById: async (req: Request, res: Response) => {
     try {
       const data = await postsServices.getPostUpdateResourceById(req);

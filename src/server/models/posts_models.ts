@@ -7,12 +7,11 @@ import {
   UpdatePostReq,
   UpdatePostResourceData,
 } from '@/app/types/post';
-import { CustomError } from '@/server/utils/errorHandling';
 import { prisma } from '@/server/utils/prisma';
 
 export default function Posts() {}
 
-Posts.getPosts = async function (req: PostsReq): Promise<PostsRes> {
+Posts.getPosts = async function (req: PostsReq): Promise<PostsRes | null> {
   const page = req.page || 1;
   const type = req.type || null;
   const q = req.q || '';
@@ -39,12 +38,17 @@ Posts.getPosts = async function (req: PostsReq): Promise<PostsRes> {
         select: {
           id: true,
           name: true,
+          nickname: true,
         },
       },
     },
   });
 
   const lastPage = Math.ceil(totalPosts / pageSize);
+
+  if (!totalPosts || !posts) {
+    return null;
+  }
 
   return {
     data: posts as unknown as PostListData[],
@@ -62,7 +66,7 @@ Posts.getPostById = async function ({
 }: {
   postId: number;
   userId: number;
-}): Promise<PostData> {
+}): Promise<PostData | null> {
   const post = await prisma.post.findUnique({
     where: {
       id: postId,
@@ -73,13 +77,14 @@ Posts.getPostById = async function ({
         select: {
           id: true,
           name: true,
+          nickname: true,
         },
       },
     },
   });
 
   if (!post) {
-    throw new CustomError('Post not found', 404);
+    return null;
   }
 
   const isEditable = post.user_id === userId;
@@ -92,7 +97,7 @@ Posts.getPostById = async function ({
     is_editable: isEditable,
     title: post.title,
     type: post.type,
-    user_name: post.user.name,
+    user_name: post.user.nickname || post.user.name,
   };
 };
 
@@ -103,7 +108,7 @@ interface CreatePostReqWithUserId extends CreatePostReq {
 Posts.createPost = async function ({
   userId,
   ...req
-}: CreatePostReqWithUserId): Promise<number> {
+}: CreatePostReqWithUserId): Promise<number | null> {
   return prisma.$transaction(async prisma => {
     const result = await prisma.post.create({
       data: {
@@ -116,6 +121,10 @@ Posts.createPost = async function ({
       },
     });
 
+    if (!result) {
+      return null;
+    }
+
     return result.id;
   });
 };
@@ -127,7 +136,7 @@ interface UpdatePostReqWithUserId extends UpdatePostReq {
 Posts.updatePost = async function ({
   userId,
   ...req
-}: UpdatePostReqWithUserId): Promise<number> {
+}: UpdatePostReqWithUserId): Promise<number | null> {
   return prisma.$transaction(async prisma => {
     const result = await prisma.post.update({
       where: {
@@ -145,7 +154,7 @@ Posts.updatePost = async function ({
     });
 
     if (!result) {
-      throw new CustomError('Post not found', 404);
+      return null;
     }
 
     return result.id;
@@ -158,7 +167,7 @@ Posts.getPostUpdateResourceById = async function ({
 }: {
   postId: number;
   userId: number;
-}): Promise<UpdatePostResourceData> {
+}): Promise<UpdatePostResourceData | null> {
   const post = await prisma.post.findFirst({
     where: {
       id: postId,
@@ -174,7 +183,9 @@ Posts.getPostUpdateResourceById = async function ({
     },
   });
 
-  if (!post) throw new CustomError('Post not found', 404);
+  if (!post) {
+    return null;
+  }
 
   return {
     id: post.id,

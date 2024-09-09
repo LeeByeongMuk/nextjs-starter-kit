@@ -8,11 +8,10 @@ import { CustomError } from '@/server/utils/errorHandling';
 const postsServices = {
   getPosts: async (req: Request) => {
     try {
-      const params = req.params;
       const posts = await Posts.getPosts({
-        page: Number(params.page),
-        type: params.type as PostType,
-        q: params.q,
+        page: Number(req.body.page),
+        type: req.body.type as PostType,
+        q: req.body.q,
       });
 
       if (!posts) {
@@ -28,6 +27,7 @@ const postsServices = {
       }
     }
   },
+
   getPostById: async (req: Request) => {
     try {
       const token = req.headers.authorization;
@@ -58,6 +58,7 @@ const postsServices = {
       }
     }
   },
+
   createPost: async (req: Request) => {
     try {
       const token = req.headers.authorization;
@@ -75,6 +76,10 @@ const postsServices = {
         userId: Number(decoded.data?.id),
       });
 
+      if (!postId) {
+        throw new CustomError('Error creating post', 500);
+      }
+
       return {
         id: postId,
       };
@@ -86,6 +91,7 @@ const postsServices = {
       }
     }
   },
+
   updatePost: async (req: Request) => {
     try {
       const token = req.headers.authorization;
@@ -104,6 +110,10 @@ const postsServices = {
         ...req.body,
       });
 
+      if (!postId) {
+        throw new CustomError('Error updating post', 500);
+      }
+
       return {
         id: postId,
       };
@@ -115,6 +125,7 @@ const postsServices = {
       }
     }
   },
+
   getPostUpdateResourceById: async (req: Request) => {
     try {
       const token = req.headers.authorization;
