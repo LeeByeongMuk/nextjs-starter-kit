@@ -3,17 +3,12 @@ import React from 'react';
 
 import { PostListData } from '@/app/types/api/post';
 import { getFormattedDate } from '@/app/utils/date';
+import { DUMMY_DATA } from '@/app/constants/post';
 
 interface Props {
   posts: PostListData[];
   isLoading: boolean;
 }
-
-const DUMMY_DATA = Array.from({ length: 10 }, (_, i) => ({
-  id: i,
-  title: `Title ${i}`,
-  type: 'Type',
-}));
 
 export default function ListTable({ posts, isLoading }: Props) {
   const renderPostList = () => {

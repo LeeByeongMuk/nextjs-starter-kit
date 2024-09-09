@@ -22,10 +22,7 @@ export default function usePost() {
         is_editable: false,
         title: '',
         type: '',
-        user: {
-          name: '',
-          nickname: '',
-        },
+        user_name: '',
       },
     } as unknown as PostRes,
     queryFn: () => fetchPost({ id }),

@@ -19,6 +19,7 @@ export default function usePostList({ searchFilters }: Props) {
       meta: {
         current_page: 1,
         last_page: 1,
+        total: 0,
       },
       links: {},
     } as unknown as PostsRes,
