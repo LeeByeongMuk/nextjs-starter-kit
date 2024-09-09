@@ -36,13 +36,13 @@ const postsServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const post = await Posts.getPostById({
         postId: Number(req.params.id),
-        userId: decoded.data?.id as number,
+        userId: decoded.id,
       });
 
       if (!post) {
@@ -67,13 +67,13 @@ const postsServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const postId = await Posts.createPost({
         ...req.body,
-        userId: Number(decoded.data?.id),
+        userId: decoded.id,
       });
 
       if (!postId) {
@@ -100,13 +100,13 @@ const postsServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const postId = await Posts.updatePost({
-        userId: decoded.data?.id as number,
         id: Number(req.params.id),
+        userId: decoded.id,
         ...req.body,
       });
 
@@ -134,13 +134,13 @@ const postsServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const post = await Posts.getPostUpdateResourceById({
         postId: Number(req.params.id),
-        userId: Number(decoded.data?.id),
+        userId: decoded.id,
       });
 
       if (!post) {
@@ -165,13 +165,13 @@ const postsServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const postId = await Posts.deletePost({
-        userId: decoded.data?.id as number,
         postId: Number(req.params.id),
+        userId: decoded.id,
       });
 
       if (!postId) {

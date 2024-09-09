@@ -1,4 +1,3 @@
-import { CustomError } from '@/server/utils/errorHandling';
 import { prisma } from '@/server/utils/prisma';
 
 export default function Token() {}
@@ -11,7 +10,7 @@ Token.saveRefreshToken = async function ({
   refreshToken: string;
 }) {
   return prisma.$transaction(async prisma => {
-    await prisma.token.upsert({
+    const result = await prisma.token.upsert({
       where: {
         user_id: userId,
       },
@@ -26,6 +25,10 @@ Token.saveRefreshToken = async function ({
       },
     });
 
+    if (!result) {
+      return null;
+    }
+
     return {
       ok: true,
     };
@@ -33,13 +36,17 @@ Token.saveRefreshToken = async function ({
 };
 
 Token.findRefreshToken = async function ({ userId }: { userId: number }) {
-  return prisma.$transaction(async prisma => {
-    return prisma.token.findUnique({
-      where: {
-        user_id: userId,
-      },
-    });
+  const result = prisma.token.findUnique({
+    where: {
+      user_id: userId,
+    },
   });
+
+  if (!result) {
+    return null;
+  }
+
+  return result;
 };
 
 Token.revokeRefreshToken = async function ({ userId }: { userId: number }) {
@@ -51,7 +58,7 @@ Token.revokeRefreshToken = async function ({ userId }: { userId: number }) {
     });
 
     if (!result) {
-      throw new CustomError('Error deleting refresh token', 500);
+      return null;
     }
 
     return {

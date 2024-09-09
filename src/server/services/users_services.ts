@@ -14,11 +14,11 @@ const usersServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
-      const user = await Users.getUser(decoded.data?.id);
+      const user = await Users.getUser(decoded.id);
       if (!user) {
         throw new CustomError('User not found', 404);
       }
@@ -84,13 +84,13 @@ const usersServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const data = await Users.updateUser({
         ...req.body,
-        id: decoded.data?.id,
+        id: decoded.id,
       });
       if (!data) {
         throw new CustomError('User not found', 404);
@@ -114,13 +114,13 @@ const usersServices = {
       }
 
       const decoded = tokenServices.verifyAccessToken(token as string);
-      if (!decoded.ok) {
+      if (!decoded) {
         throw new CustomError('Invalid token', 401);
       }
 
       const data = await Users.deleteUser({
         ...req.body,
-        id: decoded.data?.id,
+        id: decoded.id,
       });
       if (!data) {
         throw new CustomError('User not found', 404);

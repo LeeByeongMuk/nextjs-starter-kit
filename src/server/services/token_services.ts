@@ -8,7 +8,7 @@ const tokenServices = {
   createAccessToken: (user: { id: number }) => {
     return jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
       algorithm: 'HS256',
-      expiresIn: '15m',
+      expiresIn: '1h',
     });
   },
 
@@ -23,10 +23,14 @@ const tokenServices = {
         }
       );
 
-      await Token.saveRefreshToken({
+      const result = await Token.saveRefreshToken({
         userId: user.id,
         refreshToken,
       });
+
+      if (!result) {
+        throw new CustomError('Error saving refresh token', 500);
+      }
 
       return refreshToken;
     } catch (err) {
@@ -46,17 +50,10 @@ const tokenServices = {
       ) as jwt.JwtPayload;
 
       return {
-        ok: true,
-        data: {
-          id: decoded.id,
-        },
+        id: decoded.id,
       };
     } catch (err) {
-      return {
-        ok: false,
-        message: 'Invalid access token',
-        data: null,
-      };
+      throw new CustomError('Invalid access token', 401);
     }
   },
 
@@ -68,7 +65,7 @@ const tokenServices = {
       ) as jwt.JwtPayload;
 
       const refreshTokenRecord = await Token.findRefreshToken({
-        userId: decoded.id,
+        userId: Number(decoded.id),
       });
 
       if (!refreshTokenRecord || refreshTokenRecord.user_id !== decoded.id) {
@@ -80,7 +77,6 @@ const tokenServices = {
       });
 
       return {
-        ok: true,
         accessToken: newAccessToken,
       };
     } catch (err) {
@@ -103,7 +99,7 @@ const tokenServices = {
         userId: decoded.id,
       });
 
-      if (!result.ok) {
+      if (!result) {
         throw new CustomError('Error deleting refresh token', 500);
       }
 
