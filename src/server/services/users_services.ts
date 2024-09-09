@@ -37,13 +37,11 @@ const usersServices = {
     try {
       const user = await Users.signIn(req.body);
 
-      const { accessToken, refreshToken } = await tokenServices.generateTokens(
-        user.id
-      );
+      const { accessToken } = await tokenServices.generateTokens(user.id);
 
       return {
         access_token: accessToken,
-        refresh_token: refreshToken,
+        id: user.id,
       };
     } catch (err) {
       if (err instanceof CustomError) {

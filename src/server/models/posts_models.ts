@@ -3,15 +3,13 @@ import {
   PostData,
   PostListData,
   PostsReq,
-  PostsRes,
   UpdatePostReq,
-  UpdatePostResourceData,
-} from '@/app/types/post';
+} from '@/app/types/api/post';
 import { prisma } from '@/server/utils/prisma';
 
 export default function Posts() {}
 
-Posts.getPosts = async function (req: PostsReq): Promise<PostsRes | null> {
+Posts.getPosts = async function (req: PostsReq): Promise<any | null> {
   const page = req.page || 1;
   const type = req.type || null;
   const q = req.q || '';
@@ -33,7 +31,12 @@ Posts.getPosts = async function (req: PostsReq): Promise<PostsRes | null> {
     orderBy: {
       created_at: 'desc',
     },
-    include: {
+    select: {
+      created_at: true,
+      hit: true,
+      id: true,
+      title: true,
+      type: true,
       user: {
         select: {
           id: true,
@@ -167,7 +170,9 @@ Posts.getPostUpdateResourceById = async function ({
 }: {
   postId: number;
   userId: number;
-}): Promise<UpdatePostResourceData | null> {
+}): Promise<{
+  id: number;
+} | null> {
   const post = await prisma.post.findFirst({
     where: {
       id: postId,
@@ -189,10 +194,6 @@ Posts.getPostUpdateResourceById = async function ({
 
   return {
     id: post.id,
-    title: post.title,
-    contents: post.contents,
-    type: post.type,
-    is_open: post.is_open,
   };
 };
 
