@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import ValidationError from '@/app/components/Error/ValidationError';
 
-export default function IsPublishedCheckbox() {
+export default function IsOpenCheckbox() {
   const {
     register,
     formState: { errors },
@@ -20,7 +20,7 @@ export default function IsPublishedCheckbox() {
             id="isOpen1"
             className="rounded-md border-gray-200 shadow-sm sm:text-sm"
             value="1"
-            {...register('isPublished', {
+            {...register('isOpen', {
               required: 'Is Open is required',
             })}
           />
@@ -35,7 +35,7 @@ export default function IsPublishedCheckbox() {
             id="isOpen2"
             className="rounded-md border-gray-200 shadow-sm sm:text-sm"
             value="0"
-            {...register('isPublished', {
+            {...register('isOpen', {
               required: 'Is Open is required',
             })}
           />
@@ -47,8 +47,8 @@ export default function IsPublishedCheckbox() {
 
       <ValidationError
         role="isOpen-error-message"
-        isError={!!errors.isPublished}
-        message={errors.isPublished?.message?.toString()}
+        isError={!!errors.isOpen}
+        message={errors.isOpen?.message?.toString()}
       />
     </div>
   );

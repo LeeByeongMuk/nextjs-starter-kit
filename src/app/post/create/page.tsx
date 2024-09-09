@@ -5,17 +5,18 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
-import IsPublishedCheckbox from '@/app/components/Post/Form/IsPublishedCheckbox';
+import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useCreatePost from '@/app/hooks/post/useCreatePost';
+import { PostType } from '@/app/types/post';
 
 interface PostFormInput {
   title: string;
-  type: string | null;
+  type: PostType;
   contents: string;
-  is_published: '1' | '0';
+  is_open: '1' | '0';
 }
 
 export default function CreatePost() {
@@ -28,7 +29,7 @@ export default function CreatePost() {
       title: data.title,
       type: data.type,
       contents: data.contents,
-      is_published: data.is_published === '1',
+      is_open: data.is_open === '1',
     });
   };
 
@@ -42,7 +43,7 @@ export default function CreatePost() {
 
           <ContentsEditor />
 
-          <IsPublishedCheckbox />
+          <IsOpenCheckbox />
 
           <ButtonBox />
         </form>

@@ -35,7 +35,7 @@ const fetchCreatePost = async ({
   title,
   type,
   contents,
-  is_published,
+  is_open,
 }: CreatePostReq) => {
   return (await fetchApi('/api/posts', {
     method: 'POST',
@@ -43,7 +43,7 @@ const fetchCreatePost = async ({
       title,
       type: type || null,
       contents,
-      is_published,
+      is_open,
     }),
   })) as CreatePostRes;
 };
@@ -53,7 +53,7 @@ const fetchUpdatePost = async ({
   title,
   type,
   contents,
-  is_published,
+  is_open,
 }: UpdatePostReq) => {
   return (await fetchApi(`/api/posts/${id}`, {
     method: 'PUT',
@@ -61,7 +61,7 @@ const fetchUpdatePost = async ({
       title,
       type: type || null,
       contents,
-      is_published,
+      is_open,
     }),
   })) as UpdatePostRes;
 };
