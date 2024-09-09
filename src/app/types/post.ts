@@ -47,9 +47,9 @@ interface PostRes {
 
 interface CreatePostReq {
   title: string;
-  type: string | null;
+  type: PostType;
   contents: string;
-  is_published: boolean;
+  is_open: boolean;
 }
 
 interface CreatePostRes {
@@ -62,9 +62,9 @@ interface CreatePostRes {
 interface UpdatePostReq {
   id: number;
   title: string;
-  type: string | null;
+  type: PostType;
   contents: string;
-  is_published: boolean;
+  is_open: boolean;
 }
 
 interface UpdatePostRes {
@@ -74,18 +74,20 @@ interface UpdatePostRes {
   };
 }
 
+interface UpdatePostResourceData {
+  id: number;
+  type: PostType;
+  title: string;
+  contents: string;
+  is_open: boolean;
+}
+
 interface UpdatePostResourceReq {
   id: number;
 }
 
 interface UpdatePostResourceRes {
-  data: {
-    id: number;
-    type: PostType | null;
-    title: string;
-    contents: string;
-    is_published: boolean;
-  };
+  data: UpdatePostResourceData;
 }
 
 export type {
@@ -101,6 +103,7 @@ export type {
   CreatePostRes,
   UpdatePostReq,
   UpdatePostRes,
+  UpdatePostResourceData,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
 };
