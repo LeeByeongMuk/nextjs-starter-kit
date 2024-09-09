@@ -11,12 +11,7 @@ import NickNameInput from '@/app/components/Auth/Form/NickNameInput';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useDeleteAccount from '@/app/hooks/auth/useDeleteAccount';
 import useUpdateAccount from '@/app/hooks/auth/useUpdateAccount';
-
-interface UserUpdateInput {
-  email: string;
-  name: string;
-  nickname: string;
-}
+import { UserUpdateInput } from '@/app/types/form/auth';
 
 export default function Account() {
   const { data: session } = useSession();
