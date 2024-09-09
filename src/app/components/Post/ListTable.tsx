@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
 
+import { DUMMY_DATA } from '@/app/constants/post';
 import { PostListData } from '@/app/types/api/post';
 import { getFormattedDate } from '@/app/utils/date';
-import { DUMMY_DATA } from '@/app/constants/post';
 
 interface Props {
   posts: PostListData[];

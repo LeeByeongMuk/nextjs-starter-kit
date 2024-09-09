@@ -14,7 +14,6 @@ import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useSignup from '@/app/hooks/auth/useSignup';
 import { SignUpInput } from '@/app/types/form/auth';
 
-
 export default function Signup() {
   const { mutate, isPending } = useSignup();
 
