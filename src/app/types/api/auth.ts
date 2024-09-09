@@ -1,13 +1,13 @@
+import { ApiResponse } from '@/app/types/api/common';
+
 interface UserData {
-  created_at: string;
+  id: string;
   email: string;
   name: string;
   nickname: string;
-  phone: string | null;
-  provider: string | null;
 }
 
-interface UserRes {
+interface UserRes extends ApiResponse {
   data: UserData;
 }
 
@@ -16,8 +16,9 @@ interface SignInReq {
   password: string;
 }
 
-interface SignInRes {
+interface SignInRes extends ApiResponse {
   data: {
+    id: number;
     access_token: string;
   };
 }
@@ -37,18 +38,19 @@ interface UpdateAccountReq {
   nickname: string;
 }
 
-interface UpdateAccountRes {
-  data: {
-    id: string;
-    message: string;
-  };
+interface UpdateAccountRes extends ApiResponse {
+  data: UserData;
 }
 
 interface DeleteAccountReq {
   deleted_reason: string;
 }
 
-interface DeleteAccountRes extends UpdateAccountRes {}
+interface DeleteAccountRes extends ApiResponse {
+  data: {
+    id: string;
+  };
+}
 
 export type {
   UserData,

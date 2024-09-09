@@ -10,7 +10,7 @@ import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useCreatePost from '@/app/hooks/post/useCreatePost';
-import { PostType } from '@/app/types/post';
+import { PostType } from '@/app/types/api/post';
 
 interface PostFormInput {
   title: string;

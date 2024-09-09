@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 
-import { PostListData } from '@/app/types/post';
+import { PostListData } from '@/app/types/api/post';
 import { getFormattedDate } from '@/app/utils/date';
 
 interface Props {

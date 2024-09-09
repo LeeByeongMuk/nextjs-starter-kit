@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { fetchUpdatePostResource } from '@/app/api/post';
-import { UpdatePostResourceRes } from '@/app/types/post';
+import { UpdatePostResourceRes } from '@/app/types/api/post';
 
 export default function useUpdatePostResource() {
   const router = useRouter();

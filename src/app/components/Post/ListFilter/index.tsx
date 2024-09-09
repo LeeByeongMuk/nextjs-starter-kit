@@ -6,7 +6,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import SearchInput from '@/app/components/Post/ListFilter/SearchInput';
 import TypeSelect from '@/app/components/Post/ListFilter/TypeSelect';
-import { PostListSearch, PostsReq, PostType } from '@/app/types/post';
+import { PostListSearch, PostsReq, PostType } from '@/app/types/api/post';
 
 interface Props {
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;

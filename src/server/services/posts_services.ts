@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { PostType } from '@/app/types/post';
+import { PostType } from '@/app/types/api/post';
 import Posts from '@/server/models/posts_models';
 import tokenServices from '@/server/services/token_services';
 import { CustomError } from '@/server/utils/errorHandling';

@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { SignUpReq } from '@/app/types/auth';
+import { SignUpReq } from '@/app/types/api/auth';
 import Users from '@/server/models/users_models';
 import tokenServices from '@/server/services/token_services';
 import { CustomError } from '@/server/utils/errorHandling';

@@ -13,7 +13,7 @@ import Spinner from '@/app/components/Spinner';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useUpdatePost from '@/app/hooks/post/useUpdatePost';
 import useUpdatePostResource from '@/app/hooks/post/useUpdatePostResource';
-import { PostType } from '@/app/types/post';
+import { PostType } from '@/app/types/api/post';
 
 interface PostFormInput {
   title: string;

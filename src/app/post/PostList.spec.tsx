@@ -14,7 +14,7 @@ import React from 'react';
 
 import usePostList from '@/app/hooks/post/usePostList';
 import PostList from '@/app/post/page';
-import { PostsReq } from '@/app/types/post';
+import { PostsReq } from '@/app/types/api/post';
 import { server } from '@/mocks/node';
 
 jest.mock('next/headers');
