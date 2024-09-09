@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { SignUpReq } from '@/app/types/auth';
+import { SignUpReq } from '@/app/types/api/auth';
 import { CustomError } from '@/server/utils/errorHandling';
 import { prisma } from '@/server/utils/prisma';
 

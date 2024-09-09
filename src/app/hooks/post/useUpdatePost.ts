@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 
 import { fetchUpdatePost } from '@/app/api/post';
-import { UpdatePostReq } from '@/app/types/post';
+import { UpdatePostReq } from '@/app/types/api/post';
 
 export default function useUpdatePost() {
   const router = useRouter();

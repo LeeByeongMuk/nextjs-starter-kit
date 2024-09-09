@@ -9,7 +9,7 @@ import {
   UpdatePostRes,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
-} from '@/app/types/post';
+} from '@/app/types/api/post';
 import { fetchApi } from '@/app/utils/api';
 
 const fetchPosts = async ({ page, type, q }: PostsReq) => {

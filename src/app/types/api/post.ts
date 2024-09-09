@@ -1,4 +1,5 @@
-import { PaginationData } from '@/app/types/pagination';
+import { ApiResponse } from '@/app/types/api/common';
+import { PaginationData } from '@/app/types/api/pagination';
 
 type PostType = 'notice' | 'faq' | 'free';
 
@@ -19,10 +20,11 @@ interface PostListData {
   user: {
     id: number;
     name: string;
+    nickname: string;
   };
 }
 
-interface PostsRes extends PaginationData {
+interface PostsRes extends ApiResponse, PaginationData {
   data: PostListData[];
 }
 
@@ -41,7 +43,7 @@ interface PostData {
   user_name: string;
 }
 
-interface PostRes {
+interface PostRes extends ApiResponse {
   data: PostData;
 }
 
@@ -52,10 +54,9 @@ interface CreatePostReq {
   is_open: boolean;
 }
 
-interface CreatePostRes {
+interface CreatePostRes extends ApiResponse {
   data: {
     id: number;
-    message: string;
   };
 }
 
@@ -67,10 +68,9 @@ interface UpdatePostReq {
   is_open: boolean;
 }
 
-interface UpdatePostRes {
+interface UpdatePostRes extends ApiResponse {
   data: {
     id: number;
-    message: string;
   };
 }
 
@@ -86,7 +86,7 @@ interface UpdatePostResourceReq {
   id: number;
 }
 
-interface UpdatePostResourceRes {
+interface UpdatePostResourceRes extends ApiResponse {
   data: UpdatePostResourceData;
 }
 

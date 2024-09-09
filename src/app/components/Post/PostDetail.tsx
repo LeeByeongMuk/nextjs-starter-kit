@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PostData } from '@/app/types/post';
+import { PostData } from '@/app/types/api/post';
 import { getFormattedDate } from '@/app/utils/date';
 
 interface PostDetailProps {

@@ -18,18 +18,17 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         const {
-          data: { access_token },
+          data: { id },
         } = await fetchSignIn({
           email: credentials?.email || '',
           password: credentials?.password || '',
         });
         const user = await fetchUser();
-        const id = access_token.split('|')[0] || '';
 
         if (user) {
           return {
             ...user.data,
-            id,
+            id: id.toString(),
           };
         } else {
           return null;

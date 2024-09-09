@@ -86,7 +86,7 @@ const postsControllers = {
     } catch (err) {
       handleError(err, res);
     }
-  }
+  },
 };
 
 export default postsControllers;

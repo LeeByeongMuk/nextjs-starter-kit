@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { SignUpReq } from '@/app/types/auth';
+import { SignUpReq } from '@/app/types/api/auth';
 import Users from '@/server/models/users_models';
 import tokenServices from '@/server/services/token_services';
 import { CustomError } from '@/server/utils/errorHandling';
@@ -37,13 +37,11 @@ const usersServices = {
     try {
       const user = await Users.signIn(req.body);
 
-      const { accessToken, refreshToken } = await tokenServices.generateTokens(
-        user.id
-      );
+      const { accessToken } = await tokenServices.generateTokens(user.id);
 
       return {
         access_token: accessToken,
-        refresh_token: refreshToken,
+        id: user.id,
       };
     } catch (err) {
       if (err instanceof CustomError) {

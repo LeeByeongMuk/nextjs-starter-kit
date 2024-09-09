@@ -10,11 +10,7 @@ import EmailInput from '@/app/components/Auth/Form/EmailInput';
 import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
 import AuthHeader from '@/app/components/Auth/Header';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
-
-interface SignInInput {
-  email: string;
-  password: string;
-}
+import { SignInInput } from '@/app/types/form/auth';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);

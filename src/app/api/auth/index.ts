@@ -13,7 +13,7 @@ import {
   UserRes,
   UpdateAccountReq,
   UpdateAccountRes,
-} from '@/app/types/auth';
+} from '@/app/types/api/auth';
 import { fetchApi } from '@/app/utils/api';
 
 const fetchUser = async () => {

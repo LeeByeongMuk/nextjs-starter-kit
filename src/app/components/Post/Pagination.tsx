@@ -2,8 +2,8 @@ import classNames from 'classnames';
 import React from 'react';
 
 import { PAGE_GROUP_NUMBER } from '@/app/constants/post';
-import { PaginationMeta } from '@/app/types/pagination';
-import { PostsReq } from '@/app/types/post';
+import { PaginationMeta } from '@/app/types/api/pagination';
+import { PostsReq } from '@/app/types/api/post';
 
 interface Props {
   meta: PaginationMeta;
