@@ -184,3 +184,30 @@ Posts.getPostUpdateResourceById = async function ({
     is_open: post.is_open,
   };
 };
+
+Posts.deletePost = async function ({
+  userId,
+  postId,
+}: {
+  userId: number;
+  postId: number;
+}): Promise<number | null> {
+  return prisma.$transaction(async prisma => {
+    const result = await prisma.post.update({
+      where: {
+        id: postId,
+        user_id: userId,
+        deleted_at: null,
+      },
+      data: {
+        deleted_at: new Date(),
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    return result.id;
+  });
+};

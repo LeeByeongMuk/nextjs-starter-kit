@@ -145,6 +145,39 @@ const postsServices = {
       }
     }
   },
+
+  deletePost: async (req: Request) => {
+    try {
+      const token = req.headers.authorization;
+      if (!token) {
+        throw new CustomError('Token not found', 401);
+      }
+
+      const decoded = tokenServices.verifyAccessToken(token as string);
+      if (!decoded.ok) {
+        throw new CustomError('Invalid token', 401);
+      }
+
+      const postId = await Posts.deletePost({
+        userId: decoded.data?.id as number,
+        postId: Number(req.params.id),
+      });
+
+      if (!postId) {
+        throw new CustomError('Error deleting post', 500);
+      }
+
+      return {
+        id: postId,
+      };
+    } catch (err) {
+      if (err instanceof CustomError) {
+        throw err;
+      } else {
+        throw new CustomError('Error deleting post', 500);
+      }
+    }
+  },
 };
 
 export default postsServices;

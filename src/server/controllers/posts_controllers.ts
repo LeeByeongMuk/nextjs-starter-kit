@@ -69,6 +69,20 @@ const postsControllers = {
       handleError(err, res);
     }
   },
+
+  deletePost: async (req: Request, res: Response) => {
+    try {
+      const data = await postsServices.deletePost(req);
+
+      return res.status(200).json({
+        ok: true,
+        message: 'success',
+        data,
+      });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
 };
 
 export default postsControllers;
