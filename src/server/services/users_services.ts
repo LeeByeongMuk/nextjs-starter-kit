@@ -38,13 +38,13 @@ const usersServices = {
   createUser: async (req: { body: SignUpReq }) => {
     try {
       const user = await Users.createUser(req.body);
-      const { accessToken, refreshToken } = await tokenServices.generateTokens({
+      const { accessToken } = await tokenServices.generateTokens({
         userId: user.id,
       });
 
       return {
         access_token: accessToken,
-        refresh_token: refreshToken,
+        id: user.id,
       };
     } catch (err) {
       handleError(err);
