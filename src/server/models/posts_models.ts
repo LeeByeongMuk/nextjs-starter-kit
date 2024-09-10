@@ -199,6 +199,10 @@ Posts.getPostUpdateResourceById = async function ({
 
   return {
     id: post.id,
+    title: post.title,
+    contents: post.contents,
+    type: post.type,
+    is_open: post.is_open,
   };
 };
 
