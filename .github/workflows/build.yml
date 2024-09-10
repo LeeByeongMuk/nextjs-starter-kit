@@ -59,6 +59,9 @@ jobs:
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
+      - name: Remove node_modules and package-lock.json
+        run: rm -rf node_modules package-lock.json
+
       - name: Install the project dependencies
         run: npm install
 
