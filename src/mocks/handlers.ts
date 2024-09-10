@@ -8,7 +8,7 @@ export const handlers = [
       message: 'success',
       data: {
         access_token: 'mockaccesstoken0000',
-      }
+      },
     });
   }),
   http.post(`/api/users/signin`, () => {
@@ -49,7 +49,7 @@ export const handlers = [
       ok: true,
       message: 'success',
       data: {
-        ok: true
+        ok: true,
       },
     });
   }),
