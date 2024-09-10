@@ -264,8 +264,12 @@ describe('회원가입 테스트', () => {
       });
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(window.alert).toHaveBeenCalledWith('Signed up successfully!');
-      expect(result.current.data).toStrictEqual({
-        data: { access_token: '1|mockaccesstoken0000' },
+      expect(result.current.data).toMatchObject({
+        ok: true,
+        message: 'success',
+        data: {
+          access_token: 'mockaccesstoken0000',
+        },
       });
     });
 

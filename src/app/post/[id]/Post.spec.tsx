@@ -122,13 +122,11 @@ describe('게시글 상세 페이지 테스트', () => {
         contents: 'contents',
         created_at: '2021-09-01T00:00:00',
         hit: 0,
+        id: 1,
         is_editable: false,
         title: 'title',
         type: 'notice',
-        user: {
-          name: 'name',
-          nickname: 'nickname',
-        },
+        user_name: 'name',
       });
     });
   });
