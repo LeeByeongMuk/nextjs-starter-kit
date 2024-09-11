@@ -1,4 +1,5 @@
-import { PaginationData } from '@/app/types/pagination';
+import { ApiResponse } from '@/app/types/api/common';
+import { PaginationData } from '@/app/types/api/pagination';
 
 type PostType = 'notice' | 'faq' | 'free';
 
@@ -19,10 +20,11 @@ interface PostListData {
   user: {
     id: number;
     name: string;
+    nickname: string;
   };
 }
 
-interface PostsRes extends PaginationData {
+interface PostsRes extends ApiResponse, PaginationData {
   data: PostListData[];
 }
 
@@ -41,51 +43,51 @@ interface PostData {
   user_name: string;
 }
 
-interface PostRes {
+interface PostRes extends ApiResponse {
   data: PostData;
 }
 
 interface CreatePostReq {
   title: string;
-  type: string | null;
+  type: PostType;
   contents: string;
-  is_published: boolean;
+  is_open: boolean;
 }
 
-interface CreatePostRes {
+interface CreatePostRes extends ApiResponse {
   data: {
     id: number;
-    message: string;
   };
 }
 
 interface UpdatePostReq {
   id: number;
   title: string;
-  type: string | null;
+  type: PostType;
   contents: string;
-  is_published: boolean;
+  is_open: boolean;
 }
 
-interface UpdatePostRes {
+interface UpdatePostRes extends ApiResponse {
   data: {
     id: number;
-    message: string;
   };
+}
+
+interface UpdatePostResourceData {
+  id: number;
+  type: PostType;
+  title: string;
+  contents: string;
+  is_open: boolean;
 }
 
 interface UpdatePostResourceReq {
   id: number;
 }
 
-interface UpdatePostResourceRes {
-  data: {
-    id: number;
-    type: PostType | null;
-    title: string;
-    contents: string;
-    is_published: boolean;
-  };
+interface UpdatePostResourceRes extends ApiResponse {
+  data: UpdatePostResourceData;
 }
 
 export type {
@@ -101,6 +103,7 @@ export type {
   CreatePostRes,
   UpdatePostReq,
   UpdatePostRes,
+  UpdatePostResourceData,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
 };

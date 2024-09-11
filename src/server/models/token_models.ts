@@ -11,7 +11,7 @@ Token.saveRefreshToken = async function ({
   refreshToken: string;
 }) {
   return prisma.$transaction(async prisma => {
-    await prisma.token.upsert({
+    const result = await prisma.token.upsert({
       where: {
         user_id: userId,
       },
@@ -26,6 +26,10 @@ Token.saveRefreshToken = async function ({
       },
     });
 
+    if (!result) {
+      throw new CustomError('Error saving refresh token', 500);
+    }
+
     return {
       ok: true,
     };
@@ -33,13 +37,17 @@ Token.saveRefreshToken = async function ({
 };
 
 Token.findRefreshToken = async function ({ userId }: { userId: number }) {
-  return prisma.$transaction(async prisma => {
-    return prisma.token.findUnique({
-      where: {
-        user_id: userId,
-      },
-    });
+  const result = prisma.token.findUnique({
+    where: {
+      user_id: userId,
+    },
   });
+
+  if (!result) {
+    throw new CustomError('Refresh token not found', 404);
+  }
+
+  return result;
 };
 
 Token.revokeRefreshToken = async function ({ userId }: { userId: number }) {

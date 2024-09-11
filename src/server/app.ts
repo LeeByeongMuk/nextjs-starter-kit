@@ -2,7 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import 'dotenv/config';
 
-import postsRouter from '@/server/routes/posts';
+import postsRouter from '@/server/routes/posts_routes';
 import usersRouter from '@/server/routes/users_routes';
 
 const app = express();

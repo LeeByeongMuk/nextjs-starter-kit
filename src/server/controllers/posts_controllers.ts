@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 
-import usersServices from '@/server/services/users_services';
+import postsServices from '@/server/services/posts_services';
 import { handleErrorResponse } from '@/server/utils/errorHandling';
 
-const usersControllers = {
-  getUser: async (req: Request, res: Response) => {
+const postsControllers = {
+  getPosts: async (req: Request, res: Response) => {
     try {
-      const data = await usersServices.getUser(req);
+      const data = await postsServices.getPosts(req);
 
       return res.status(200).json({
         ok: true,
@@ -18,9 +18,9 @@ const usersControllers = {
     }
   },
 
-  signIn: async (req: Request, res: Response) => {
+  getPostById: async (req: Request, res: Response) => {
     try {
-      const data = await usersServices.signIn(req);
+      const data = await postsServices.getPostById(req);
 
       return res.status(200).json({
         ok: true,
@@ -32,9 +32,9 @@ const usersControllers = {
     }
   },
 
-  createUser: async (req: Request, res: Response) => {
+  createPost: async (req: Request, res: Response) => {
     try {
-      const data = await usersServices.createUser(req);
+      const data = await postsServices.createPost(req);
 
       return res.status(201).json({
         ok: true,
@@ -46,9 +46,9 @@ const usersControllers = {
     }
   },
 
-  updateUser: async (req: Request, res: Response) => {
+  updatePost: async (req: Request, res: Response) => {
     try {
-      const data = await usersServices.updateUser(req);
+      const data = await postsServices.updatePost(req);
 
       return res.status(200).json({
         ok: true,
@@ -60,9 +60,23 @@ const usersControllers = {
     }
   },
 
-  deleteUser: async (req: Request, res: Response) => {
+  getPostUpdateResourceById: async (req: Request, res: Response) => {
     try {
-      const data = await usersServices.deleteUser(req);
+      const data = await postsServices.getPostUpdateResourceById(req);
+
+      return res.status(200).json({
+        ok: true,
+        message: 'success',
+        data,
+      });
+    } catch (err) {
+      handleErrorResponse(err, res);
+    }
+  },
+
+  deletePost: async (req: Request, res: Response) => {
+    try {
+      const data = await postsServices.deletePost(req);
 
       return res.status(200).json({
         ok: true,
@@ -75,4 +89,4 @@ const usersControllers = {
   },
 };
 
-export default usersControllers;
+export default postsControllers;

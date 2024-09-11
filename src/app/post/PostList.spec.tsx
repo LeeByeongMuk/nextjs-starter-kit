@@ -14,7 +14,7 @@ import React from 'react';
 
 import usePostList from '@/app/hooks/post/usePostList';
 import PostList from '@/app/post/page';
-import { PostsReq } from '@/app/types/post';
+import { PostsReq } from '@/app/types/api/post';
 import { server } from '@/mocks/node';
 
 jest.mock('next/headers');
@@ -154,12 +154,15 @@ describe('게시글 리스트 페이지 테스트', () => {
       expect(Array.isArray(result.current.data.data)).toBe(true);
       expect(result.current.data.data[0]).toMatchObject({
         id: 1,
+        type: 'notice',
         title: 'Title 1',
         hit: 0,
-        user: {
-          name: 'name',
-        },
         created_at: '2021-09-01T00:00:00',
+        user: {
+          id: 1,
+          name: 'name',
+          nickname: 'nickname',
+        },
       });
       expect(result.current.data.meta).toEqual({
         total: 1,

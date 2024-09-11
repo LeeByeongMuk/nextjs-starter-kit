@@ -14,4 +14,10 @@ const LIST_TYPE_OPTIONS = [
 
 const PAGE_GROUP_NUMBER = 10;
 
-export { TYPE_OPTIONS, LIST_TYPE_OPTIONS, PAGE_GROUP_NUMBER };
+const DUMMY_DATA = Array.from({ length: PAGE_GROUP_NUMBER }, (_, i) => ({
+  id: i,
+  title: `Title ${i}`,
+  type: 'Type',
+}));
+
+export { TYPE_OPTIONS, LIST_TYPE_OPTIONS, PAGE_GROUP_NUMBER, DUMMY_DATA };

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { fetchPost } from '@/app/api/post';
-import { PostRes } from '@/app/types/post';
+import { PostRes } from '@/app/types/api/post';
 
 export default function usePost() {
   const router = useRouter();
@@ -22,10 +22,7 @@ export default function usePost() {
         is_editable: false,
         title: '',
         type: '',
-        user: {
-          name: '',
-          nickname: '',
-        },
+        user_name: '',
       },
     } as unknown as PostRes,
     queryFn: () => fetchPost({ id }),

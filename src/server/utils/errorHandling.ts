@@ -10,7 +10,7 @@ export class CustomError extends Error {
   }
 }
 
-export function handleError(err: unknown, res: Response) {
+export function handleErrorResponse(err: unknown, res: Response) {
   if (err instanceof CustomError) {
     return res.status(err.statusCode).json({
       ok: false,
@@ -26,5 +26,13 @@ export function handleError(err: unknown, res: Response) {
       ok: false,
       message: 'An unknown error occurred',
     });
+  }
+}
+
+export function handleError(err: unknown) {
+  if (err instanceof CustomError) {
+    return err;
+  } else {
+    return new CustomError('Internal Server Error', 500);
   }
 }

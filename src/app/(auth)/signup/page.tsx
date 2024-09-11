@@ -12,14 +12,7 @@ import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
 import AuthHeader from '@/app/components/Auth/Header';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useSignup from '@/app/hooks/auth/useSignup';
-
-interface SignUpInput {
-  email: string;
-  name: string;
-  nickname: string;
-  password: string;
-  passwordConfirmation: string;
-}
+import { SignUpInput } from '@/app/types/form/auth';
 
 export default function Signup() {
   const { mutate, isPending } = useSignup();

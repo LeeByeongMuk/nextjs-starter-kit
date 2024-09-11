@@ -6,21 +6,14 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import ButtonBox from '@/app/components/Post/Form/ButtonBox';
 import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
-import IsPublishedCheckbox from '@/app/components/Post/Form/IsPublishedCheckbox';
+import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
 import TitleInput from '@/app/components/Post/Form/TitleInput';
 import TypeSelect from '@/app/components/Post/Form/TypeSelect';
 import Spinner from '@/app/components/Spinner';
 import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
 import useUpdatePost from '@/app/hooks/post/useUpdatePost';
 import useUpdatePostResource from '@/app/hooks/post/useUpdatePostResource';
-import { PostType } from '@/app/types/post';
-
-interface PostFormInput {
-  title: string;
-  type: PostType | null;
-  contents: string;
-  isPublished: '1' | '0';
-}
+import { PostFormInput } from '@/app/types/form/post';
 
 export default function UpdatePost() {
   const params = useParams<{ id: string }>();
@@ -42,7 +35,7 @@ export default function UpdatePost() {
       setValue('title', post.title);
       setValue('contents', post.contents);
       setValue('type', post.type);
-      setValue('isPublished', post.is_published ? '1' : '0');
+      setValue('isOpen', post.is_open ? '1' : '0');
     }
   }, [isSuccess, setValue, post]);
 
@@ -54,7 +47,7 @@ export default function UpdatePost() {
       title: data.title,
       type: data.type || null,
       contents: data.contents,
-      is_published: data.isPublished === '1',
+      is_open: data.isOpen === '1',
     });
   };
 
@@ -70,7 +63,7 @@ export default function UpdatePost() {
 
           <ContentsEditor />
 
-          <IsPublishedCheckbox />
+          <IsOpenCheckbox />
 
           <ButtonBox />
         </form>

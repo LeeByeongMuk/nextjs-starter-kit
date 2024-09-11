@@ -1,34 +1,31 @@
 import bcrypt from 'bcrypt';
 
-import { SignUpReq } from '@/app/types/auth';
 import { CustomError } from '@/server/utils/errorHandling';
 import { prisma } from '@/server/utils/prisma';
 
 export default function Users() {}
 
-Users.getUser = async function (id: number) {
-  return prisma.$transaction(async prisma => {
-    const result = await prisma.user.findUnique({
-      where: {
-        id,
-        deleted_at: null,
-      },
-    });
-
-    if (!result) {
-      throw new CustomError('User not found', 404);
-    }
-
-    return {
-      id: result.id,
-      name: result.name,
-      nickname: result.nickname,
-      email: result.email,
-    };
+Users.getUser = async function ({ userId }: { userId: number }) {
+  const result = await prisma.user.findUnique({
+    where: {
+      id: userId,
+      deleted_at: null,
+    },
   });
+
+  if (!result) {
+    throw new CustomError('User not found', 404);
+  }
+
+  return {
+    id: result.id,
+    name: result.name,
+    nickname: result.nickname,
+    email: result.email,
+  };
 };
 
-Users.signIn = async function (req: SignUpReq): Promise<{ id: number }> {
+Users.signIn = async function (req: { email: string; password: string }) {
   return prisma.$transaction(async prisma => {
     const user = await prisma.user.findUnique({
       where: {
@@ -51,7 +48,12 @@ Users.signIn = async function (req: SignUpReq): Promise<{ id: number }> {
   });
 };
 
-Users.createUser = async function (req: SignUpReq): Promise<{ id: number }> {
+Users.createUser = async function (req: {
+  email: string;
+  name: string;
+  nickname: string;
+  password: string;
+}) {
   const hashedPassword = await bcrypt.hash(req.password, 10);
 
   return prisma.$transaction(async prisma => {
@@ -68,23 +70,35 @@ Users.createUser = async function (req: SignUpReq): Promise<{ id: number }> {
       throw new CustomError('Error creating user', 500);
     }
 
-    return { id: result.id };
+    return {
+      id: result.id,
+    };
   });
 };
 
-Users.updateUser = async function ({ id, ...req }: any): Promise<{
-  id: number;
+Users.updateUser = async function ({
+  userId,
+  ...req
+}: {
+  userId: number;
   name: string;
   nickname: string;
   email: string;
-}> {
+  password: string;
+}) {
+  const hashedPassword = await bcrypt.hash(req.password, 10);
   return prisma.$transaction(async prisma => {
     const result = await prisma.user.update({
       where: {
-        id,
+        id: userId,
         deleted_at: null,
       },
-      data: req,
+      data: {
+        name: req.name,
+        nickname: req.nickname,
+        email: req.email,
+        password: hashedPassword,
+      },
     });
 
     if (!result) {
@@ -95,22 +109,22 @@ Users.updateUser = async function ({ id, ...req }: any): Promise<{
       id: result.id,
       name: result.name,
       nickname: result.nickname,
-      email: result.email as string,
+      email: result.email,
     };
   });
 };
 
 Users.deleteUser = async function ({
-  id,
+  userId,
   ...req
 }: {
-  id: number;
+  userId: number;
   deleted_reason?: string;
 }) {
   return prisma.$transaction(async prisma => {
     const result = await prisma.user.update({
       where: {
-        id,
+        id: userId,
         deleted_at: null,
       },
       data: {
@@ -125,9 +139,13 @@ Users.deleteUser = async function ({
 
     // 유저 삭제 시 관련된 모든 리프레시 토큰 철회
     await prisma.token.deleteMany({
-      where: { user_id: id },
+      where: {
+        user_id: userId,
+      },
     });
 
-    return { id: result.id };
+    return {
+      ok: true,
+    };
   });
 };
