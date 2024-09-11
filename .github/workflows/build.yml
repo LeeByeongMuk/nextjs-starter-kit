@@ -62,8 +62,11 @@ jobs:
       - name: Remove node_modules and package-lock.json
         run: rm -rf node_modules package-lock.json
 
+      - name: msw error fix
+        run: npm uninstall msw && npm install msw@2.3.5 --save-dev
+
       - name: Install the project dependencies
-        run: npm cache clean --force && npm install && npm audit fix --force
+        run: npm install
 
       - name: Run tests
         run: npm run jest
