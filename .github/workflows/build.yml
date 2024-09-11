@@ -63,7 +63,7 @@ jobs:
         run: rm -rf node_modules package-lock.json
 
       - name: Install the project dependencies
-        run: npm install && npm audit fix --force
+        run: npm cache clean --force && npm install && npm audit fix --force
 
       - name: Run tests
         run: npm run jest
