@@ -3,11 +3,12 @@
 import React from 'react';
 
 import ListFilter from '@/app/components/Post/ListFilter';
-import List from '../components/Post/List';
 import Pagination from '@/app/components/Post/Pagination';
 import usePostList from '@/app/hooks/post/usePostList';
 import useReplaceSearchParams from '@/app/hooks/post/useReplaceSearchParams';
 import useSearchFilters from '@/app/hooks/post/useSearchFilters';
+
+import List from '../components/Post/List';
 
 export default function PostList() {
   const { searchFilters, setSearchFilters } = useSearchFilters();
