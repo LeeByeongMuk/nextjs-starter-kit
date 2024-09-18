@@ -90,6 +90,12 @@ interface UpdatePostResourceRes extends ApiResponse {
   data: UpdatePostResourceData;
 }
 
+interface DeletePostReq {
+  id: number;
+}
+
+interface DeletePostRes extends ApiResponse {}
+
 export type {
   PostType,
   PostsReq,
@@ -106,4 +112,6 @@ export type {
   UpdatePostResourceData,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
+  DeletePostReq,
+  DeletePostRes,
 };

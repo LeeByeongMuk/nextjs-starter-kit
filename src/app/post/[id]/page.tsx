@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 
 import Detail from '@/app/components/Post/PostDetail';
+import useDeletePost from '@/app/hooks/post/useDeletePost';
 import usePost from '@/app/hooks/post/usePost';
 
 export default function PostDetail() {
@@ -19,8 +20,20 @@ export default function PostDetail() {
     isFetching,
   } = usePost();
 
+  const { mutate } = useDeletePost();
+
   const redirectBack = () => {
     router.back();
+  };
+
+  const onDeletePost = () => {
+    const confirm = window.confirm(
+      'Are you sure you want to delete this post?'
+    );
+
+    if (confirm) {
+      mutate();
+    }
   };
 
   return (
@@ -36,7 +49,7 @@ export default function PostDetail() {
           back
         </button>
 
-        {post.is_editable && (
+        {post?.is_editable && (
           <Link
             href={`/post/${id}/update`}
             role="post-edit-link"
@@ -46,6 +59,14 @@ export default function PostDetail() {
             update
           </Link>
         )}
+
+        <button
+          type="button"
+          className="inline-block rounded border border-red-600 px-12 py-3 text-sm font-medium text-red-600 hover:bg-red-600 hover:text-white focus:outline-none focus:ring active:bg-teal-500"
+          onClick={onDeletePost}
+        >
+          delete
+        </button>
       </div>
     </section>
   );
