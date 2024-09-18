@@ -7,7 +7,7 @@ import { handleError } from '@/server/utils/errorHandling';
 const postsServices = {
   getPosts: async (req: Request) => {
     try {
-      return await Posts.getPosts(req.body);
+      return await Posts.getPosts(req.query);
     } catch (err) {
       handleError(err);
     }
@@ -47,7 +47,7 @@ const postsServices = {
       const decoded = tokenServices.verifyAccessToken({ token });
 
       return await Posts.updatePost({
-        id: Number(req.params.id),
+        postId: Number(req.params.id),
         userId: decoded.id,
         ...req.body,
       });
