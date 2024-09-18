@@ -11,7 +11,7 @@ const postsControllers = {
       return res.status(200).json({
         ok: true,
         message: 'success',
-        data,
+        ...data,
       });
     } catch (err) {
       handleErrorResponse(err, res);

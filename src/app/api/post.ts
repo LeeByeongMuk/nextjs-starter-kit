@@ -1,6 +1,8 @@
 import {
   CreatePostReq,
   CreatePostRes,
+  DeletePostReq,
+  DeletePostRes,
   PostReq,
   PostRes,
   PostsReq,
@@ -72,11 +74,18 @@ const fetchUpdatePostResource = async ({ id }: UpdatePostResourceReq) => {
   })) as UpdatePostResourceRes;
 };
 
+const fetchDeletePost = async ({ id }: DeletePostReq) => {
+  return (await fetchApi(`/api/posts/${id}`, {
+    method: 'DELETE',
+  })) as DeletePostRes;
+};
+
 export {
   fetchPosts,
   fetchPost,
   fetchCreatePost,
   fetchUpdatePost,
   fetchUpdatePostResource,
+  fetchDeletePost,
 };
 export type { CreatePostReq, UpdatePostReq };

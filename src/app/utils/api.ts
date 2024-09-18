@@ -21,7 +21,7 @@ const fetchApi = async <Response>(
         ...options.headers,
         'Content-Type': 'application/json',
         Authorization: hasAccessToken
-          ? `Bearer ${cookieStore.get(TOKEN_KEY)?.value}`
+          ? `${cookieStore.get(TOKEN_KEY)?.value}`
           : '',
       },
     });

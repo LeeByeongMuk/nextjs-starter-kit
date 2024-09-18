@@ -72,7 +72,7 @@ const usersServices = {
 
       return await Users.deleteUser({
         ...req.body,
-        id: decoded.id,
+        userId: decoded.id,
       });
     } catch (err) {
       handleError(err);

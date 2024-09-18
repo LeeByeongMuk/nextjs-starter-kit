@@ -31,8 +31,8 @@ export function handleErrorResponse(err: unknown, res: Response) {
 
 export function handleError(err: unknown) {
   if (err instanceof CustomError) {
-    return err;
+    throw err;
   } else {
-    return new CustomError('Internal Server Error', 500);
+    throw new CustomError('Internal Server Error', 500);
   }
 }

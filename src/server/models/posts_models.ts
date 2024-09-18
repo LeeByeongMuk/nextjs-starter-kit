@@ -18,6 +18,7 @@ Posts.getPosts = async function (req: {
 
   const whereCondition = {
     deleted_at: null,
+    is_open: true,
     ...(type !== null && { type }),
     OR: [{ title: { contains: q } }, { contents: { contains: q } }],
   };
@@ -47,7 +48,7 @@ Posts.getPosts = async function (req: {
   });
   const lastPage = Math.ceil(totalPosts / pageSize);
 
-  if (!totalPosts || !posts) {
+  if (!posts) {
     throw new CustomError('Posts not found', 404);
   }
 

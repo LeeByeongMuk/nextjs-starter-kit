@@ -20,7 +20,7 @@ export default function Pagination({ meta, setSearchFilters }: Props) {
     );
 
     return Array.from(
-      { length: lastPageNum - firstPageNum + 1 },
+      { length: Math.max(lastPageNum - firstPageNum + 1, 1) },
       (_, i) => firstPageNum + i
     );
   };
@@ -82,7 +82,7 @@ export default function Pagination({ meta, setSearchFilters }: Props) {
           </li>
         ))}
 
-        {meta.last_page !== meta.current_page && (
+        {meta.last_page > 1 && meta.last_page !== meta.current_page && (
           <li>
             <a
               href="#"

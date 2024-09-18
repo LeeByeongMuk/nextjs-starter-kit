@@ -26,26 +26,24 @@ Users.getUser = async function ({ userId }: { userId: number }) {
 };
 
 Users.signIn = async function (req: { email: string; password: string }) {
-  return prisma.$transaction(async prisma => {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: req.email,
-        deleted_at: null,
-      },
-    });
-    if (!user) {
-      throw new CustomError('User not found', 404);
-    }
-
-    const isPasswordValid = bcrypt.compareSync(req.password, user.password);
-    if (!isPasswordValid) {
-      throw new CustomError('Invalid password', 401);
-    }
-
-    return {
-      id: user.id,
-    };
+  const user = await prisma.user.findUnique({
+    where: {
+      email: req.email,
+      deleted_at: null,
+    },
   });
+  if (!user) {
+    throw new CustomError('User not found', 404);
+  }
+
+  const isPasswordValid = bcrypt.compareSync(req.password, user.password);
+  if (!isPasswordValid) {
+    throw new CustomError('Invalid password', 401);
+  }
+
+  return {
+    id: user.id,
+  };
 };
 
 Users.createUser = async function (req: {
@@ -84,9 +82,7 @@ Users.updateUser = async function ({
   name: string;
   nickname: string;
   email: string;
-  password: string;
 }) {
-  const hashedPassword = await bcrypt.hash(req.password, 10);
   return prisma.$transaction(async prisma => {
     const result = await prisma.user.update({
       where: {
@@ -97,7 +93,6 @@ Users.updateUser = async function ({
         name: req.name,
         nickname: req.nickname,
         email: req.email,
-        password: hashedPassword,
       },
     });
 
@@ -137,7 +132,6 @@ Users.deleteUser = async function ({
       throw new CustomError('User not found', 404);
     }
 
-    // 유저 삭제 시 관련된 모든 리프레시 토큰 철회
     await prisma.token.deleteMany({
       where: {
         user_id: userId,
