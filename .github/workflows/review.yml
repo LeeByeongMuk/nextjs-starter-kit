@@ -9,7 +9,8 @@ on:
     types: [ opened, reopened, synchronize ]
 
 jobs:
-  test:
+  review:
+    if: ${{ contains(github.event.*.labels.*.name, 'review') }}
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -19,7 +20,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           # optional
           LANGUAGE: Korean
-          MODEL: gpt-4o  # gpt-3.5-turbo
-          PROMPT: "코드를 검토하고 오류 또는 불규칙성이 있는지 확인해주세요."
+          MODEL: gpt-4o  # https://platform.openai.com/docs/models
+          PROMPT: "변경전 소스에 대한 한줄 요약을 '## AS-IS', 변경후 소스에 대한 한줄 요약을 '## TO-BE' 라는 제목으로 요약해줘. 개선할 부분이 있다면 '## 개선' 이라는 제목으로 제안해줘. 예상되는 에러가 있다면 '## 주의' 라는 제목으로 알려줘."
           max_tokens: 4096
           MAX_PATCH_LENGTH: 4096
