@@ -14,7 +14,6 @@
 /node_modules
 /.pnp
 .pnp.js
-package-lock.json
 
 # testing
 /coverage
@@ -46,10 +45,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# analyze
-/analyze
-
-# Symbolic link
-/*-frontend-*
-/module
