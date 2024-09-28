@@ -1,25 +1,29 @@
 services:
-  next_js:
-    image: 'node:20'
-    build: docker/next/Dockerfile
-    # command: bash -c "npm install && npm run dev"
+  next-js:
+    build:
+      dockerfile: docker/next/Dockerfile
+      context: .
     volumes:
       - '.:/var/www'
+      - '/var/www/node_modules'
     ports:
       - '${APP_PORT:-3000}:3000'
     networks:
-      - next_js_kit
+      - next-js-kit
 
-  express_js:
-    image: 'node:20'
-    build: docker/express/Dockerfile
-    # command: bash -c "npm run server"
+  express-js:
+    build:
+      dockerfile: docker/express/Dockerfile
+      context: .
     volumes:
       - '.:/var/www'
+      - '/var/www/node_modules'
     ports:
-      - '${APP_PORT:-80}:80'
+      - '${APP_API_PORT:-80}:80'
     networks:
-      - next_js_kit
+      - next-js-kit
+    depends_on:
+      - mysql
 
   mysql:
     image: 'mysql/mysql-server:8.0'
@@ -35,9 +39,9 @@ services:
     ports:
       - '${FORWARD_DB_PORT:-3306}:3306'
     networks:
-      - next_js_kit
+      - next-js-kit
 
-  shadow_mysql:
+  shadow-mysql:
     image: 'mysql/mysql-server:8.0'
     # command: --default-authentication-plugin=mysql_native_password
     environment:
@@ -50,8 +54,8 @@ services:
     ports:
       - '${FORWARD_SHADOW_DB_PORT:-3307}:3306'
     networks:
-      - next_js_kit
+      - next-js-kit
 
 networks:
-  next_js_kit:
+  next-js-kit:
     driver: bridge

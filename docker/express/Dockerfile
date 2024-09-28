@@ -7,6 +7,6 @@ LABEL build_date="2024-10-01"
 
 WORKDIR /var/www
 COPY . .
-RUN npm install && npx prisma migrate dev
+RUN npm install
 
 CMD ["npm", "run", "server"]
