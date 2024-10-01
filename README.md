@@ -27,5 +27,5 @@ docker 를 사용해 로컬 환경을 구축합니다.
 npm install
 cp .env.example .env
 docker compose up -d
-npx prisma migrate dev # DB 마이그레이션
+docker-compose exec express-js npx prisma migrate deploy # DB 마이그레이션
 ```
