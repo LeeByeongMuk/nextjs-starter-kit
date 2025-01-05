@@ -12,8 +12,7 @@
     "prettier:fix": "prettier --write ./src",
     "jest": "jest",
     "jest:watch": "jest --watch",
-    "tsc": "tsc",
-    "server": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server/app.ts"
+    "tsc": "tsc"
   },
   "overrides": {
     "@toast-ui/react-editor": {
@@ -63,7 +62,6 @@
     "tailwindcss": "^3.4.3",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5",
     "undici": "^5.28.4"
   }
