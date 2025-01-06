@@ -5,12 +5,12 @@ import { signIn } from 'next-auth/react';
 import React, { useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
-import EmailInput from '@/app/components/Auth/Form/EmailInput';
-import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
-import AuthHeader from '@/app/components/Auth/Header';
-import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
-import { SignInInput } from '@/app/types/form/auth';
+import ButtonBox from '@/components/Auth/Form/ButtonBox';
+import EmailInput from '@/components/Auth/Form/EmailInput';
+import PasswordInput from '@/components/Auth/Form/PasswordInput';
+import AuthHeader from '@/components/Auth/Header';
+import LayerSpinner from '@/components/Spinner/LayerSpinner';
+import { SignInInput } from '@/types/form/auth';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 
-import Layout from '@/app/components/Layout';
-import Provider from '@/app/components/Provider';
+import Layout from '@/components/Layout';
+import Provider from '@/components/Provider';
 
 import './globals.css';
 

@@ -4,16 +4,16 @@ import { useParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import ButtonBox from '@/app/components/Post/Form/ButtonBox';
-import ContentsEditor from '@/app/components/Post/Form/ContentsEditor';
-import IsOpenCheckbox from '@/app/components/Post/Form/IsOpenCheckbox';
-import TitleInput from '@/app/components/Post/Form/TitleInput';
-import TypeSelect from '@/app/components/Post/Form/TypeSelect';
-import Spinner from '@/app/components/Spinner';
-import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
-import useUpdatePost from '@/app/hooks/post/useUpdatePost';
-import useUpdatePostResource from '@/app/hooks/post/useUpdatePostResource';
-import { PostFormInput } from '@/app/types/form/post';
+import ButtonBox from '@/components/Post/Form/ButtonBox';
+import ContentsEditor from '@/components/Post/Form/ContentsEditor';
+import IsOpenCheckbox from '@/components/Post/Form/IsOpenCheckbox';
+import TitleInput from '@/components/Post/Form/TitleInput';
+import TypeSelect from '@/components/Post/Form/TypeSelect';
+import Spinner from '@/components/Spinner';
+import LayerSpinner from '@/components/Spinner/LayerSpinner';
+import useUpdatePost from '@/hooks/post/useUpdatePost';
+import useUpdatePostResource from '@/hooks/post/useUpdatePostResource';
+import { PostFormInput } from '@/types/form/post';
 
 export default function UpdatePost() {
   const params = useParams<{ id: string }>();

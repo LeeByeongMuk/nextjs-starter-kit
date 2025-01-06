@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 
-import Detail from '@/app/components/Post/PostDetail';
-import useDeletePost from '@/app/hooks/post/useDeletePost';
-import usePost from '@/app/hooks/post/usePost';
+import Detail from '@/components/Post/PostDetail';
+import useDeletePost from '@/hooks/post/useDeletePost';
+import usePost from '@/hooks/post/usePost';
 
 export default function PostDetail() {
   const router = useRouter();

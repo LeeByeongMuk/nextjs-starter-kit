@@ -2,13 +2,13 @@
 
 import React from 'react';
 
-import ListFilter from '@/app/components/Post/ListFilter';
-import Pagination from '@/app/components/Post/Pagination';
-import usePostList from '@/app/hooks/post/usePostList';
-import useReplaceSearchParams from '@/app/hooks/post/useReplaceSearchParams';
-import useSearchFilters from '@/app/hooks/post/useSearchFilters';
+import ListFilter from '@/components/Post/ListFilter';
+import Pagination from '@/components/Post/Pagination';
+import usePostList from '@/hooks/post/usePostList';
+import useReplaceSearchParams from '@/hooks/post/useReplaceSearchParams';
+import useSearchFilters from '@/hooks/post/useSearchFilters';
 
-import List from '../components/Post/List';
+import List from '@/components/Post/List';
 
 export default function PostList() {
   const { searchFilters, setSearchFilters } = useSearchFilters();

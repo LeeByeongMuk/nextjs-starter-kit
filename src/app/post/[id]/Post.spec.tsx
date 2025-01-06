@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 
-import usePost from '@/app/hooks/post/usePost';
+import usePost from '@/hooks/post/usePost';
 import PostDetail from '@/app/post/[id]/page';
 import { server } from '@/mocks/node';
 

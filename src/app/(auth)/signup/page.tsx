@@ -3,16 +3,16 @@
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import ButtonBox from '@/app/components/Auth/Form/ButtonBox';
-import EmailInput from '@/app/components/Auth/Form/EmailInput';
-import NameInput from '@/app/components/Auth/Form/NameInput';
-import NickNameInput from '@/app/components/Auth/Form/NickNameInput';
-import PasswordConfirmInput from '@/app/components/Auth/Form/PasswordConfirmInput';
-import PasswordInput from '@/app/components/Auth/Form/PasswordInput';
-import AuthHeader from '@/app/components/Auth/Header';
-import LayerSpinner from '@/app/components/Spinner/LayerSpinner';
-import useSignup from '@/app/hooks/auth/useSignup';
-import { SignUpInput } from '@/app/types/form/auth';
+import ButtonBox from '@/components/Auth/Form/ButtonBox';
+import EmailInput from '@/components/Auth/Form/EmailInput';
+import NameInput from '@/components/Auth/Form/NameInput';
+import NickNameInput from '@/components/Auth/Form/NickNameInput';
+import PasswordConfirmInput from '@/components/Auth/Form/PasswordConfirmInput';
+import PasswordInput from '@/components/Auth/Form/PasswordInput';
+import AuthHeader from '@/components/Auth/Header';
+import LayerSpinner from '@/components/Spinner/LayerSpinner';
+import useSignup from '@/hooks/auth/useSignup';
+import { SignUpInput } from '@/types/form/auth';
 
 export default function Signup() {
   const { mutate, isPending } = useSignup();

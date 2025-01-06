@@ -12,9 +12,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 
-import usePostList from '@/app/hooks/post/usePostList';
+import usePostList from '@/hooks/post/usePostList';
 import PostList from '@/app/post/page';
-import { PostsReq } from '@/app/types/api/post';
+import { PostsReq } from '@/types/api/post';
 import { server } from '@/mocks/node';
 
 jest.mock('next/headers');
