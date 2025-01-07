@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 
-import useCreatePost from '@/hooks/post/useCreatePost';
+import useCreatePost from '@/app/post/_hooks/useCreatePost';
 import CreatePost from '@/app/post/create/page';
 import { server } from '@/mocks/node';
 

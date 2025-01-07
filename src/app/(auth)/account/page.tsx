@@ -4,14 +4,14 @@ import { useSession } from 'next-auth/react';
 import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import ButtonBox from '@/components/Auth/Form/ButtonBox';
-import EmailInput from '@/components/Auth/Form/EmailInput';
-import NameInput from '@/components/Auth/Form/NameInput';
-import NickNameInput from '@/components/Auth/Form/NickNameInput';
+import ButtonBox from '@/app/(auth)/_components/Form/ButtonBox';
+import EmailInput from '@/app/(auth)/_components/Form/EmailInput';
+import NameInput from '@/app/(auth)/_components/Form/NameInput';
+import NickNameInput from '@/app/(auth)/_components/Form/NickNameInput';
 import LayerSpinner from '@/components/Spinner/LayerSpinner';
-import useDeleteAccount from '@/hooks/auth/useDeleteAccount';
-import useUpdateAccount from '@/hooks/auth/useUpdateAccount';
-import { UserUpdateInput } from '@/types/form/auth';
+import useDeleteAccount from '@/app/(auth)/_hooks/useDeleteAccount';
+import useUpdateAccount from '@/app/(auth)/_hooks/useUpdateAccount';
+import { UserUpdateInput } from '@/app/(auth)/_types/form';
 
 export default function Account() {
   const { data: session } = useSession();

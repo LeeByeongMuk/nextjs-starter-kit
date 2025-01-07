@@ -11,7 +11,7 @@ import {
   UpdatePostRes,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
-} from '@/types/api/post';
+} from '@/app/post/_types/api';
 import { fetchApi } from '@/utils/api';
 
 const fetchPosts = async ({ page, type, q }: PostsReq) => {

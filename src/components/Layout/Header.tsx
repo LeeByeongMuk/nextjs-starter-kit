@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 
-import { TOKEN_KEY } from '@/constants/auth';
+import { TOKEN_KEY } from '@/app/(auth)/_constants/auth';
 
 export default function Header() {
   const { status } = useSession();

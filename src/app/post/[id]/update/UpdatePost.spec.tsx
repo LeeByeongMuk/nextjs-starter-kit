@@ -13,8 +13,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 
-import useUpdatePost from '@/hooks/post/useUpdatePost';
-import useUpdatePostResource from '@/hooks/post/useUpdatePostResource';
+import useUpdatePost from '@/app/post/_hooks/useUpdatePost';
+import useUpdatePostResource from '@/app/post/_hooks/useUpdatePostResource';
 import UpdatePost from '@/app/post/[id]/update/page';
 import { server } from '@/mocks/node';
 

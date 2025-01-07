@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-import { TOKEN_KEY } from '@/constants/auth';
+import { TOKEN_KEY } from '@/app/(auth)/_constants/auth';
 import {
   SignInReq,
   SignInRes,
@@ -13,7 +13,7 @@ import {
   UserRes,
   UpdateAccountReq,
   UpdateAccountRes,
-} from '@/types/api/auth';
+} from '@/app/(auth)/_types/api';
 import { fetchApi } from '@/utils/api';
 
 const fetchUser = async () => {

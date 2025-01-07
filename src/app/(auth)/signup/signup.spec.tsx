@@ -13,7 +13,7 @@ import { cookies } from 'next/headers';
 import React from 'react';
 
 import Signup from '@/app/(auth)/signup/page';
-import useSignup from '@/hooks/auth/useSignup';
+import useSignup from '@/app/(auth)/_hooks/useSignup';
 import { server } from '@/mocks/node';
 
 jest.mock('next/headers', () => ({
