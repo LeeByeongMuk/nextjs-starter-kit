@@ -23,8 +23,29 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
+      "@app_domain/*": [
+        "./src/app/(domain)/*"
+      ],
+      "@app_api/*": [
+        "./src/app/api/*"
+      ],
+      "@shared/*": [
+        "./src/shared/*"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ],
+      "@lib/*": [
+        "./lib/*"
+      ],
+      "@domains/*": [
+        "./src/domains/*"
+      ],
+      "@tests/*": [
+        "./src/tests/*"
+      ],
+      "@public/*": [
+        "./public/*"
       ]
     }
   },

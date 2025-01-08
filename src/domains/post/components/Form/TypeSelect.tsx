@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { TYPE_OPTIONS } from '@/domains/post/constants/post';
-import ValidationError from '@/shared/components/Error/ValidationError';
+import ValidationError from '@shared/components/Error/ValidationError';
 
 export default function TypeSelect() {
   const {

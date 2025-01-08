@@ -1,5 +1,5 @@
-import { ApiResponse } from '@/shared/types/api';
-import { PaginationData } from '@/shared/types/pagination';
+import { ApiResponse } from '@shared/types/api';
+import { PaginationData } from '@shared/types/pagination';
 
 type PostType = 'notice' | 'faq' | 'free';
 

@@ -1,3 +1,4 @@
+import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   fireEvent,
@@ -13,10 +14,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 
-import UpdatePost from '@/app/(domain)/post/[id]/update/page';
-import useUpdatePost from '@/domains/post/hooks/useUpdatePost';
-import useUpdatePostResource from '@/domains/post/hooks/useUpdatePostResource';
-import { server } from '@/lib/mocks/node';
+import UpdatePost from '@app_domain/post/[id]/update/page';
+import useUpdatePost from '@domains/post/hooks/useUpdatePost';
+import useUpdatePostResource from '@domains/post/hooks/useUpdatePostResource';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

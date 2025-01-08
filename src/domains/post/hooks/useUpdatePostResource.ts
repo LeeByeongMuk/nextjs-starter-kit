@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { fetchUpdatePostResource } from '@/app/api/post';
 import { UpdatePostResourceRes } from '@/domains/post/types/api';
+import { fetchUpdatePostResource } from '@app_api/post';
 
 export default function useUpdatePostResource() {
   const router = useRouter();

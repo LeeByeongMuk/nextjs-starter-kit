@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { fetchPost } from '@/app/api/post';
 import { PostRes } from '@/domains/post/types/api';
+import { fetchPost } from '@app_api/post';
 
 export default function usePost() {
   const router = useRouter();

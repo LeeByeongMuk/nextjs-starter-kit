@@ -1,5 +1,5 @@
-import { UserRes } from '@/domains/auth/_types/api';
-import { fetchApi } from '@/shared/utils/api';
+import { UserRes } from '@domains/auth/_types/api';
+import { fetchApi } from '@shared/utils/api';
 
 const fetchUser = async () => {
   return (await fetchApi('/api/users', {

@@ -3,8 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 
-import { fetchUpdatePost } from '@/app/api/post';
 import { UpdatePostReq } from '@/domains/post/types/api';
+import { fetchUpdatePost } from '@app_api/post';
 
 export default function useUpdatePost() {
   const router = useRouter();

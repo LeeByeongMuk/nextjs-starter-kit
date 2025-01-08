@@ -3,8 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import { fetchCreatePost } from '@/app/api/post';
 import { CreatePostReq } from '@/domains/post/types/api';
+import { fetchCreatePost } from '@app_api/post';
 
 export default function useCreatePost() {
   const router = useRouter();

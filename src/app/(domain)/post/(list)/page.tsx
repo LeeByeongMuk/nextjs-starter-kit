@@ -2,11 +2,11 @@
 
 import React from 'react';
 
-import Pagination from '@/domains/post/components/Pagination';
-import List from '@/domains/post/components/PostList/PostListContainer';
-import usePostList from '@/domains/post/hooks/usePostList';
-import useReplaceSearchParams from '@/domains/post/hooks/useReplaceSearchParams';
-import useSearchFilters from '@/domains/post/hooks/useSearchFilters';
+import Pagination from '@domains/post/components/Pagination';
+import List from '@domains/post/components/PostList/PostListContainer';
+import usePostList from '@domains/post/hooks/usePostList';
+import useReplaceSearchParams from '@domains/post/hooks/useReplaceSearchParams';
+import useSearchFilters from '@domains/post/hooks/useSearchFilters';
 
 import ListFilter from '../../../../domains/post/components/PostList/PostListFilter';
 

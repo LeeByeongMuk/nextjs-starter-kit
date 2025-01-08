@@ -3,14 +3,14 @@
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import ButtonBox from '@/domains/post/components/Form/ButtonBox';
-import ContentsEditor from '@/domains/post/components/Form/ContentsEditor';
-import IsOpenCheckbox from '@/domains/post/components/Form/IsOpenCheckbox';
-import TitleInput from '@/domains/post/components/Form/TitleInput';
-import TypeSelect from '@/domains/post/components/Form/TypeSelect';
-import useCreatePost from '@/domains/post/hooks/useCreatePost';
-import { PostFormInput } from '@/domains/post/types/form';
-import LayerSpinner from '@/shared/components/Spinner/LayerSpinner';
+import ButtonBox from '@domains/post/components/Form/ButtonBox';
+import ContentsEditor from '@domains/post/components/Form/ContentsEditor';
+import IsOpenCheckbox from '@domains/post/components/Form/IsOpenCheckbox';
+import TitleInput from '@domains/post/components/Form/TitleInput';
+import TypeSelect from '@domains/post/components/Form/TypeSelect';
+import useCreatePost from '@domains/post/hooks/useCreatePost';
+import { PostFormInput } from '@domains/post/types/form';
+import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
 
 export default function CreatePost() {
   const methods = useForm<PostFormInput>();

@@ -1,8 +1,8 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-import { fetchUser } from '@/domains/auth/_services/userServices';
-import { fetchSignIn } from '@/domains/auth/signin/_services/signinService';
+import { fetchUser } from '@domains/auth/_services/userServices';
+import { fetchSignIn } from '@domains/auth/signin/_services/signinService';
 
 const handler = NextAuth({
   providers: [

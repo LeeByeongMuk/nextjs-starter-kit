@@ -1,3 +1,4 @@
+import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   fireEvent,
@@ -12,10 +13,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 
-import PostList from '@/app/(domain)/post/(list)/page';
-import usePostList from '@/domains/post/hooks/usePostList';
-import { PostsReq } from '@/domains/post/types/api';
-import { server } from '@/lib/mocks/node';
+import PostList from '@app_domain/post/(list)/page';
+import usePostList from '@domains/post/hooks/usePostList';
+import { PostsReq } from '@domains/post/types/api';
 
 jest.mock('next/headers');
 jest.mock('next/navigation');

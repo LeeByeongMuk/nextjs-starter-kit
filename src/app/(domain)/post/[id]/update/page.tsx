@@ -4,16 +4,16 @@ import { useParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import ButtonBox from '@/domains/post/components/Form/ButtonBox';
-import ContentsEditor from '@/domains/post/components/Form/ContentsEditor';
-import IsOpenCheckbox from '@/domains/post/components/Form/IsOpenCheckbox';
-import TitleInput from '@/domains/post/components/Form/TitleInput';
-import TypeSelect from '@/domains/post/components/Form/TypeSelect';
-import useUpdatePost from '@/domains/post/hooks/useUpdatePost';
-import useUpdatePostResource from '@/domains/post/hooks/useUpdatePostResource';
-import { PostFormInput } from '@/domains/post/types/form';
-import Spinner from '@/shared/components/Spinner';
-import LayerSpinner from '@/shared/components/Spinner/LayerSpinner';
+import ButtonBox from '@domains/post/components/Form/ButtonBox';
+import ContentsEditor from '@domains/post/components/Form/ContentsEditor';
+import IsOpenCheckbox from '@domains/post/components/Form/IsOpenCheckbox';
+import TitleInput from '@domains/post/components/Form/TitleInput';
+import TypeSelect from '@domains/post/components/Form/TypeSelect';
+import useUpdatePost from '@domains/post/hooks/useUpdatePost';
+import useUpdatePostResource from '@domains/post/hooks/useUpdatePostResource';
+import { PostFormInput } from '@domains/post/types/form';
+import Spinner from '@shared/components/Spinner';
+import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
 
 export default function UpdatePost() {
   const params = useParams<{ id: string }>();

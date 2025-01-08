@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 
 import { PostListData } from '@/domains/post/types/api';
-import { getFormattedDate } from '@/shared/utils/date';
+import { getFormattedDate } from '@shared/utils/date';
 
 interface Props {
   post: PostListData;

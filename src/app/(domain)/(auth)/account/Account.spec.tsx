@@ -1,3 +1,4 @@
+import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -11,10 +12,9 @@ import { HttpResponse, http } from 'msw';
 import { cookies } from 'next/headers';
 import { useSession } from 'next-auth/react';
 
-import Account from '@/app/(domain)/(auth)/account/page';
-import useDeleteAccount from '@/domains/auth/account/_hooks/useDeleteAccount';
-import useUpdateAccount from '@/domains/auth/account/_hooks/useUpdateAccount';
-import { server } from '@/lib/mocks/node';
+import Account from '@app_domain/(auth)/account/page';
+import useDeleteAccount from '@domains/auth/account/_hooks/useDeleteAccount';
+import useUpdateAccount from '@domains/auth/account/_hooks/useUpdateAccount';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

@@ -4,7 +4,7 @@ import {
   UpdateAccountReq,
   UpdateAccountRes,
 } from '@/domains/auth/account/_types/api';
-import { fetchApi } from '@/shared/utils/api';
+import { fetchApi } from '@shared/utils/api';
 
 export const fetchUpdateAccount = async (req: UpdateAccountReq) => {
   return (await fetchApi('/api/users', {

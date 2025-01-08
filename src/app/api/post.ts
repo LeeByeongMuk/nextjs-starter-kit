@@ -11,8 +11,8 @@ import {
   UpdatePostRes,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
-} from '@/domains/post/types/api';
-import { fetchApi } from '@/shared/utils/api';
+} from '@domains/post/types/api';
+import { fetchApi } from '@shared/utils/api';
 
 const fetchPosts = async ({ page, type, q }: PostsReq) => {
   const params = new URLSearchParams();

@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 
-import { fetchDeletePost } from '@/app/api/post';
+import { fetchDeletePost } from '@app_api/post';
 
 export default function useDeletePost() {
   const router = useRouter();

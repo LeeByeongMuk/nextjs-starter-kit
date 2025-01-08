@@ -1,4 +1,4 @@
-import { ApiResponse } from '@/shared/types/api';
+import { ApiResponse } from '@shared/types/api';
 
 interface UserData {
   id: string;

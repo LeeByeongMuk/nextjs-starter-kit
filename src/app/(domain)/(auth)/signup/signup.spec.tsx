@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -12,9 +13,8 @@ import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
 import React from 'react';
 
-import Signup from '@/app/(domain)/(auth)/signup/page';
-import useSignup from '@/domains/auth/signup/_hooks/useSignup';
-import { server } from '@/lib/mocks/node';
+import Signup from '@app_domain/(auth)/signup/page';
+import useSignup from '@domains/auth/signup/_hooks/useSignup';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

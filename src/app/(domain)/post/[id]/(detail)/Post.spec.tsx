@@ -1,3 +1,4 @@
+import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
@@ -5,9 +6,8 @@ import { cookies } from 'next/headers';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 
-import PostDetail from '@/app/(domain)/post/[id]/(detail)/page';
-import usePost from '@/domains/post/hooks/usePost';
-import { server } from '@/lib/mocks/node';
+import PostDetail from '@app_domain/post/[id]/(detail)/page';
+import usePost from '@domains/post/hooks/usePost';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
