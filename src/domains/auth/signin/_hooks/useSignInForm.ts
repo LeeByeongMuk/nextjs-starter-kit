@@ -3,7 +3,7 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { SignInReq } from '@/domains/auth/signin/_types/api';
+import { SignInReq } from '@domains/auth/signin/_types/api';
 
 export function useSignInForm() {
   const [isLoading, setIsLoading] = useState(false);

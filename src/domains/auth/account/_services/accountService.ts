@@ -3,7 +3,7 @@ import {
   DeleteAccountRes,
   UpdateAccountReq,
   UpdateAccountRes,
-} from '@/domains/auth/account/_types/api';
+} from '@domains/auth/account/_types/api';
 import { fetchApi } from '@shared/utils/api';
 
 export const fetchUpdateAccount = async (req: UpdateAccountReq) => {

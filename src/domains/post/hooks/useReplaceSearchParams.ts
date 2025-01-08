@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { PostsReq } from '@/domains/post/types/api';
+import { PostsReq } from '@domains/post/types/api';
 
 interface Props {
   searchFilters: PostsReq;

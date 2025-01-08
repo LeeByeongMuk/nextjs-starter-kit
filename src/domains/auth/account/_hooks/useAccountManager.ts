@@ -2,9 +2,9 @@ import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import useDeleteAccount from '@/domains/auth/account/_hooks/useDeleteAccount';
-import useUpdateAccount from '@/domains/auth/account/_hooks/useUpdateAccount';
-import { UpdateAccountReq } from '@/domains/auth/account/_types/api';
+import useDeleteAccount from '@domains/auth/account/_hooks/useDeleteAccount';
+import useUpdateAccount from '@domains/auth/account/_hooks/useUpdateAccount';
+import { UpdateAccountReq } from '@domains/auth/account/_types/api';
 
 export function useAccountManager() {
   const { data: session } = useSession();

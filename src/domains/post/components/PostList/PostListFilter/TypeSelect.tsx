@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { useFormContext } from 'react-hook-form';
 
-import { LIST_TYPE_OPTIONS } from '@/domains/post/constants/post';
+import { LIST_TYPE_OPTIONS } from '@domains/post/constants/post';
 
 interface Props {
   onChange: () => void;

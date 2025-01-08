@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 
-import { fetchDeleteAccount } from '@/domains/auth/account/_services/accountService';
+import { fetchDeleteAccount } from '@domains/auth/account/_services/accountService';
 
 export default function useDeleteAccount() {
   return useMutation({

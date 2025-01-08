@@ -3,8 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-import { PostsReq, PostsRes } from '@/domains/post/types/api';
 import { fetchPosts } from '@app_api/post';
+import { PostsReq, PostsRes } from '@domains/post/types/api';
 
 interface Props {
   searchFilters: PostsReq;

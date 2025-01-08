@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
-import { PostsReq, PostType } from '@/domains/post/types/api';
+import { PostsReq, PostType } from '@domains/post/types/api';
 
 export default function useSearchFilters() {
   const searchParams = useSearchParams();

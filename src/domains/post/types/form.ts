@@ -1,4 +1,4 @@
-import { PostType } from '@/domains/post/types/api';
+import { PostType } from '@domains/post/types/api';
 
 interface PostFormInput {
   title: string;

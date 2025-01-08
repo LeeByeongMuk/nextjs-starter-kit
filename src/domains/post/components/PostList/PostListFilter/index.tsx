@@ -4,9 +4,9 @@ import { useSession } from 'next-auth/react';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import SearchInput from '@/domains/post/components/PostList/PostListFilter/SearchInput';
-import TypeSelect from '@/domains/post/components/PostList/PostListFilter/TypeSelect';
-import { PostListSearch, PostsReq, PostType } from '@/domains/post/types/api';
+import SearchInput from '@domains/post/components/PostList/PostListFilter/SearchInput';
+import TypeSelect from '@domains/post/components/PostList/PostListFilter/TypeSelect';
+import { PostListSearch, PostsReq, PostType } from '@domains/post/types/api';
 
 interface Props {
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;

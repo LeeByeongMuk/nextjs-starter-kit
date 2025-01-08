@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DUMMY_DATA } from '@/domains/post/constants/post';
+import { DUMMY_DATA } from '@domains/post/constants/post';
 
 export default function PostListSkeletonUI() {
   return DUMMY_DATA.map(post => (

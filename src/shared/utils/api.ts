@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-import { TOKEN_KEY } from '@/domains/auth/_constants/auth';
+import { TOKEN_KEY } from '@domains/auth/_constants/auth';
 
 const fetchApi = async <Response>(
   url: string,
