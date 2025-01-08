@@ -12,8 +12,8 @@ import { cookies } from 'next/headers';
 import { useSession } from 'next-auth/react';
 
 import Account from '@/app/(domain)/(auth)/account/page';
-import useDeleteAccount from '@/domains/auth/hooks/useDeleteAccount';
-import useUpdateAccount from '@/domains/auth/hooks/useUpdateAccount';
+import useDeleteAccount from '@/domains/auth/account/_hooks/useDeleteAccount';
+import useUpdateAccount from '@/domains/auth/account/_hooks/useUpdateAccount';
 import { server } from '@/lib/mocks/node';
 
 jest.mock('next/headers', () => ({
