@@ -1,4 +1,3 @@
-import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
@@ -8,6 +7,7 @@ import { signIn } from 'next-auth/react';
 import React from 'react';
 
 import SignIn from '@app_domain/(auth)/signin/page';
+import { server } from '@lib/mocks/node';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

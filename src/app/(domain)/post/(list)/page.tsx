@@ -2,30 +2,20 @@
 
 import React from 'react';
 
-import Pagination from '@domains/post/components/Pagination';
-import List from '@domains/post/components/PostList/PostListContainer';
-import usePostList from '@domains/post/hooks/usePostList';
-import useReplaceSearchParams from '@domains/post/hooks/useReplaceSearchParams';
-import useSearchFilters from '@domains/post/hooks/useSearchFilters';
+import Pagination from '@domains/post/_components/Pagination';
+import PostListContainer from '@domains/post/list/_components/PostListContainer';
+import ListFilter from '@domains/post/list/_components/PostListFilter';
+import usePostListManager from '@domains/post/list/_hooks/usePostListManager';
 
-import ListFilter from '../../../../domains/post/components/PostList/PostListFilter';
-
-export default function PostList() {
-  const { searchFilters, setSearchFilters } = useSearchFilters();
-  const {
-    data: { data: posts, meta },
-    isLoading,
-    isError,
-    isFetching,
-  } = usePostList({ searchFilters });
-
-  useReplaceSearchParams({ searchFilters });
+export default function PostListPage() {
+  const { setSearchFilters, posts, meta, isLoading, isError } =
+    usePostListManager();
 
   return (
     <section className="py-8">
       <ListFilter setSearchFilters={setSearchFilters} />
 
-      <List posts={posts} isLoading={isFetching || isLoading || isError} />
+      <PostListContainer posts={posts} isLoading={isLoading || isError} />
 
       <Pagination meta={meta} setSearchFilters={setSearchFilters} />
     </section>

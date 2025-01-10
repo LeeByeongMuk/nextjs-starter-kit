@@ -1,4 +1,3 @@
-import { server } from '@lib/mocks/node';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -15,7 +14,8 @@ import { useSession } from 'next-auth/react';
 import React from 'react';
 
 import CreatePost from '@app_domain/post/create/page';
-import useCreatePost from '@domains/post/hooks/useCreatePost';
+import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
+import { server } from '@lib/mocks/node';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
