@@ -15,7 +15,7 @@ import React from 'react';
 import PostList from '@app_domain/post/(list)/page';
 import usePostList from '@domains/post/list/_hooks/usePostList';
 import { PostsReq } from '@domains/post/list/_types/api';
-import { server } from '@lib/mocks/node';
+import { server } from '@lib/mocks/server';
 
 jest.mock('next/headers');
 jest.mock('next/navigation');

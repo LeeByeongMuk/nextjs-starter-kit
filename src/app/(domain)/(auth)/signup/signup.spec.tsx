@@ -14,7 +14,7 @@ import React from 'react';
 
 import Signup from '@app_domain/(auth)/signup/page';
 import useSignup from '@domains/auth/signup/_hooks/useSignup';
-import { server } from '@lib/mocks/node';
+import { server } from '@lib/mocks/server';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

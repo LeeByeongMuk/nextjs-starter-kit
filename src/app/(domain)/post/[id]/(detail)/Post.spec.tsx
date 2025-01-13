@@ -7,7 +7,7 @@ import React from 'react';
 
 import PostDetail from '@app_domain/post/[id]/(detail)/page';
 import usePost from '@domains/post/detail/_hooks/usePost';
-import { server } from '@lib/mocks/node';
+import { server } from '@lib/mocks/server';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

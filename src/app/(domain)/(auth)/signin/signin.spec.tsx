@@ -7,7 +7,7 @@ import { signIn } from 'next-auth/react';
 import React from 'react';
 
 import SignIn from '@app_domain/(auth)/signin/page';
-import { server } from '@lib/mocks/node';
+import { server } from '@lib/mocks/server';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

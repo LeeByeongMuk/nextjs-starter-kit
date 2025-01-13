@@ -15,7 +15,7 @@ import React from 'react';
 
 import CreatePost from '@app_domain/post/create/page';
 import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
-import { server } from '@lib/mocks/node';
+import { server } from '@lib/mocks/server';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

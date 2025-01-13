@@ -16,7 +16,7 @@ import React from 'react';
 import UpdatePost from '@app_domain/post/[id]/update/page';
 import useUpdatePost from '@domains/post/update/_hooks/useUpdatePost';
 import useUpdatePostResource from '@domains/post/update/_hooks/useUpdatePostResource';
-import { server } from '@lib/mocks/node';
+import { server } from '@lib/mocks/server';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
