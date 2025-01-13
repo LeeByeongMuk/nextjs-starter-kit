@@ -48,7 +48,7 @@ export default function Header() {
                 <li>
                   <Link
                     className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/src/app/(domain)/post"
+                    href="/post"
                   >
                     Post
                   </Link>

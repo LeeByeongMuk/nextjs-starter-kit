@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div>
       <h1>Home</h1>
-      <Link href="/src/app/(domain)/post">post</Link>
+      <Link href="/post">post</Link>
       <br />
       <Link href="/signin">signin</Link>
       <br />
