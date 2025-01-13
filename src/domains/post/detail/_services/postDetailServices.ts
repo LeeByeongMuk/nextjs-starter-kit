@@ -1,3 +1,5 @@
+'use server';
+
 import { PostReq, PostRes } from '@domains/post/detail/_types/api';
 import { fetchApi } from '@shared/utils/api';
 

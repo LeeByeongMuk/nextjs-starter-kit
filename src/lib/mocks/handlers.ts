@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 export const handlers = [
   // 회원 API
-  http.post(`/api/users/signup`, () => {
+  http.post(`${process.env.APP_API_URL}/api/users/signup`, () => {
     return HttpResponse.json({
       ok: true,
       message: 'success',
@@ -11,7 +11,7 @@ export const handlers = [
       },
     });
   }),
-  http.post(`/api/users/signin`, () => {
+  http.post(`${process.env.APP_API_URL}/api/users/signin`, () => {
     return HttpResponse.json({
       ok: true,
       message: 'success',
@@ -20,7 +20,7 @@ export const handlers = [
       },
     });
   }),
-  http.get(`/api/users`, () => {
+  http.get(`${process.env.APP_API_URL}/api/users`, () => {
     return HttpResponse.json({
       ok: true,
       message: 'success',
@@ -32,7 +32,7 @@ export const handlers = [
       },
     });
   }),
-  http.put(`/api/users`, () => {
+  http.put(`${process.env.APP_API_URL}/api/users`, () => {
     return HttpResponse.json({
       ok: true,
       message: 'success',
@@ -44,7 +44,7 @@ export const handlers = [
       },
     });
   }),
-  http.delete(`/api/users`, () => {
+  http.delete(`${process.env.APP_API_URL}/api/users`, () => {
     return HttpResponse.json({
       ok: true,
       message: 'success',
@@ -55,63 +55,7 @@ export const handlers = [
   }),
 
   // 게시글 API
-  http.post(`/api/posts`, () => {
-    return HttpResponse.json({
-      ok: true,
-      message: 'success',
-      data: {
-        id: 1,
-      },
-    });
-  }),
-  http.put(`/api/posts/:id`, () => {
-    return HttpResponse.json({
-      ok: true,
-      message: 'success',
-      data: {
-        id: 1,
-      },
-    });
-  }),
-  http.get('/api/posts/:id/edit', () => {
-    return HttpResponse.json({
-      ok: true,
-      message: 'success',
-      data: {
-        id: 1,
-        title: 'title',
-        contents: 'contents',
-        type: 'notice',
-        is_open: true,
-      },
-    });
-  }),
-  http.get(`/api/posts/:id`, () => {
-    return HttpResponse.json({
-      ok: true,
-      message: 'success',
-      data: {
-        contents: 'contents',
-        created_at: '2021-09-01T00:00:00',
-        hit: 0,
-        id: 1,
-        is_editable: false,
-        title: 'title',
-        type: 'notice',
-        user_name: 'name',
-      },
-    });
-  }),
-  http.delete(`/api/posts/:id`, () => {
-    return HttpResponse.json({
-      ok: true,
-      message: 'success',
-      data: {
-        id: 1,
-      },
-    });
-  }),
-  http.get(`/api/posts`, () => {
+  http.get(`${process.env.APP_API_URL}/api/posts`, () => {
     const data = Array.from({ length: 20 }, (_, index) => ({
       id: index + 1,
       type: 'notice',
@@ -133,4 +77,61 @@ export const handlers = [
       },
     });
   }),
+  // http.post(`${process.env.APP_API_URL}/api/posts`, () => {
+  //   console.log('asd');
+  //   return HttpResponse.json({
+  //     ok: true,
+  //     message: 'success',
+  //     data: {
+  //       id: 1,
+  //     },
+  //   });
+  // }),
+  // http.put(`${process.env.APP_API_URL}/api/posts/:id`, () => {
+  //   return HttpResponse.json({
+  //     ok: true,
+  //     message: 'success',
+  //     data: {
+  //       id: 1,
+  //     },
+  //   });
+  // }),
+  // http.get('${process.env.APP_API_URL}/api/posts/:id/edit', () => {
+  //   return HttpResponse.json({
+  //     ok: true,
+  //     message: 'success',
+  //     data: {
+  //       id: 1,
+  //       title: 'title',
+  //       contents: 'contents',
+  //       type: 'notice',
+  //       is_open: true,
+  //     },
+  //   });
+  // }),
+  // http.get(`${process.env.APP_API_URL}/api/posts/:id`, () => {
+  //   return HttpResponse.json({
+  //     ok: true,
+  //     message: 'success',
+  //     data: {
+  //       contents: 'contents',
+  //       created_at: '2021-09-01T00:00:00',
+  //       hit: 0,
+  //       id: 1,
+  //       is_editable: false,
+  //       title: 'title',
+  //       type: 'notice',
+  //       user_name: 'name',
+  //     },
+  //   });
+  // }),
+  // http.delete(`${process.env.APP_API_URL}/api/posts/:id`, () => {
+  //   return HttpResponse.json({
+  //     ok: true,
+  //     message: 'success',
+  //     data: {
+  //       id: 1,
+  //     },
+  //   });
+  // }),
 ];
