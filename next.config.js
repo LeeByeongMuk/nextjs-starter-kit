@@ -2,7 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   distDir: 'build',
-  experimental: { instrumentationHook: true },
   env: {
     APP_API_URL: process.env.APP_API_URL,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
