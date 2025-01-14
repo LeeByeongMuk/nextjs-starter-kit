@@ -13,19 +13,7 @@ interface Props {
 export default function usePostList({ searchFilters }: Props) {
   const postListQuery = useQuery({
     queryKey: ['posts', searchFilters],
-    queryFn: async () => {
-      return await fetchPosts(searchFilters);
-
-      const params = new URLSearchParams();
-      params.append('page', searchFilters.page.toString());
-      params.append('type', searchFilters.type);
-      params.append('q', searchFilters.q);
-      const res = await fetch(
-        `${process.env.APP_API_URL}/api/posts?${params.toString()}`
-      );
-
-      return res.json();
-    },
+    queryFn: () => fetchPosts(searchFilters),
     initialData: {
       data: [],
       meta: {
@@ -40,8 +28,6 @@ export default function usePostList({ searchFilters }: Props) {
 
   useEffect(() => {
     if (isError) {
-      console.log('asd');
-      console.log(postListQuery.error);
       alert('Failed to fetch posts');
     }
   }, [isError]);
