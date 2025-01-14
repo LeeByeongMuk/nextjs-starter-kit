@@ -29,7 +29,6 @@ const nextConfig = {
     if (isServer) {
       if (Array.isArray(config.resolve.alias)) {
         config.resolve.alias.push({ name: 'msw/browser', alias: false });
-
       } else {
         config.resolve.alias['msw/browser'] = false;
       }
