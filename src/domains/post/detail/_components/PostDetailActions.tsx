@@ -35,13 +35,15 @@ export default function PostDetailActions({
         </Link>
       )}
 
-      <button
-        type="button"
-        className="inline-block rounded border border-red-600 px-12 py-3 text-sm font-medium text-red-600 hover:bg-red-600 hover:text-white focus:outline-none focus:ring active:bg-teal-500"
-        onClick={handleDeletePost}
-      >
-        delete
-      </button>
+      {isEditable && (
+        <button
+          type="button"
+          className="inline-block rounded border border-red-600 px-12 py-3 text-sm font-medium text-red-600 hover:bg-red-600 hover:text-white focus:outline-none focus:ring active:bg-teal-500"
+          onClick={handleDeletePost}
+        >
+          delete
+        </button>
+      )}
     </div>
   );
 }

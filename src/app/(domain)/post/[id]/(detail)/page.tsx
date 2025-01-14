@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 import Detail from '@domains/post/detail/_components/PostDetail';

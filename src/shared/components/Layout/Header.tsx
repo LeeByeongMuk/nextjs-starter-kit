@@ -18,7 +18,7 @@ export default function Header() {
       <div className="mx-auto max-w-screen-xl">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
-            <Link className="block text-teal-600" href="/public">
+            <Link className="block text-teal-600" href="/">
               <span className="sr-only">Home</span>
               <svg
                 className="h-8"
@@ -40,7 +40,7 @@ export default function Header() {
                 <li>
                   <Link
                     className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/public"
+                    href="/"
                   >
                     Home
                   </Link>
