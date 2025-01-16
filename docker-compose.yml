@@ -8,3 +8,20 @@ services:
       - '/var/www/node_modules'
     ports:
       - '${APP_PORT:-3000}:3000'
+    networks:
+      - next-js-kit
+
+  mock-api:
+    build:
+      dockerfile: docker/mock-api/Dockerfile
+      context: .
+    volumes:
+      - '.:/var/www'
+    ports:
+      - '${APP_API_PORT:-9090}:9090'
+    networks:
+      - next-js-kit
+
+networks:
+  next-js-kit:
+    driver: bridge

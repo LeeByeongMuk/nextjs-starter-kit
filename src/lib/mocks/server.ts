@@ -5,7 +5,7 @@ import express from 'express';
 import { handlers } from '@lib/mocks/handlers';
 
 const app = express();
-const port = 9090;
+const port = process.env.APP_API_PORT || 9090;
 
 app.use(
   cors({
