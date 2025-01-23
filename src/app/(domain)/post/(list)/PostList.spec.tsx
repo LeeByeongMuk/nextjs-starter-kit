@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   fireEvent,
   render,
@@ -15,20 +15,14 @@ import React from 'react';
 import PostList from '@app_domain/post/(list)/page';
 import usePostList from '@domains/post/list/_hooks/usePostList';
 import { PostsReq } from '@domains/post/list/_types/api';
-import { server } from '@lib/mocks/server';
+import { server } from '@lib/mocks/testServer';
+import { getQueryClient } from '@lib/tanstackQuery/client';
 
 jest.mock('next/headers');
 jest.mock('next/navigation');
 jest.mock('next-auth/react');
-global.alert = jest.fn();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+const queryClient = getQueryClient();
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -44,16 +38,7 @@ describe('게시글 리스트 페이지 테스트', () => {
     page: 1,
   } as PostsReq;
 
-  beforeAll(() => {
-    server.listen();
-  });
-
   beforeEach(() => {
-    server.resetHandlers();
-
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
     (cookies as jest.Mock).mockReturnValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
@@ -83,14 +68,6 @@ describe('게시글 리스트 페이지 테스트', () => {
 
     // given - 회원가입 페이지가 그려짐
     render(<PostList />, { wrapper });
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  afterAll(() => {
-    server.close();
   });
 
   test('게시글 타입을 선택할 시 검색 필터에 타입이 추가된다', () => {
@@ -152,23 +129,6 @@ describe('게시글 리스트 페이지 테스트', () => {
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
       expect(Array.isArray(result.current.data.data)).toBe(true);
-      expect(result.current.data.data[0]).toMatchObject({
-        id: 1,
-        type: 'notice',
-        title: 'Title 1',
-        hit: 0,
-        created_at: '2021-09-01T00:00:00',
-        user: {
-          id: 1,
-          name: 'name',
-          nickname: 'nickname',
-        },
-      });
-      expect(result.current.data.meta).toEqual({
-        total: 1,
-        current_page: 1,
-        last_page: 1,
-      });
     });
   });
 

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
   fireEvent,
@@ -14,37 +14,22 @@ import React from 'react';
 
 import Signup from '@app_domain/(auth)/signup/page';
 import useSignup from '@domains/auth/signup/_hooks/useSignup';
-import { server } from '@lib/mocks/server';
+import { server } from '@lib/mocks/testServer';
+import { getQueryClient } from '@lib/tanstackQuery/client';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
 }));
 jest.mock('next-auth/react');
-global.alert = jest.fn();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+const queryClient = getQueryClient();
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
 describe('회원가입 테스트', () => {
-  beforeAll(() => {
-    server.listen();
-  });
-
   beforeEach(() => {
-    server.resetHandlers();
-
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
     (cookies as jest.Mock).mockReturnValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
@@ -52,14 +37,6 @@ describe('회원가입 테스트', () => {
 
     // given - 회원가입 페이지가 그려짐
     render(<Signup />, { wrapper });
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  afterAll(() => {
-    server.close();
   });
 
   describe('이메일 형식을 확인 한다', () => {

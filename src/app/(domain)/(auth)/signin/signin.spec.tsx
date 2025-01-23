@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
@@ -7,7 +7,8 @@ import { signIn } from 'next-auth/react';
 import React from 'react';
 
 import SignIn from '@app_domain/(auth)/signin/page';
-import { server } from '@lib/mocks/server';
+import { server } from '@lib/mocks/testServer';
+import { getQueryClient } from '@lib/tanstackQuery/client';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -16,15 +17,8 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 jest.mock('next-auth/react');
-global.alert = jest.fn();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+const queryClient = getQueryClient();
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -33,16 +27,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('로그인 테스트', () => {
   const mockPush = jest.fn();
 
-  beforeAll(() => {
-    server.listen();
-  });
-
   beforeEach(() => {
-    server.resetHandlers();
-
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
     (cookies as jest.Mock).mockReturnValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
@@ -54,14 +39,6 @@ describe('로그인 테스트', () => {
 
     // given - 로그인 페이지가 그려짐
     render(<SignIn />, { wrapper });
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  afterAll(() => {
-    server.close();
   });
 
   describe('회원가입 API 호출', () => {

@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
   fireEvent,
@@ -15,7 +15,8 @@ import React from 'react';
 
 import CreatePost from '@app_domain/post/create/page';
 import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
-import { server } from '@lib/mocks/server';
+import { server } from '@lib/mocks/testServer';
+import { getQueryClient } from '@lib/tanstackQuery/client';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -24,17 +25,9 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 jest.mock('next-auth/react');
-jest.mock('next/navigation');
 jest.mock('@toast-ui/react-editor');
-global.alert = jest.fn();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+const queryClient = getQueryClient();
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -44,16 +37,7 @@ describe('게시글 생성 테스트', () => {
   const useSessionMock = useSession as jest.Mock;
   const mockPush = jest.fn();
 
-  beforeAll(() => {
-    server.listen();
-  });
-
   beforeEach(() => {
-    server.resetHandlers();
-
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
     (cookies as jest.Mock).mockReturnValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
@@ -80,11 +64,7 @@ describe('게시글 생성 테스트', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  afterAll(() => {
-    server.close();
+    queryClient.clear();
   });
 
   describe('제목 형식을 확인한다', () => {
@@ -159,20 +139,6 @@ describe('게시글 생성 테스트', () => {
 
   describe('게시글 생성 API 호출', () => {
     test('게시글 생성에 성공하면 성공 메시지를 출력하고 상세페이지로 이동한다', async () => {
-      // when - 제목, 내용, 타입, 라디오박스를 입력하고 제출 버튼을 클릭한다
-      fireEvent.input(screen.getByLabelText('Title'), {
-        target: {
-          value: '제목',
-        },
-      });
-      fireEvent.input(screen.getByRole('textbox'), {
-        target: {
-          value: '내용',
-        },
-      });
-      fireEvent.click(screen.getByLabelText('Yes'));
-      fireEvent.submit(screen.getByText('submit'));
-
       const { result } = renderHook(() => useCreatePost(), { wrapper });
 
       act(() => {

@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   fireEvent,
   render,
@@ -16,7 +16,8 @@ import React from 'react';
 import UpdatePost from '@app_domain/post/[id]/update/page';
 import useUpdatePost from '@domains/post/update/_hooks/useUpdatePost';
 import useUpdatePostResource from '@domains/post/update/_hooks/useUpdatePostResource';
-import { server } from '@lib/mocks/server';
+import { server } from '@lib/mocks/testServer';
+import { getQueryClient } from '@lib/tanstackQuery/client';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -27,15 +28,8 @@ jest.mock('next/navigation', () => ({
 }));
 jest.mock('next-auth/react');
 jest.mock('@toast-ui/react-editor');
-global.alert = jest.fn();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+const queryClient = getQueryClient();
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -45,16 +39,7 @@ describe('게시글 수정 테스트', () => {
   const useSessionMock = useSession as jest.Mock;
   const mockPush = jest.fn();
 
-  beforeAll(() => {
-    server.listen();
-  });
-
   beforeEach(() => {
-    server.resetHandlers();
-
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
     (cookies as jest.Mock).mockReturnValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
@@ -83,14 +68,6 @@ describe('게시글 수정 테스트', () => {
     render(<UpdatePost />, { wrapper });
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   describe('게시글 수정 리소스 API 호출', () => {
     test('게시글 수정 리소스 API 호출에 성공하면 게시글 정보를 가져온다', async () => {
       // when - 게시글 수정 리소스 API 호출에 성공
@@ -112,10 +89,8 @@ describe('게시글 수정 테스트', () => {
     test('게시글 수정 리소스 API 호출에 실패하면 실패 메시지를 출력한다', async () => {
       queryClient.clear();
       server.use(
-        http.get('/api/posts/:id/edit', () => {
-          return new HttpResponse(null, {
-            status: 500,
-          });
+        http.get(`/api/posts/:id/edit`, () => {
+          return new HttpResponse(null, { status: 500 });
         })
       );
 

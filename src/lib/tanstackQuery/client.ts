@@ -1,4 +1,4 @@
-import { QueryClient, isServer, QueryCache } from '@tanstack/react-query';
+import { QueryClient, isServer } from '@tanstack/react-query';
 
 export const defaultStaleTime = 60 * 1000;
 
@@ -6,12 +6,11 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: defaultStaleTime,
+        // staleTime: defaultStaleTime,
         refetchOnWindowFocus: false,
         retry: false,
       },
     },
-    queryCache: new QueryCache({}),
   });
 }
 
