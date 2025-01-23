@@ -21,7 +21,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Install the project dependencies
-        run: rm -rf node_modules && npm install
+        run: npm ci
 
       - name: Fix code style issues with prettier & eslint
         run: npm run lint:fix && npm run prettier:fix
@@ -50,7 +50,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install the project dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build the project
         run: npm run build
