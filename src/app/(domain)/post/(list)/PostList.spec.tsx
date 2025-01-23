@@ -17,6 +17,7 @@ import usePostList from '@domains/post/list/_hooks/usePostList';
 import { PostsReq } from '@domains/post/list/_types/api';
 import { server } from '@lib/mocks/testServer';
 import { getQueryClient } from '@lib/tanstackQuery/client';
+import { getHandlerURI } from '@shared/utils/url';
 
 jest.mock('next/headers');
 jest.mock('next/navigation');
@@ -129,6 +130,23 @@ describe('게시글 리스트 페이지 테스트', () => {
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
       expect(Array.isArray(result.current.data.data)).toBe(true);
+      expect(result.current.data.data[0]).toMatchObject({
+        id: 1,
+        type: 'notice',
+        title: 'Title 1',
+        hit: 0,
+        created_at: '2021-09-01T00:00:00',
+        user: {
+          id: 1,
+          name: 'name',
+          nickname: 'nickname',
+        },
+      });
+      expect(result.current.data.meta).toEqual({
+        total: 1,
+        current_page: 1,
+        last_page: 1,
+      });
     });
   });
 
@@ -143,7 +161,7 @@ describe('게시글 리스트 페이지 테스트', () => {
 
   test('게시글 리스트 호출 중 에러가 발생하면 에러 메시지가 출력된다', async () => {
     server.use(
-      http.get('/api/posts', () => {
+      http.get(getHandlerURI('/api/posts'), () => {
         return new HttpResponse(null, {
           status: 500,
         });
@@ -156,7 +174,9 @@ describe('게시글 리스트 페이지 테스트', () => {
     });
 
     // then - 에러 메시지가 출력된다
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
 
     expect(window.alert).toHaveBeenCalledWith('Failed to fetch posts');
   });

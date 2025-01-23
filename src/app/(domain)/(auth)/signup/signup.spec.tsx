@@ -16,6 +16,7 @@ import Signup from '@app_domain/(auth)/signup/page';
 import useSignup from '@domains/auth/signup/_hooks/useSignup';
 import { server } from '@lib/mocks/testServer';
 import { getQueryClient } from '@lib/tanstackQuery/client';
+import { getHandlerURI } from '@shared/utils/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -252,7 +253,7 @@ describe('회원가입 테스트', () => {
 
     test('회원가입에 실패하면 에러 알럿이 출력된다', async () => {
       server.use(
-        http.post('/api/users/signup', () => {
+        http.post(getHandlerURI('/api/users/signup'), () => {
           return new HttpResponse(null, { status: 500 });
         })
       );

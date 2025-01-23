@@ -16,6 +16,7 @@ import useDeleteAccount from '@domains/auth/account/_hooks/useDeleteAccount';
 import useUpdateAccount from '@domains/auth/account/_hooks/useUpdateAccount';
 import { server } from '@lib/mocks/testServer';
 import { getQueryClient } from '@lib/tanstackQuery/client';
+import { getHandlerURI } from '@shared/utils/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -84,8 +85,9 @@ describe('마이페이지 페이지 테스트', () => {
     });
 
     test('회원 정보 수정 실패 시 에러 메세지가 표시된다.', async () => {
+      queryClient.clear();
       server.use(
-        http.put('/api/users', () => {
+        http.put(getHandlerURI('/api/users'), () => {
           return new HttpResponse(null, { status: 500 });
         })
       );
@@ -147,8 +149,9 @@ describe('마이페이지 페이지 테스트', () => {
     });
 
     test('회원 탈퇴 실패 시 에러 메세지가 표시된다.', async () => {
+      queryClient.clear();
       server.use(
-        http.delete('/api/users', () => {
+        http.delete(getHandlerURI('/api/users'), () => {
           return new HttpResponse(null, { status: 500 });
         })
       );

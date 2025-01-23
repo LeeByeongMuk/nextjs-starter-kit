@@ -17,6 +17,7 @@ import CreatePost from '@app_domain/post/create/page';
 import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
 import { server } from '@lib/mocks/testServer';
 import { getQueryClient } from '@lib/tanstackQuery/client';
+import { getHandlerURI } from '@shared/utils/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -158,7 +159,7 @@ describe('게시글 생성 테스트', () => {
 
     test('게시글 생성에 실패하면 에러 알럿이 출력한다', async () => {
       server.use(
-        http.post('/api/posts', () => {
+        http.post(getHandlerURI('/api/posts'), () => {
           return new HttpResponse(null, { status: 500 });
         })
       );

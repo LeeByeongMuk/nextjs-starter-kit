@@ -18,6 +18,7 @@ import useUpdatePost from '@domains/post/update/_hooks/useUpdatePost';
 import useUpdatePostResource from '@domains/post/update/_hooks/useUpdatePostResource';
 import { server } from '@lib/mocks/testServer';
 import { getQueryClient } from '@lib/tanstackQuery/client';
+import { getHandlerURI } from '@shared/utils/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -89,7 +90,7 @@ describe('게시글 수정 테스트', () => {
     test('게시글 수정 리소스 API 호출에 실패하면 실패 메시지를 출력한다', async () => {
       queryClient.clear();
       server.use(
-        http.get(`/api/posts/:id/edit`, () => {
+        http.get(getHandlerURI(`/api/posts/:id/edit`), () => {
           return new HttpResponse(null, { status: 500 });
         })
       );
@@ -142,7 +143,7 @@ describe('게시글 수정 테스트', () => {
 
     test('게시글 수정에 실패하면 실패 메시지를 출력한다', async () => {
       server.use(
-        http.put('/api/posts/:id', () => {
+        http.put(getHandlerURI('/api/posts/:id'), () => {
           return new HttpResponse(null, { status: 500 });
         })
       );
