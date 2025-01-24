@@ -35,4 +35,4 @@ export interface DeletePostReq {
   id: number;
 }
 
-export interface DeletePostRes extends ApiResponse {}
+export type DeletePostRes = ApiResponse;
