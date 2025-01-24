@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix",
     "prettier": "prettier --check ./src",
     "prettier:fix": "prettier --write ./src",
-    "jest": "jest",
+    "test": "jest",
     "tsc": "tsc",
     "mock": "npx tsx watch ./src/lib/mocks/server.ts"
   },
