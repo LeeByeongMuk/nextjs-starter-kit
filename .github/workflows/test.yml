@@ -37,6 +37,9 @@ jobs:
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
+      - name: fix msw dependency issue
+        run: npm uninstall msw && npm install msw@2.4.3
+
       - name: Install dependencies
         run: npm ci
 
