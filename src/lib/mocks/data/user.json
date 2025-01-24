@@ -1,0 +1,45 @@
+{
+  "signup": {
+    "ok": true,
+    "message": "success",
+    "data": {
+      "id": 1,
+      "access_token": "mockaccesstoken0000"
+    }
+  },
+  "signin": {
+    "ok": true,
+    "message": "success",
+    "data": {
+      "id": 1,
+      "access_token": "mockaccesstoken0000"
+    }
+  },
+  "get": {
+    "ok": true,
+    "message": "success",
+    "data": {
+      "id": 1,
+      "name": "John Doe",
+      "nickname": "nickname",
+      "email": "test@email.com"
+    }
+  },
+  "update": {
+    "ok": true,
+    "message": "success",
+    "data": {
+      "id": 1,
+      "name": "John Doe",
+      "nickname": "nickname",
+      "email": "test@email.com"
+    }
+  },
+  "delete": {
+    "ok": true,
+    "message": "success",
+    "data": {
+      "ok": true
+    }
+  }
+}
