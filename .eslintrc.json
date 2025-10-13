@@ -1,57 +1,13 @@
 {
-  "env": {
-    "browser": true,
-    "es6": true,
-    "node": true,
-    "jest": true
-  },
-  "parser": "@typescript-eslint/parser",
   "extends": [
     "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+    "next/typescript",
+    "plugin:tailwindcss/recommended",
     "plugin:@tanstack/eslint-plugin-query/recommended",
-    "prettier"
-  ],
-  "settings": {
-    "react": {
-      "version": "detect"
-    },
-    "import/resolver": {
-      "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ],
-        "moduleDirectory": [
-          "node_modules",
-          "src/"
-        ]
-      }
-    }
-  },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 2018,
-    "sourceType": "module"
-  },
-  "plugins": [
-    "react",
-    "react-hooks",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "rules": {
-    "react/react-in-jsx-scope": 0,
-    "react/prefer-stateless-function": 0,
-    "react/jsx-filename-extension": 0,
-    "react/jsx-one-expression-per-line": 0,
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-inferrable-types": "off",
+    "no-alert": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -64,8 +20,6 @@
     "@typescript-eslint/no-explicit-any": [
       "warn"
     ],
-    "no-nested-ternary": 0,
-    "no-alert": "off",
     "import/order": [
       "warn",
       {
@@ -89,9 +43,6 @@
         }
       }
     ],
-    "complexity": "warn",
-    "no-console": [
-      "error"
-    ]
+    "complexity": "warn"
   }
 }

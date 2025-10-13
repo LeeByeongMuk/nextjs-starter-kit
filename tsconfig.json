@@ -23,25 +23,39 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
+      "@app_domain/*": [
+        "./src/app/(domain)/*"
+      ],
+      "@app_api/*": [
+        "./src/app/api/*"
+      ],
+      "@shared/*": [
+        "./src/shared/*"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ],
+      "@domains/*": [
+        "./src/domains/*"
+      ],
+      "@tests/*": [
+        "./src/tests/*"
+      ],
+      "@public/*": [
+        "./public/*"
       ]
     }
   },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    },
-    "require": ["tsconfig-paths/register"]
-  },
   "include": [
     "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
     "build/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ]
 }
