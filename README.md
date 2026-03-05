@@ -10,7 +10,7 @@
 ### 기술스택
 
 - **Turborepo** (모노레포 빌드 시스템)
-- **Next.js** 14
+- **Next.js** 15
 - **React** 18
 - **TypeScript**
 - **Tailwind CSS**

@@ -11,7 +11,7 @@ export const fetchSignIn = async (req: SignInReq) => {
   });
 
   const { access_token } = res.data;
-  cookies().set(TOKEN_KEY, access_token, {
+  (await cookies()).set(TOKEN_KEY, access_token, {
     path: '/',
   });
 

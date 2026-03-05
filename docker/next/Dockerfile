@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 LABEL maintainer="ByeongMuk Lee <mansogod@gmail.com>"
 LABEL version="0.2"
-LABEL description="next js 14 image for app (turborepo)"
+LABEL description="next js 15 image for app (turborepo)"
 LABEL build_date="2025-03-05"
 
 WORKDIR /var/www
