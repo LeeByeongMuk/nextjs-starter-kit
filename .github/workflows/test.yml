@@ -28,10 +28,10 @@ jobs:
 
       - name: .env setting
         run: |
-          touch .env
-          echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
-          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          touch apps/web/.env
+          echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> apps/web/.env
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> apps/web/.env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> apps/web/.env
         env:
           APP_API_URL: ${{ secrets.APP_API_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
@@ -41,15 +41,16 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test -- --coverage
+        run: npm run test
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: apps/web/coverage/
 
       - name: Annotate PR with coverage
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: apps/web

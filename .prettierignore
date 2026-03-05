@@ -1,5 +1,6 @@
 .next
 .build
+.turbo
 build
 next-env.d.ts
 yarn.lock

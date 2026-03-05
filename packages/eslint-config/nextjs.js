@@ -1,0 +1,41 @@
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  extends: [
+    'next/core-web-vitals',
+    'next/typescript',
+    'plugin:tailwindcss/recommended',
+    'plugin:@tanstack/eslint-plugin-query/recommended',
+    'plugin:prettier/recommended',
+  ],
+  rules: {
+    'no-alert': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
+    ],
+    '@typescript-eslint/no-explicit-any': ['warn'],
+    'import/order': [
+      'warn',
+      {
+        groups: [
+          ['builtin', 'external'],
+          'internal',
+          'parent',
+          ['sibling', 'index'],
+          'object',
+        ],
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
+      },
+    ],
+    complexity: 'warn',
+  },
+};

@@ -2,67 +2,30 @@
   "name": "next-starter-kit",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "prettier": "prettier --check ./src",
-    "prettier:fix": "prettier --write ./src",
-    "test": "jest",
-    "tsc": "tsc",
-    "mock": "npx tsx watch ./src/lib/mocks/server.ts"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "test": "turbo run test",
+    "tsc": "turbo run tsc",
+    "prettier": "prettier --check \"apps/*/src/**\" \"packages/*/src/**\"",
+    "prettier:fix": "prettier --write \"apps/*/src/**\" \"packages/*/src/**\"",
+    "format": "prettier --write \"apps/*/src/**\" \"packages/*/src/**\""
   },
   "overrides": {
     "@toast-ui/react-editor": {
       "react": "^18"
     }
   },
-  "dependencies": {
-    "@tanstack/react-query": "^5.66.0",
-    "@toast-ui/editor": "^3.2.2",
-    "@toast-ui/react-editor": "^3.2.3",
-    "classnames": "^2.5.1",
-    "next": "14.2.23",
-    "next-auth": "^4.24.11",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-hook-form": "^7.54.2"
-  },
   "devDependencies": {
-    "@mswjs/http-middleware": "^0.10.3",
-    "@tailwindcss/forms": "^0.5.10",
-    "@tanstack/eslint-plugin-query": "^5.66.0",
-    "@tanstack/react-query-devtools": "^5.66.0",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "cors": "^2.8.5",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.23",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.3",
-    "eslint-plugin-tailwindcss": "^3.18.0",
-    "express": "^4.21.2",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "jest-fixed-jsdom": "^0.0.9",
-    "msw": "^2.7.0",
-    "postcss": "^8.5.1",
     "prettier": "^3.4.2",
-    "tailwindcss": "^3.4.17",
-    "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "turbo": "^2.4.4"
   },
-  "msw": {
-    "workerDirectory": "public"
-  }
+  "packageManager": "npm@10.2.4"
 }

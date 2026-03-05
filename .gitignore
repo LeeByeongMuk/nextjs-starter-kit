@@ -11,19 +11,19 @@
 *.sublime-workspace
 
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.js
 
 # testing
-/coverage
+coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
-/build
+build
 
 # misc
 .DS_Store
@@ -45,3 +45,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# turbo
+.turbo

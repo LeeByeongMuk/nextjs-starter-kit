@@ -1,5 +1,6 @@
 .next
 .build
+.turbo
 build
 next-env.d.ts
 yarn.lock
@@ -13,4 +14,4 @@ Dockerfile
 .yarn
 .pnp.*
 jest.setup.ts
-jest.polyfills.js
+jest.polyfills.ts

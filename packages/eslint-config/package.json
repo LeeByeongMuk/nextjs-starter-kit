@@ -1,0 +1,17 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "base.js",
+    "nextjs.js"
+  ],
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.23",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-tailwindcss": "^3.18.0",
+    "@tanstack/eslint-plugin-query": "^5.66.0"
+  }
+}

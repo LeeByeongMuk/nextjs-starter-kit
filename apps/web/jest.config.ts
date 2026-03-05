@@ -13,6 +13,7 @@ const config: Config = {
   preset: 'ts-jest',
   rootDir: './',
   testEnvironment: 'jest-fixed-jsdom',
+  setupFiles: ['<rootDir>/jest.polyfills.ts'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testEnvironmentOptions: {
     customExportConditions: [''],
@@ -30,4 +31,15 @@ const config: Config = {
   coverageDirectory: 'coverage',
 };
 
-export default createJestConfig(config);
+const jestConfig = async () => {
+  const nextJestConfig = await createJestConfig(config)();
+  return {
+    ...nextJestConfig,
+    transformIgnorePatterns: [
+      '/node_modules/(?!(until-async|msw|@mswjs)/)',
+      '^.+\\.module\\.(css|sass|scss)$',
+    ],
+  };
+};
+
+export default jestConfig;

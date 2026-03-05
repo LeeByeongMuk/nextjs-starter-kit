@@ -1,12 +1,12 @@
 FROM node:20-alpine
 
 LABEL maintainer="ByeongMuk Lee <mansogod@gmail.com>"
-LABEL version="0.1"
-LABEL description="mock api image for app"
-LABEL build_date="2025-01-14"
+LABEL version="0.2"
+LABEL description="mock api image for app (turborepo)"
+LABEL build_date="2025-03-05"
 
 WORKDIR /var/www
 COPY . .
 RUN npm install
 
-CMD ["npm", "run", "mock"]
+CMD ["npm", "run", "mock", "--workspace=@repo/web"]
