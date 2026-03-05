@@ -1,12 +1,13 @@
-## 확인 사항
+<!--
+## PR Title Format
+Please ensure your PR title follows the Conventional Commits format:
+<type>(<scope>): <description>
 
-- 이슈에 대한 설명이 필요한 경우 첨부
+Types: feat, fix, docs, refactor, test, chore, perf, ci, build, style, revert
+Example scopes (recommendations only; any lowercase scope is accepted by CI): user, product, order, payment, auth, api, database, middleware, service, controller, model, docker, deps, config, github
 
-## 작업 내용
-
-- [ ] 작업 내용 1
-
-
-## 주의 사항
-
-- 주의 사항 
+Examples:
+- feat(user): add social login support
+- fix(payment): resolve duplicate transaction issue
+- refactor(user): extract service layer from controllers
+-->
