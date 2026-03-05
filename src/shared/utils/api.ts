@@ -8,7 +8,7 @@ export const fetchApi = async <Response>(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const hasAccessToken = cookieStore.has(TOKEN_KEY);
   const requestUrl = url.startsWith('http')
     ? url
