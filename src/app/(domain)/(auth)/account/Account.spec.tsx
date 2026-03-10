@@ -35,7 +35,7 @@ describe('마이페이지 페이지 테스트', () => {
   beforeEach(() => {
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
-      get: jest.fn().mockReturnValue,
+      get: jest.fn().mockReturnValue({ value: 'test-token' }),
     });
 
     useSessionMock.mockReturnValue({
