@@ -39,7 +39,7 @@ describe('게시글 생성 테스트', () => {
   const mockPush = jest.fn();
 
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
     });

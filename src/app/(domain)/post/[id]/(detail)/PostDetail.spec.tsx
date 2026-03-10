@@ -28,7 +28,7 @@ describe('게시글 상세 페이지 테스트', () => {
   const mockBack = jest.fn();
 
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
     });

@@ -31,7 +31,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('회원가입 테스트', () => {
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
     });

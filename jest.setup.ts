@@ -2,6 +2,8 @@ import '@testing-library/jest-dom';
 import { server } from '@lib/mocks/testServer';
 import { QueryCache } from '@tanstack/react-query';
 
+process.env.APP_API_URL = 'http://localhost:9090';
+
 const queryCache = new QueryCache();
 
 global.alert = jest.fn();

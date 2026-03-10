@@ -33,7 +33,7 @@ describe('마이페이지 페이지 테스트', () => {
   const useSessionMock = useSession as jest.Mock;
 
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue,
     });
