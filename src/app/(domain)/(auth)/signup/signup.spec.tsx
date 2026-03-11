@@ -31,9 +31,9 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('회원가입 테스트', () => {
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
-      get: jest.fn().mockReturnValue,
+      get: jest.fn().mockReturnValue({ value: 'test-token' }),
     });
 
     // given - 회원가입 페이지가 그려짐

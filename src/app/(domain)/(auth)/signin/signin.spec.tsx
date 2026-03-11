@@ -28,9 +28,9 @@ describe('로그인 테스트', () => {
   const mockPush = jest.fn();
 
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
-      get: jest.fn().mockReturnValue,
+      get: jest.fn().mockReturnValue({ value: 'test-token' }),
     });
 
     (useRouter as jest.Mock).mockReturnValue({

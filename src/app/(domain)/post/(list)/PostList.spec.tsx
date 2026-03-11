@@ -40,9 +40,9 @@ describe('게시글 리스트 페이지 테스트', () => {
   } as PostsReq;
 
   beforeEach(() => {
-    (cookies as jest.Mock).mockReturnValue({
+    (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
-      get: jest.fn().mockReturnValue,
+      get: jest.fn().mockReturnValue({ value: 'test-token' }),
     });
     (useRouter as jest.Mock).mockReturnValue({
       push: jest.fn(),

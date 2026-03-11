@@ -1,3 +1,5 @@
+process.env.APP_API_URL = 'http://localhost:9090';
+
 import type { Config } from 'jest';
 import nextJest from 'next/jest.js';
 
