@@ -525,11 +525,11 @@ npm run dev
 
 ## 마이그레이션 체크리스트
 
-### Phase 1: Quick Wins
-- [ ] `eslint-config-prettier` 10.x 업데이트
-- [ ] `express` 5.x 업데이트
-- [ ] `@types/node` 25 업데이트
-- [ ] mock 서버 기동 확인
+### Phase 1: Quick Wins ✅
+- [x] `eslint-config-prettier` 10.x 업데이트
+- [x] `express` 5.x 업데이트
+- [x] `@types/node` 25 업데이트
+- [x] lint, build, test 통과 확인
 
 ### Phase 2: Tailwind CSS
 - [ ] `tailwindcss` 4.x 업데이트
