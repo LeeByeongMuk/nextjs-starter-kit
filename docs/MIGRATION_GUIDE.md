@@ -531,12 +531,12 @@ npm run dev
 - [x] `@types/node` 25 업데이트
 - [x] lint, build, test 통과 확인
 
-### Phase 2: Tailwind CSS
-- [ ] `tailwindcss` 4.x 업데이트
-- [ ] `globals.css` 디렉티브 변경
-- [ ] `postcss.config.js` 업데이트
-- [ ] `tailwind.config.js` 제거
-- [ ] 빌드 및 스타일 검증
+### Phase 2: Tailwind CSS ✅
+- [x] `tailwindcss` 4.x 업데이트
+- [x] `globals.css` 디렉티브 변경
+- [x] `postcss.config.js` 업데이트
+- [x] `tailwind.config.js` 제거
+- [x] 빌드 및 스타일 검증
 
 ### Phase 3: React 19 + Next.js 16
 - [ ] `react`, `react-dom` 19 업데이트
