@@ -538,14 +538,14 @@ npm run dev
 - [x] `tailwind.config.js` 제거
 - [x] 빌드 및 스타일 검증
 
-### Phase 3: React 19 + Next.js 16
-- [ ] `react`, `react-dom` 19 업데이트
-- [ ] `next` 16.x 업데이트
-- [ ] `@types/react`, `@types/react-dom` 19 업데이트
-- [ ] `eslint-config-next` 16.x 업데이트
-- [ ] `overrides` 수정 (toast-ui)
+### Phase 3: React 19 + Next.js 16 ✅
+- [x] `react`, `react-dom` 19 업데이트
+- [x] `next` 16.x 업데이트
+- [x] `@types/react`, `@types/react-dom` 19 업데이트
+- [x] `eslint-config-next` 15.x backport 유지 (eslint 8 호환)
+- [x] `overrides` 수정 (toast-ui)
 - [ ] Toast UI Editor 수동 테스트
-- [ ] 전체 빌드 및 테스트
+- [x] 전체 빌드 및 테스트
 
 ### Phase 4: ESLint 10
 - [ ] `eslint` 10.x 업데이트
