@@ -30,7 +30,7 @@ export default function ListFilter({ setSearchFilters }: Props) {
             {status === 'authenticated' && (
               <Link
                 href="/post/create"
-                className="mr-2 flex items-center rounded border border-teal-600 bg-teal-600 px-4 text-sm font-medium text-white hover:bg-transparent hover:text-teal-600 focus:outline-none focus:ring active:text-teal-500"
+                className="mr-2 flex items-center rounded border border-teal-600 bg-teal-600 px-4 text-sm font-medium text-white hover:bg-transparent hover:text-teal-600 focus:ring focus:outline-none active:text-teal-500"
                 passHref={false}
               >
                 Post Create
