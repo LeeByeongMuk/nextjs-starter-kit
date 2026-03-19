@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "prettier": "prettier --check ./src",
     "prettier:fix": "prettier --write ./src",
     "test": "jest",
@@ -16,7 +16,7 @@
   },
   "overrides": {
     "@toast-ui/react-editor": {
-      "react": "^18"
+      "react": "^19"
     }
   },
   "dependencies": {
@@ -24,10 +24,10 @@
     "@toast-ui/editor": "^3.2.2",
     "@toast-ui/react-editor": "^3.2.3",
     "classnames": "^2.5.1",
-    "next": "15.5.10",
+    "next": "^16.1.7",
     "next-auth": "^4.24.13",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.2"
   },
   "devDependencies": {
@@ -43,11 +43,11 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^29.5.14",
     "@types/node": "^25.5.0",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "cors": "^2.8.6",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^15.5.10",
+    "eslint-config-next": "^15.5.13",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-tailwindcss": "^4.0.0-beta.0",
