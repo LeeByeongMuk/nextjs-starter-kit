@@ -1,9 +1,8 @@
-import React from 'react';
-
 import PostListEmptyUI from '@domains/post/list/_components/PostListEmptyUI';
 import ListItem from '@domains/post/list/_components/PostListItem';
 import PostListSkeletonUI from '@domains/post/list/_components/PostListSkeletonUI';
 import { PostListData } from '@domains/post/list/_types/api';
+import React from 'react';
 
 interface Props {
   posts: PostListData[];

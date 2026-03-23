@@ -1,10 +1,9 @@
 'use client';
 
-import { useRouter, useParams } from 'next/navigation';
-import { useCallback } from 'react';
-
 import usePost from '@domains/post/detail/_hooks/usePost';
 import useDeletePost from '@domains/post/update/_hooks/useDeletePost';
+import { useRouter, useParams } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function usePostDetail() {
   const router = useRouter();

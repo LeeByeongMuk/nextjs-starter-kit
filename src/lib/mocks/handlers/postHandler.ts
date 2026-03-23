@@ -1,7 +1,6 @@
-import { http, HttpResponse } from 'msw';
-
 import postData from '@lib/mocks/data/post.json';
 import { getHandlerURI } from '@shared/utils/url';
+import { http, HttpResponse } from 'msw';
 
 export const postHandler = [
   http.get(getHandlerURI('/api/posts'), () => {

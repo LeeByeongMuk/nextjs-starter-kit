@@ -1,8 +1,7 @@
+import ValidationError from '@shared/components/Error/ValidationError';
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-
-import ValidationError from '@shared/components/Error/ValidationError';
 
 const Editor = dynamic(() => import('../Editor'), {
   ssr: false,

@@ -1,8 +1,7 @@
-import type { Metadata } from 'next';
-import React, { Suspense } from 'react';
-
 import Layout from '@shared/components/Layout';
 import Provider from '@shared/components/Provider';
+import type { Metadata } from 'next';
+import React, { Suspense } from 'react';
 
 import '@styles/globals.css';
 

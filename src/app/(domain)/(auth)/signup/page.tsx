@@ -1,14 +1,13 @@
 'use client';
 
-import React from 'react';
-import { FormProvider } from 'react-hook-form';
-
 import AuthHeader from '@domains/auth/_components/AuthHeader';
 import SignUpForm from '@domains/auth/signup/_components/SignUpForm';
 import useSignup from '@domains/auth/signup/_hooks/useSignup';
 import { useSignupForm } from '@domains/auth/signup/_hooks/useSignupForm';
 import { SignUpReq } from '@domains/auth/signup/_types/api';
 import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
+import React from 'react';
+import { FormProvider } from 'react-hook-form';
 
 export default function Signup() {
   const methods = useSignupForm();

@@ -1,12 +1,11 @@
-import { useSession } from 'next-auth/react';
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
-
 import ButtonBox from '@domains/auth/_components/AuthForm/ButtonBox';
 import EmailInput from '@domains/auth/_components/AuthForm/EmailInput';
 import NameInput from '@domains/auth/_components/AuthForm/NameInput';
 import NickNameInput from '@domains/auth/_components/AuthForm/NickNameInput';
 import { UpdateAccountReq } from '@domains/auth/account/_types/api';
+import { useSession } from 'next-auth/react';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 interface AccountFormProps {
   handleUpdateAccount: (req: UpdateAccountReq) => void;

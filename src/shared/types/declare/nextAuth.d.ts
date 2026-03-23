@@ -1,6 +1,5 @@
-import { DefaultSession } from 'next-auth';
-
 import { UserData } from '@domains/auth/_types/api';
+import { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
   interface Session {

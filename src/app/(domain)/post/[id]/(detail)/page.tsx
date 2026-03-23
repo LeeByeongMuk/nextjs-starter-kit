@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
-
 import Detail from '@domains/post/detail/_components/PostDetail';
 import PostDetailActions from '@domains/post/detail/_components/PostDetailActions';
 import usePostDetail from '@domains/post/detail/_hooks/usePostDetail';
+import React from 'react';
 
 export default function PostDetail() {
   const {

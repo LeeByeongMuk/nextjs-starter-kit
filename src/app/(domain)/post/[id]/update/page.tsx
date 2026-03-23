@@ -1,12 +1,11 @@
 'use client';
 
-import React from 'react';
-import { FormProvider } from 'react-hook-form';
-
 import UpdatePostForm from '@domains/post/update/_components/UpdatePostForm';
 import { useUpdatePostManager } from '@domains/post/update/_hooks/usePostUpdateManager';
 import Spinner from '@shared/components/Spinner';
 import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
+import React from 'react';
+import { FormProvider } from 'react-hook-form';
 
 export default function UpdatePost() {
   const {

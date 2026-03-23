@@ -1,9 +1,8 @@
 'use client';
 
+import { PostsReq } from '@domains/post/list/_types/api';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-
-import { PostsReq } from '@domains/post/list/_types/api';
 
 interface Props {
   searchFilters: PostsReq;
