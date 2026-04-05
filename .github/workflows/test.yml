@@ -30,12 +30,12 @@ jobs:
         run: |
           touch .env
           echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
-          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "AUTH_URL=${{ secrets.AUTH_URL }}" >> .env
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
         env:
           APP_API_URL: ${{ secrets.APP_API_URL }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          AUTH_URL: ${{ secrets.AUTH_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
       - name: Install dependencies
         run: npm ci

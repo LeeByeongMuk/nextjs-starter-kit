@@ -11,6 +11,7 @@ const config: Config = {
   coverageProvider: 'v8',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^next-auth/react$': '<rootDir>/src/tests/mocks/nextAuthReact.tsx',
   },
   preset: 'ts-jest',
   rootDir: './',
@@ -19,6 +20,7 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: [''],
   },
+  transformIgnorePatterns: ['/node_modules/(?!(next-auth|@auth/core)/)'],
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
   coverageThreshold: {
