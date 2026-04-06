@@ -547,26 +547,26 @@ npm run dev
 - [ ] Toast UI Editor 수동 테스트
 - [x] 전체 빌드 및 테스트
 
-### Phase 4: ESLint 10
-- [ ] `eslint` 10.x 업데이트
-- [ ] `eslint.config.mjs` 생성 (flat config)
-- [ ] `.eslintrc.json` 삭제
-- [ ] lint 통과 확인
+### Phase 4: ESLint 9 (flat config) ✅
+- [x] `eslint` 9.x 업데이트
+- [x] `eslint.config.mjs` 생성 (flat config)
+- [x] `.eslintrc.json` 삭제
+- [x] lint 통과 확인
 
-### Phase 5: Jest 30
-- [ ] `jest-fixed-jsdom` 호환성 확인
-- [ ] `jest`, `ts-jest`, `@types/jest` 30.x 업데이트
-- [ ] `jest.config.ts` 수정 (필요 시)
-- [ ] 전체 테스트 통과 확인
+### Phase 5: Jest 30 ✅
+- [x] `jest-fixed-jsdom` 호환성 확인
+- [x] `jest`, `ts-jest`, `@types/jest` 30.x 업데이트
+- [x] `jest.config.ts` 수정 (필요 시)
+- [x] 전체 테스트 통과 확인
 
-### Phase 6: next-auth 5
-- [ ] `src/auth.ts` 생성
-- [ ] API route 변경
-- [ ] `middleware.ts` 변경
-- [ ] 환경변수 마이그레이션 (`NEXTAUTH_*` → `AUTH_*`)
-- [ ] `next.config.js` 환경변수 업데이트
-- [ ] 타입 선언 확인
-- [ ] 인증 전체 플로우 테스트
+### Phase 6: next-auth 5 ✅
+- [x] `src/auth.ts` 생성
+- [x] API route 변경
+- [x] `middleware.ts` 변경
+- [x] 환경변수 마이그레이션 (`NEXTAUTH_*` → `AUTH_*`)
+- [x] `next.config.js` 환경변수 업데이트
+- [x] 타입 선언 확인
+- [x] 인증 전체 플로우 테스트
 
 ---
 
