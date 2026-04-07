@@ -20,7 +20,6 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: [''],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(next-auth|@auth/core)/)'],
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
   coverageThreshold: {
@@ -34,4 +33,21 @@ const config: Config = {
   coverageDirectory: 'coverage',
 };
 
-export default createJestConfig(config);
+// Packages that ship ESM and need Jest transformation
+const extraTransformPkgs = ['rettime', 'until-async', 'next-auth', '@auth'];
+
+const nextConfig = createJestConfig(config);
+
+export default async () => {
+  const resolved = await nextConfig();
+  if (resolved.transformIgnorePatterns) {
+    const pkgList = extraTransformPkgs.join('|');
+    resolved.transformIgnorePatterns = resolved.transformIgnorePatterns.map(
+      (pattern: string) => {
+        if (!pattern.includes('node_modules')) return pattern;
+        return pattern.replaceAll('(geist|', `(${pkgList}|geist|`);
+      }
+    );
+  }
+  return resolved;
+};
