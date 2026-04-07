@@ -1,11 +1,10 @@
 'use client';
 
+import { fetchPost } from '@domains/post/detail/_services/postDetailServices';
+import { PostRes } from '@domains/post/detail/_types/api';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-
-import { fetchPost } from '@domains/post/detail/_services/postDetailServices';
-import { PostRes } from '@domains/post/detail/_types/api';
 
 export default function usePost() {
   const router = useRouter();

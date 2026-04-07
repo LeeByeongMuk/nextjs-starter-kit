@@ -1,9 +1,8 @@
 'use client';
 
+import { fetchDeletePost } from '@domains/post/update/_services/postDeleteServices';
 import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-
-import { fetchDeletePost } from '@domains/post/update/_services/postDeleteServices';
 
 export default function useDeletePost() {
   const router = useRouter();

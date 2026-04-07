@@ -1,11 +1,10 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
-
 import useUpdatePost from '@domains/post/update/_hooks/useUpdatePost';
 import useUpdatePostForm from '@domains/post/update/_hooks/useUpdatePostForm';
 import useUpdatePostResource from '@domains/post/update/_hooks/useUpdatePostResource';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 import { UpdatePostFormInput } from '../_types/form';
 

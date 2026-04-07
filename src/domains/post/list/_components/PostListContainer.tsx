@@ -1,9 +1,8 @@
-import React from 'react';
-
 import PostListEmptyUI from '@domains/post/list/_components/PostListEmptyUI';
 import ListItem from '@domains/post/list/_components/PostListItem';
 import PostListSkeletonUI from '@domains/post/list/_components/PostListSkeletonUI';
 import { PostListData } from '@domains/post/list/_types/api';
+import React from 'react';
 
 interface Props {
   posts: PostListData[];
@@ -30,19 +29,19 @@ export default function PostList({ posts, isLoading }: Props) {
       <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
         <thead className="ltr:text-left">
           <tr>
-            <th className="w-10/12 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th className="w-10/12 px-4 py-2 font-medium whitespace-nowrap text-gray-900">
               Title
             </th>
 
-            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th className="px-4 py-2 font-medium whitespace-nowrap text-gray-900">
               Type
             </th>
 
-            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th className="px-4 py-2 font-medium whitespace-nowrap text-gray-900">
               Writer
             </th>
 
-            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+            <th className="px-4 py-2 font-medium whitespace-nowrap text-gray-900">
               Time
             </th>
           </tr>

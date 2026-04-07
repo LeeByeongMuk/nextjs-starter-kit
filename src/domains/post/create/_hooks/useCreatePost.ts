@@ -1,10 +1,9 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-
 import { fetchCreatePost } from '@domains/post/create/_services/postCreateServices';
 import { CreatePostReq } from '@domains/post/create/_types/api';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 export default function useCreatePost() {
   const router = useRouter();
