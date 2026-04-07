@@ -14,7 +14,7 @@
 |---|---|---|---|---|
 | react / react-dom | 18 | 19 | 낮음 | 낮음 |
 | next | 15.5.10 | 16.x | 낮음 | 낮음 |
-| eslint | 8.57.1 | 10.x | 중간 | 낮음 |
+| eslint | 8.57.1 | 9.x (flat config) | 중간 | 낮음 |
 | eslint-config-next | 15.5.10 | 16.x | 낮음 | 낮음 |
 | eslint-config-prettier | 9.1.2 | 10.x | 낮음 | 매우 낮음 |
 | tailwindcss | 3.4.19 | 4.x | 낮음 | 매우 낮음 |
@@ -220,7 +220,7 @@ npm test               # 테스트 통과 확인
 
 ---
 
-## Phase 4: ESLint 10 Flat Config 전환 (예상 소요: 반나절)
+## Phase 4: ESLint 9 Flat Config 전환 (예상 소요: 반나절)
 
 ### 분석 결과
 
@@ -228,7 +228,7 @@ npm test               # 테스트 통과 확인
 - `eslint-config-next` ≥ 15.x
 - `eslint-config-prettier` ≥ 9.x
 - `eslint-plugin-prettier` ≥ 5.x
-- `eslint-plugin-tailwindcss` ≥ 3.x
+- `eslint-plugin-tailwindcss` ≥ 3.x (4.0.0-beta.0 사용)
 - `@tanstack/eslint-plugin-query` ≥ 5.x
 
 ### 마이그레이션 절차
@@ -236,7 +236,7 @@ npm test               # 테스트 통과 확인
 **1) 패키지 업데이트:**
 
 ```bash
-npm install eslint@^10 --save-dev
+npm install eslint@^9 --save-dev
 npm install eslint-plugin-tailwindcss@latest --save-dev
 npm install eslint-plugin-prettier@latest --save-dev
 npm install @tanstack/eslint-plugin-query@latest --save-dev
@@ -244,23 +244,37 @@ npm install @tanstack/eslint-plugin-query@latest --save-dev
 
 **2) `.eslintrc.json` → `eslint.config.mjs` 전환:**
 
+`eslint-config-next`와 `@tanstack/eslint-plugin-query`가 native flat config를 지원하므로 `FlatCompat` 없이 직접 사용합니다.
+
 ```js
 // eslint.config.mjs
-import { FlatCompat } from '@eslint/eslintrc';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const compat = new FlatCompat({ baseDirectory: __dirname });
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import tanstackQuery from '@tanstack/eslint-plugin-query';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default [
-  ...compat.extends(
-    'next/core-web-vitals',
-    'next/typescript',
-    'plugin:tailwindcss/recommended',
-    'plugin:@tanstack/eslint-plugin-query/recommended',
-    'plugin:prettier/recommended'
-  ),
+  {
+    ignores: [
+      '.next/**',
+      '.build/**',
+      'build/**',
+      'next-env.d.ts',
+      'yarn.lock',
+      'public/**',
+      'next.config.js',
+      'README.md',
+      'Dockerfile',
+      '.nvmrc',
+      '.vscode/**',
+      '.idea/**',
+      '.yarn/**',
+      '.pnp.*',
+      'jest.setup.ts',
+      'jest.polyfills.js',
+    ],
+  },
+  ...nextVitals,
+  ...tanstackQuery.configs['flat/recommended'],
   {
     rules: {
       'no-alert': 'off',
@@ -285,6 +299,7 @@ export default [
       complexity: 'warn',
     },
   },
+  eslintPluginPrettierRecommended,
 ];
 ```
 
@@ -292,11 +307,12 @@ export default [
 
 ```bash
 rm .eslintrc.json
+rm .eslintignore
 ```
 
 **4) `.eslintignore` 처리:**
 
-ESLint 10에서는 `.eslintignore` 대신 config 파일 내 `ignores` 속성을 사용합니다. `.eslintignore`가 있다면 마이그레이션 필요.
+ESLint 9 flat config에서는 `.eslintignore` 대신 config 파일 내 `ignores` 속성을 사용합니다. 위 설정의 첫 번째 객체에 포함되어 있습니다.
 
 **검증:**
 
@@ -547,17 +563,19 @@ npm run dev
 - [ ] Toast UI Editor 수동 테스트
 - [x] 전체 빌드 및 테스트
 
-### Phase 4: ESLint 9 (flat config) ✅
+### Phase 4: ESLint 9 Flat Config ✅
 - [x] `eslint` 9.x 업데이트
-- [x] `eslint.config.mjs` 생성 (flat config)
+- [x] `eslint.config.mjs` 생성 (native flat config, `FlatCompat` 미사용)
 - [x] `.eslintrc.json` 삭제
+- [x] `.eslintignore` 삭제 (flat config `ignores`로 이관)
 - [x] lint 통과 확인
 
 ### Phase 5: Jest 30 ✅
 - [x] `jest-fixed-jsdom` 호환성 확인
-- [x] `jest`, `ts-jest`, `@types/jest` 30.x 업데이트
-- [x] `jest.config.ts` 수정 (필요 시)
-- [x] 전체 테스트 통과 확인
+- [x] `jest`, `jest-environment-jsdom`, `@types/jest` 30.x 업데이트
+- [x] `jest.config.ts` 수정 (`transformIgnorePatterns`, `moduleNameMapper` 추가)
+- [x] `next-auth/react` 테스트 mock 추가 (`src/tests/mocks/nextAuthReact.tsx`)
+- [x] 전체 테스트 통과 확인 (7 suites, 44 tests)
 
 ### Phase 6: next-auth 5 ✅
 - [x] `src/auth.ts` 생성
