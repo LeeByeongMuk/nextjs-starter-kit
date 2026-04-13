@@ -21,7 +21,7 @@ Feature-Sliced Design은 프런트엔드 코드를 **계층(layer) → 슬라이
 
 | 레이어 | 디렉터리 | 책임 | 비고 |
 |---|---|---|---|
-| `app` | `src/app/` | Next.js App Router (라우팅, 메타데이터, route handler) | **얇게** 유지. 실제 합성은 `views`로 위임 |
+| `app` | `src/app/`, `src/middleware.ts` | Next.js 라우팅·생명주기 아티팩트(`page`/`layout`/`loading`/`error`/`route`/`middleware` 등) | **얇게** 유지. 실제 합성은 `views`/`widgets`로 위임. 위치는 Next.js가 강제하므로 옮기지 않는다 |
 | `views` | `src/views/` | 화면 단위 합성 (FSD 표준의 `pages`) | App Router `page.tsx`가 import |
 | `widgets` | `src/widgets/` | 여러 features/entities를 묶는 독립 UI 블록 | 단일 features만 사용한다면 widget 불필요 |
 | `features` | `src/features/` | 사용자 인터랙션 단위 (signin form, post-create flow) | 슬라이스명: `<도메인>-<액션>` (e.g. `auth-signin`) |
@@ -113,23 +113,31 @@ ESLint `boundaries/entry-point` + `boundaries/no-private`가 강제한다.
   import { PostListView } from '@views/post-list';
   export default PostListView;
   ```
-- 메타데이터(`export const metadata`, `generateMetadata`)는 `page.tsx`에 둔다(Next.js 요구사항).
+- 메타데이터(`export const metadata`, `generateMetadata`)는 `page.tsx` 또는 `layout.tsx`에 둔다(Next.js가 이 두 파일에서만 인식).
+- `layout.tsx`도 `page.tsx`와 동일 원칙: 얇게 유지, 합성 로직이 자라면 view 또는 widget으로 추출하고 import만 한다.
 - 클라이언트/서버 컴포넌트 분기(`'use client'`)는 view 또는 widget에서 결정.
-- `middleware.ts`, `app/api/**/route.ts`는 FSD 레이어 적용 외 — 그대로 유지.
+- `src/middleware.ts`는 Next.js가 위치를 `src/` 루트로 강제하므로 옮기지 않는다(`src/app/` 안에 두지 못함). app 레이어 멤버이며, 다른 routing 파일과 동일하게 얇게 유지한다.
+- `src/app/api/**/route.ts`는 라우트 핸들러로서 app 레이어 멤버. 비즈니스 로직은 features/entities/shared로 위임한다.
 - Route Group(`(domain)`, `(auth)` 등) 네이밍은 라우팅 표현이며 FSD 슬라이스와 1:1 매핑하지 않는다.
+
+### NextAuth 설정 위치
+
+NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 따라서 본 프로젝트는 **FSD 원칙에 따라 `src/shared/api/auth/`로 이동하기로 결정**한다(현재 위치는 `src/auth.ts` — Phase C에서 이동). 이후 middleware/route handler는 alias(`@shared/api/auth`)로 import.
 
 ---
 
 ## 7. 결정 가이드 — "이 코드는 어디에 둬야 하나"
 
-1. **도메인과 무관한가?** (버튼, 스피너, 날짜 유틸 등) → `shared`
-2. **특정 도메인의 모델/공용 UI인가?** (Post 타입, AuthHeader) → `entities`
-3. **사용자 인터랙션/플로우인가?** (폼 제출, 리스트 필터링) → `features`
-4. **여러 features/entities를 한 화면 블록으로 묶어야 하나?** → `widgets`
-5. **하나의 라우트 화면 전체 합성인가?** → `views`
-6. **Next.js 라우팅·메타데이터 필요?** → `app` (얇게)
+위에서부터 순서대로 답하고, 처음 매칭되는 곳에서 멈춘다.
 
-같은 코드가 여러 features에서 쓰이면 하단 레이어로 끌어내려 공유한다 (entities 또는 shared).
+1. **도메인과 무관한가?** (버튼, 스피너, 날짜 유틸, 환경 설정 등) → `shared/<segment>/`
+2. **특정 도메인의 모델/공용 UI인가?** (Post 타입, AuthHeader, Pagination) → `entities/<entity>/<segment>/`
+3. **사용자 인터랙션/플로우인가?** (폼 제출, 리스트 필터링, 뮤테이션) → `features/<도메인>-<액션>/<segment>/`
+4. **여러 features/entities를 묶는 독립 UI 블록인가?** → `widgets/<widget-name>/<segment>/`
+5. **하나의 라우트 화면 전체 합성인가?** → `views/<route-name>/`
+6. **Next.js 라우팅·생명주기 아티팩트인가?** (`page`/`layout`/`loading`/`error`/`route` under `src/app/**`, `src/middleware.ts`) → `app` 레이어. 위치는 Next.js가 강제하므로 옮기지 않고, 합성은 `views`/`widgets`에서 import만 한다
+
+같은 코드가 여러 features에서 쓰이면 하단 레이어로 끌어내려 공유한다(entities 또는 shared).
 
 ---
 
@@ -162,7 +170,10 @@ ESLint `boundaries/entry-point` + `boundaries/no-private`가 강제한다.
 | `src/lib/tanstackQuery/*` | `src/shared/api/tanstack-query/*` |
 | `src/lib/mocks/*` | `src/shared/api/mocks/*` |
 | `src/tests/mocks/*` | `src/shared/lib/testing/*` |
+| `src/auth.ts` | `src/shared/api/auth/index.ts` |
 | `src/app/(domain)/.../page.tsx` 합성 로직 | `src/views/<route>/` (page.tsx는 view import만) |
+| `src/app/(domain)/.../layout.tsx` 합성 로직 | `src/views/<route>/` 또는 `src/widgets/<name>/` (layout.tsx는 import만) |
+| `src/middleware.ts` | (이동 없음) — Next.js 강제. 내부 로직은 entities/shared로 추출 후 import |
 
 widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/post-list-container/` (Phase C-5에서 결정).
 
@@ -172,10 +183,10 @@ widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/pos
 
 `eslint-plugin-boundaries`로 다음을 차단한다:
 
-- 레이어 방향 위반 (`shared`가 `features` import 등)
-- 동일 레이어 슬라이스 간 직접 import (`features/post-list`가 `features/post-detail` import)
-- 슬라이스 내부 경로 deep import (`@features/auth-signin/ui/SignInForm`)
-- 정의되지 않은 디렉터리에 코드 추가
+- 레이어 방향 위반 (`shared`가 `features` import 등) — `boundaries/element-types`
+- 동일 레이어 슬라이스 간 직접 import (`features/post-list`가 `features/post-detail` import) — `boundaries/element-types` + `boundaries/no-private`
+- 슬라이스 내부 경로 deep import (`@features/auth-signin/ui/SignInForm`) — `boundaries/entry-point`
+- 어느 레이어에도 속하지 않는 디렉터리 추가 — `boundaries/no-unknown-files`
 
 마이그레이션 진행 중에는 `severity: 'warn'`, Phase C 완료 시 `'error'`로 승격한다.
 

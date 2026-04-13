@@ -1,70 +1,39 @@
-# FSD enforcement checklist
+---
+paths:
+  - "src/**/*"
+  - "eslint.config.mjs"
+  - "tsconfig.json"
+---
 
-Use this as a pre-flight check whenever you (Claude) add, move, or rename code in this repo. Full spec: `docs/FSD_GUIDE.md`.
+# FSD pre-flight checklist
 
-## Before creating a new file
+**Canonical spec: `docs/FSD_GUIDE.md`.** This file is a Claude-only operational checklist; if it disagrees with the spec, the spec wins. Update both together.
 
-Walk this in order, stop at the first match:
+## Decide where new code goes (walk in order, stop at first match)
 
 1. Domain-agnostic primitive (button, spinner, date util, env config) → `src/shared/<segment>/...`
-2. A concept tied to a domain entity but reusable across features (Post type, AuthHeader, Pagination) → `src/entities/<entity>/<segment>/...`
-3. A user-facing flow / interaction (sign-in form, post-create mutation, list filter) → `src/features/<domain>-<action>/<segment>/...`
-4. A composition of multiple features/entities into one UI block (post list with filters + pagination + items) → `src/widgets/<widget-name>/<segment>/...`
-5. The full screen for a single route → `src/views/<route-name>/`
-6. Next.js routing artifact (`page.tsx`, `layout.tsx`, `loading.tsx`, `route.ts`, `middleware.ts`) → `src/app/...` (thin — only imports from `views`)
+2. Domain model or domain-shared UI (Post type, AuthHeader, Pagination) → `src/entities/<entity>/<segment>/...`
+3. User-facing flow (sign-in form, post-create mutation, list filter) → `src/features/<domain>-<action>/<segment>/...`
+4. Composition of multiple features/entities into one UI block → `src/widgets/<widget-name>/<segment>/...`
+5. Full-screen composition for a single route → `src/views/<route-name>/`
+6. Next.js routing/lifecycle artifact (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `route.ts` under `src/app/**`; plus `src/middleware.ts` at src root — Next.js fixes its location) → keep thin, only import from `views` / `widgets`
 
-## Slice naming
+Reasoning and edge cases: `docs/FSD_GUIDE.md` §7.
 
-- kebab-case: `auth-signin`, `post-list`, `post-detail`
-- Features: `<domain>-<action>`. Entities: single noun.
+## Hard rules ESLint will catch (don't fight it — fix the placement)
 
-## Segments inside a slice
+- Reverse-direction imports (`shared` importing from `features`, etc.) — see `docs/FSD_GUIDE.md` §1
+- Sibling-slice imports at the same layer (`features/post-list` → `features/post-detail`) — see §1, §4
+- Deep imports past a slice's `index.ts` (`@features/post-list/ui/X`) — see §4
 
-Use only these folders, skip what you don't need:
+## Workflow rules
 
-```
-ui/      components (.tsx)
-model/   hooks, state, view-model types, form schemas
-api/     server calls + request/response types
-lib/     slice-local helpers (not exported)
-config/  constants, enums
-```
-
-## Public API
-
-Every slice must have an `index.ts` at its root. Re-export only what consumers need:
-
-```ts
-// src/features/auth-signin/index.ts
-export { SignInForm } from './ui/SignInForm';
-export { useSignInForm } from './model/useSignInForm';
-export type { SignInRequest } from './api/types';
-```
-
-When you create a new slice, create `index.ts` in the same edit. Empty `index.ts` is fine and intentional.
-
-## Import rules
-
-- Use aliases only: `@app/* @views/* @widgets/* @features/* @entities/* @shared/* @styles/* @public/*`
-- Never deep-import another slice: `@features/post-list` ✓, `@features/post-list/ui/PostListItem` ✗
-- Never import a sibling at the same layer: a `features/*` slice cannot import another `features/*`. Push shared code down to `entities/` or `shared/` instead.
-- Within a slice, relative imports (`./model/foo`) are fine.
-
-## Layer direction (cheat sheet)
-
-```
-app  →  views  →  widgets  →  features  →  entities  →  shared
-```
-
-Allowed: any layer imports anything to its right.
-Blocked (by `eslint-plugin-boundaries`): any import going leftward.
-
-## Next.js specifics
-
-- `src/app/**/page.tsx` body should be ≤5 lines: import a view, re-export it as default, optionally export `metadata` / `generateMetadata`.
-- `'use client'` directive lives on the view or widget that needs it, not on `page.tsx`.
-- `src/app/api/**/route.ts` and `src/middleware.ts` are exempt from FSD layering — keep them as-is.
+- New slice = create `index.ts` in the same edit (empty is fine, intentional)
+- Use only the `@<layer>/*` aliases from `docs/FSD_GUIDE.md` §5; no relative imports across slices
+- Inside a slice, relative imports (`./model/foo`) are fine
+- App-layer files at Next.js-fixed paths (`src/middleware.ts`, `src/app/**/{page,layout,loading,error,route}.tsx?`) cannot move — but the same FSD rule applies: keep them thin and import composition from `views` / `widgets`
+- `src/auth.ts` (NextAuth config) is **not** Next.js-fixed — it lives at `src/shared/api/auth/` per FSD. Import via `@shared/api/auth`
 
 ## When in doubt
 
-If a placement isn't obvious from rule 1–6, ask the user before creating files. Prefer questioning over guessing — the wrong layer creates churn that ESLint won't catch until later.
+Ask the user before creating files. The wrong layer creates churn that ESLint won't catch until the structure has already shipped.
