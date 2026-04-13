@@ -6,7 +6,6 @@ export { default as NickNameInput } from './ui/AuthForm/NickNameInput';
 export { default as PasswordConfirmInput } from './ui/AuthForm/PasswordConfirmInput';
 export { default as PasswordInput } from './ui/AuthForm/PasswordInput';
 
-export { fetchUser } from './api/userServices';
 export type { UserData, UserRes } from './api/types';
 
 export { TOKEN_KEY } from './config/auth';

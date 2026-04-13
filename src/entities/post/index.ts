@@ -1,10 +1,13 @@
 export { default as Pagination } from './ui/Pagination';
-export { default as Editor } from './ui/Editor';
 export { default as ButtonBox } from './ui/Form/ButtonBox';
-export { default as ContentsEditor } from './ui/Form/ContentsEditor';
 export { default as IsOpenCheckbox } from './ui/Form/IsOpenCheckbox';
 export { default as TitleInput } from './ui/Form/TitleInput';
 export { default as TypeSelect } from './ui/Form/TypeSelect';
+
+// DOM-dependent components (TUI editor) are intentionally excluded from
+// the barrel — import them via the deep path inside `'use client'` files:
+//   import Editor from '@entities/post/ui/Editor';
+//   import ContentsEditor from '@entities/post/ui/Form/ContentsEditor';
 
 export type { PostType } from './model/types';
 
