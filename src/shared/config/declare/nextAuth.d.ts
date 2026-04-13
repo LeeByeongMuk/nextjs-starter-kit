@@ -1,4 +1,4 @@
-import { UserData } from '@domains/auth/_types/api';
+import { UserData } from '@entities/auth/api/types';
 import { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {

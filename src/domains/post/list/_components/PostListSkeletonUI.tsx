@@ -1,4 +1,4 @@
-import { DUMMY_DATA } from '@domains/post/_constants/post';
+import { DUMMY_DATA } from '@entities/post/config/post';
 import React from 'react';
 
 export default function PostListSkeletonUI() {

@@ -1,4 +1,4 @@
-import { PAGE_GROUP_NUMBER } from '@domains/post/_constants/post';
+import { PAGE_GROUP_NUMBER } from '@entities/post/config/post';
 import { PostsReq } from '@domains/post/list/_types/api';
 import { PaginationMeta } from '@shared/api/pagination';
 import classNames from 'classnames';

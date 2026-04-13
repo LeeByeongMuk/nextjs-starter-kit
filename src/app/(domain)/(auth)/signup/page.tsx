@@ -1,6 +1,6 @@
 'use client';
 
-import AuthHeader from '@domains/auth/_components/AuthHeader';
+import AuthHeader from '@entities/auth/ui/AuthHeader';
 import SignUpForm from '@domains/auth/signup/_components/SignUpForm';
 import useSignup from '@domains/auth/signup/_hooks/useSignup';
 import { useSignupForm } from '@domains/auth/signup/_hooks/useSignupForm';

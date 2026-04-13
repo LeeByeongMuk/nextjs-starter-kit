@@ -1,4 +1,4 @@
-import { TYPE_OPTIONS } from '@domains/post/_constants/post';
+import { TYPE_OPTIONS } from '@entities/post/config/post';
 import ValidationError from '@shared/ui/error/ValidationError';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

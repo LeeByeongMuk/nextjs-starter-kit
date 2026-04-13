@@ -1,6 +1,6 @@
 'use client';
 
-import { TOKEN_KEY } from '@domains/auth/_constants/auth';
+import { TOKEN_KEY } from '@entities/auth/config/auth';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 

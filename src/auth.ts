@@ -1,4 +1,4 @@
-import { fetchUser } from '@domains/auth/_services/userServices';
+import { fetchUser } from '@entities/auth/api/userServices';
 import { fetchSignIn } from '@domains/auth/signin/_services/signinService';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';

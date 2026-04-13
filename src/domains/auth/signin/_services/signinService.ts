@@ -1,4 +1,4 @@
-import { TOKEN_KEY } from '@domains/auth/_constants/auth';
+import { TOKEN_KEY } from '@entities/auth/config/auth';
 import { SignInReq, SignInRes } from '@domains/auth/signin/_types/api';
 import { fetchApi } from '@shared/lib/api';
 import { cookies } from 'next/headers';

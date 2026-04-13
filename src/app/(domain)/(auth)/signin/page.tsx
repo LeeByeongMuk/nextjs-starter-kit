@@ -1,6 +1,6 @@
 'use client';
 
-import AuthHeader from '@domains/auth/_components/AuthHeader';
+import AuthHeader from '@entities/auth/ui/AuthHeader';
 import SignInForm from '@domains/auth/signin/_components/SignInForm';
 import { useSignInForm } from '@domains/auth/signin/_hooks/useSignInForm';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';

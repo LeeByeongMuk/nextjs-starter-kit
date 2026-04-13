@@ -1,7 +1,7 @@
-import ButtonBox from '@domains/auth/_components/AuthForm/ButtonBox';
-import EmailInput from '@domains/auth/_components/AuthForm/EmailInput';
-import NameInput from '@domains/auth/_components/AuthForm/NameInput';
-import NickNameInput from '@domains/auth/_components/AuthForm/NickNameInput';
+import ButtonBox from '@entities/auth/ui/AuthForm/ButtonBox';
+import EmailInput from '@entities/auth/ui/AuthForm/EmailInput';
+import NameInput from '@entities/auth/ui/AuthForm/NameInput';
+import NickNameInput from '@entities/auth/ui/AuthForm/NickNameInput';
 import { UpdateAccountReq } from '@domains/auth/account/_types/api';
 import { useSession } from 'next-auth/react';
 import React from 'react';

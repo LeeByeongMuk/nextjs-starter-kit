@@ -1,4 +1,4 @@
-import { UserRes } from '@domains/auth/_types/api';
+import { UserRes } from '@entities/auth/api/types';
 import { fetchApi } from '@shared/lib/api';
 
 const fetchUser = async () => {

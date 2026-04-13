@@ -1,6 +1,6 @@
 'use client';
 
-import { PostType } from '@domains/post/_types/postType';
+import { PostType } from '@entities/post/model/types';
 import { PostListSearch, PostsReq } from '@domains/post/list/_types/api';
 import { useSearchParams } from 'next/navigation';
 import React from 'react';

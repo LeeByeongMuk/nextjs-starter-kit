@@ -1,9 +1,9 @@
-import ButtonBox from '@domains/auth/_components/AuthForm/ButtonBox';
-import EmailInput from '@domains/auth/_components/AuthForm/EmailInput';
-import NameInput from '@domains/auth/_components/AuthForm/NameInput';
-import NickNameInput from '@domains/auth/_components/AuthForm/NickNameInput';
-import PasswordConfirmInput from '@domains/auth/_components/AuthForm/PasswordConfirmInput';
-import PasswordInput from '@domains/auth/_components/AuthForm/PasswordInput';
+import ButtonBox from '@entities/auth/ui/AuthForm/ButtonBox';
+import EmailInput from '@entities/auth/ui/AuthForm/EmailInput';
+import NameInput from '@entities/auth/ui/AuthForm/NameInput';
+import NickNameInput from '@entities/auth/ui/AuthForm/NickNameInput';
+import PasswordConfirmInput from '@entities/auth/ui/AuthForm/PasswordConfirmInput';
+import PasswordInput from '@entities/auth/ui/AuthForm/PasswordInput';
 import { SignUpReq } from '@domains/auth/signup/_types/api';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

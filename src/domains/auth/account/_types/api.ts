@@ -1,4 +1,4 @@
-import { UserData } from '@domains/auth/_types/api';
+import { UserData } from '@entities/auth/api/types';
 import { ApiResponse } from '@shared/api/types';
 
 export interface UpdateAccountReq {
