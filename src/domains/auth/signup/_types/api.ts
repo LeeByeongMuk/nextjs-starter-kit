@@ -1,4 +1,4 @@
-import { ApiResponse } from '@shared/types/api';
+import { ApiResponse } from '@shared/api/types';
 
 export interface SignUpReq {
   email: string;

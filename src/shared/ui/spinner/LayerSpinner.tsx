@@ -1,4 +1,4 @@
-import Spinner from '@shared/components/Spinner/index';
+import Spinner from '@shared/ui/spinner/index';
 
 export default function LayerSpinner() {
   return (

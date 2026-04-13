@@ -1,5 +1,5 @@
 import { CreatePostReq, CreatePostRes } from '@domains/post/create/_types/api';
-import { fetchApi } from '@shared/utils/api';
+import { fetchApi } from '@shared/lib/api';
 
 export const fetchCreatePost = async ({
   title,

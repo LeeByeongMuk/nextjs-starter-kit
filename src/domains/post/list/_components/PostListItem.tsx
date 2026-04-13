@@ -1,5 +1,5 @@
 import { PostListData } from '@domains/post/list/_types/api';
-import { getFormattedDate } from '@shared/utils/date';
+import { getFormattedDate } from '@shared/lib/date';
 import Link from 'next/link';
 import React from 'react';
 

@@ -4,7 +4,7 @@ import CreatePostForm from '@domains/post/create/_components/CreatePostForm';
 import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
 import useCreatePostForm from '@domains/post/create/_hooks/useCreatePostForm';
 import { CreatePostFormInput } from '@domains/post/create/_types/form';
-import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
+import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';
 

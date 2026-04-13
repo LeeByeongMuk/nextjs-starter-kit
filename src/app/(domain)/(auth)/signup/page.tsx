@@ -5,7 +5,7 @@ import SignUpForm from '@domains/auth/signup/_components/SignUpForm';
 import useSignup from '@domains/auth/signup/_hooks/useSignup';
 import { useSignupForm } from '@domains/auth/signup/_hooks/useSignupForm';
 import { SignUpReq } from '@domains/auth/signup/_types/api';
-import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
+import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';
 

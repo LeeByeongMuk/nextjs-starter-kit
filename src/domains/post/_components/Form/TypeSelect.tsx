@@ -1,5 +1,5 @@
 import { TYPE_OPTIONS } from '@domains/post/_constants/post';
-import ValidationError from '@shared/components/Error/ValidationError';
+import ValidationError from '@shared/ui/error/ValidationError';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 

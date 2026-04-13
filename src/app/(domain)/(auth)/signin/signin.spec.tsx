@@ -1,6 +1,6 @@
 import SignIn from '@app_domain/(auth)/signin/page';
-import { server } from '@lib/mocks/testServer';
-import { getQueryClient } from '@lib/tanstackQuery/client';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';

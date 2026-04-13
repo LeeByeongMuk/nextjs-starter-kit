@@ -1,5 +1,5 @@
 import { PostType } from '@domains/post/_types/postType';
-import { ApiResponse } from '@shared/types/api';
+import { ApiResponse } from '@shared/api/types';
 
 export interface CreatePostReq {
   title: string;

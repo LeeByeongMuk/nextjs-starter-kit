@@ -1,4 +1,4 @@
-import { handlers } from '@lib/mocks/handlers';
+import { handlers } from '@shared/api/mocks/handlers';
 import { createMiddleware } from '@mswjs/http-middleware';
 import cors from 'cors';
 import express from 'express';

@@ -1,5 +1,5 @@
-import userData from '@lib/mocks/data/user.json';
-import { getHandlerURI } from '@shared/utils/url';
+import userData from '@shared/api/mocks/data/user.json';
+import { getHandlerURI } from '@shared/lib/url';
 import { http, HttpResponse } from 'msw';
 
 export const userHandler = [

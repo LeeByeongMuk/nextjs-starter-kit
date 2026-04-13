@@ -1,4 +1,4 @@
-import ValidationError from '@shared/components/Error/ValidationError';
+import ValidationError from '@shared/ui/error/ValidationError';
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

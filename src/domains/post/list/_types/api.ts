@@ -1,6 +1,6 @@
 import { PostType } from '@domains/post/_types/postType';
-import { ApiResponse } from '@shared/types/api';
-import { PaginationData } from '@shared/types/pagination';
+import { ApiResponse } from '@shared/api/types';
+import { PaginationData } from '@shared/api/pagination';
 
 export interface PostsReq {
   page: number;

@@ -1,5 +1,5 @@
 import { PostsReq, PostsRes } from '@domains/post/list/_types/api';
-import { fetchApi } from '@shared/utils/api';
+import { fetchApi } from '@shared/lib/api';
 
 export const fetchPosts = async ({ page, type, q }: PostsReq) => {
   const params = new URLSearchParams();

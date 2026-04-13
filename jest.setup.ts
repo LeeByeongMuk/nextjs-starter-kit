@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { server } from '@lib/mocks/testServer';
+import { server } from '@shared/api/mocks/testServer';
 import { QueryCache } from '@tanstack/react-query';
 
 const queryCache = new QueryCache();

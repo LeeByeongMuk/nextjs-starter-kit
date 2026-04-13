@@ -3,7 +3,7 @@
 import AccountForm from '@domains/auth/account/_components/AccountForm';
 import DeleteAccountButton from '@domains/auth/account/_components/DeleteAccountButton';
 import { useAccountManager } from '@domains/auth/account/_hooks/useAccountManager';
-import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
+import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';
 

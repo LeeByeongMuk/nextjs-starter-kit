@@ -1,6 +1,6 @@
 import { TOKEN_KEY } from '@domains/auth/_constants/auth';
 import { SignInReq, SignInRes } from '@domains/auth/signin/_types/api';
-import { fetchApi } from '@shared/utils/api';
+import { fetchApi } from '@shared/lib/api';
 import { cookies } from 'next/headers';
 
 export const fetchSignIn = async (req: SignInReq) => {

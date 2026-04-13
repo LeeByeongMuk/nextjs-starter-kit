@@ -1,7 +1,7 @@
 'use client';
 
-import { getQueryClient } from '@lib/tanstackQuery/client';
-import MSWComponent from '@shared/components/Provider/MSWComponent';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
+import MSWComponent from '@shared/ui/provider/MSWComponent';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SessionProvider } from 'next-auth/react';

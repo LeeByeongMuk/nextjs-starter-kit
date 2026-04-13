@@ -1,5 +1,5 @@
-import Layout from '@shared/components/Layout';
-import Provider from '@shared/components/Provider';
+import Layout from '@shared/ui/layout';
+import Provider from '@shared/ui/provider';
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 

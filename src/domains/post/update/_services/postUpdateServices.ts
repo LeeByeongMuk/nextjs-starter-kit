@@ -4,7 +4,7 @@ import {
   UpdatePostResourceReq,
   UpdatePostResourceRes,
 } from '@domains/post/update/_types/api';
-import { fetchApi } from '@shared/utils/api';
+import { fetchApi } from '@shared/lib/api';
 
 export const fetchUpdatePost = async ({
   id,

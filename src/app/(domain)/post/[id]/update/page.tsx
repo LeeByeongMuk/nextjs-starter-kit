@@ -2,8 +2,8 @@
 
 import UpdatePostForm from '@domains/post/update/_components/UpdatePostForm';
 import { useUpdatePostManager } from '@domains/post/update/_hooks/usePostUpdateManager';
-import Spinner from '@shared/components/Spinner';
-import LayerSpinner from '@shared/components/Spinner/LayerSpinner';
+import Spinner from '@shared/ui/spinner';
+import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';
 

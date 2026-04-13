@@ -1,5 +1,5 @@
 import { PostData } from '@domains/post/detail/_types/api';
-import { getFormattedDate } from '@shared/utils/date';
+import { getFormattedDate } from '@shared/lib/date';
 import React from 'react';
 
 interface PostDetailProps {

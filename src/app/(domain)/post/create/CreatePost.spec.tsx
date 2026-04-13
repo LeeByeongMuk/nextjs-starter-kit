@@ -1,8 +1,8 @@
 import CreatePost from '@app_domain/post/create/page';
 import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
-import { server } from '@lib/mocks/testServer';
-import { getQueryClient } from '@lib/tanstackQuery/client';
-import { getHandlerURI } from '@shared/utils/url';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,

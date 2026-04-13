@@ -11,7 +11,7 @@ const config: Config = {
   coverageProvider: 'v8',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^next-auth/react$': '<rootDir>/src/tests/mocks/nextAuthReact.tsx',
+    '^next-auth/react$': '<rootDir>/src/shared/lib/testing/nextAuthReact.tsx',
   },
   preset: 'ts-jest',
   rootDir: './',
