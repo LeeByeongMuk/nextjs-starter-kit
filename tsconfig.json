@@ -24,17 +24,35 @@
       }
     ],
     "paths": {
-      "@app_domain/*": [
-        "./src/app/(domain)/*"
+      "@app/*": [
+        "./src/app/*"
       ],
-      "@app_api/*": [
-        "./src/app/api/*"
+      "@views/*": [
+        "./src/views/*"
+      ],
+      "@widgets/*": [
+        "./src/widgets/*"
+      ],
+      "@features/*": [
+        "./src/features/*"
+      ],
+      "@entities/*": [
+        "./src/entities/*"
       ],
       "@shared/*": [
         "./src/shared/*"
       ],
       "@styles/*": [
         "./src/styles/*"
+      ],
+      "@public/*": [
+        "./public/*"
+      ],
+      "@app_domain/*": [
+        "./src/app/(domain)/*"
+      ],
+      "@app_api/*": [
+        "./src/app/api/*"
       ],
       "@lib/*": [
         "./src/lib/*"
@@ -44,9 +62,6 @@
       ],
       "@tests/*": [
         "./src/tests/*"
-      ],
-      "@public/*": [
-        "./public/*"
       ]
     }
   },
