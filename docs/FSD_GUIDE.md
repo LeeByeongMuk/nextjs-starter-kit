@@ -1,0 +1,188 @@
+# Feature-Sliced Design (FSD) Guide
+
+> 작성일: 2026-04-13
+> 대상 브랜치: `develop`
+> 참고: 본 프로젝트는 Next.js 16 App Router 기반이며, FSD 표준의 `pages` 레이어는 **`views`** 로 네이밍한다 (라우팅 계층인 `src/app`과 명확히 구분).
+
+## 개요
+
+Feature-Sliced Design은 프런트엔드 코드를 **계층(layer) → 슬라이스(slice) → 세그먼트(segment)** 의 3단계로 조직하는 아키텍처 방법론이다. 본 문서는 이 프로젝트에 적용되는 규칙·네이밍·import 방향을 정의한다.
+
+해결하려는 문제:
+- 기능 단위 응집도를 강제해 도메인 코드가 흩어지는 현상 차단
+- import 방향을 한쪽으로 고정해 순환 참조·의도치 않은 결합 제거
+- 신규 인원과 Claude가 동일한 의사결정 트리로 새 코드를 배치
+
+---
+
+## 1. 레이어 정의
+
+상위 레이어는 하위 레이어만 import 할 수 있다. 동일 레이어의 다른 슬라이스끼리도 직접 import 금지(공유물은 한 단계 아래로 끌어내림).
+
+| 레이어 | 디렉터리 | 책임 | 비고 |
+|---|---|---|---|
+| `app` | `src/app/` | Next.js App Router (라우팅, 메타데이터, route handler) | **얇게** 유지. 실제 합성은 `views`로 위임 |
+| `views` | `src/views/` | 화면 단위 합성 (FSD 표준의 `pages`) | App Router `page.tsx`가 import |
+| `widgets` | `src/widgets/` | 여러 features/entities를 묶는 독립 UI 블록 | 단일 features만 사용한다면 widget 불필요 |
+| `features` | `src/features/` | 사용자 인터랙션 단위 (signin form, post-create flow) | 슬라이스명: `<도메인>-<액션>` (e.g. `auth-signin`) |
+| `entities` | `src/entities/` | 도메인 모델 + 도메인 공용 UI/타입 | User, Post 등 비즈니스 엔티티 |
+| `shared` | `src/shared/` | 도메인 무관 재사용 자산 | UI 프리미티브, 유틸, 설정 |
+
+### Import 방향 (요약)
+
+```
+app  →  views  →  widgets  →  features  →  entities  →  shared
+```
+
+화살표 반대 방향 import는 ESLint(`boundaries/element-types`)가 차단한다.
+
+---
+
+## 2. 슬라이스 명명 규칙
+
+- **kebab-case**: `post-list`, `auth-signin`, `auth-account`
+- features는 `<도메인>-<액션>` 형태 권장 (검색·grouping 용이)
+- entities는 단일 명사 (`auth`, `post`, `user`)
+- views는 라우트와 직관적으로 매핑되는 이름 (`post-detail`, `signin`, `home`)
+
+---
+
+## 3. 세그먼트 표준
+
+각 슬라이스 내부는 다음 세그먼트로 분리한다.
+
+| 세그먼트 | 내용 | 예시 |
+|---|---|---|
+| `ui/` | 컴포넌트 (React) | `SignInForm.tsx`, `PostListItem.tsx` |
+| `model/` | 상태/훅/뷰모델/폼 타입 | `useSignInForm.ts`, `usePostListManager.ts`, `form.ts` |
+| `api/` | 서버 통신, 요청/응답 타입 | `signinService.ts`, `api.ts`(Req/Res) |
+| `lib/` | 슬라이스 로컬 헬퍼 (외부 비공개) | 날짜 포맷터, validators |
+| `config/` | 상수, enum, constants | `TOKEN_KEY`, `PostType` |
+
+세그먼트는 모두 선택. 사용 안 하면 폴더를 만들지 않는다.
+
+---
+
+## 4. 공개 API 규칙 (Public API)
+
+각 슬라이스 루트에 `index.ts`를 둬 외부에 노출할 심볼만 re-export 한다.
+
+```ts
+// src/features/auth-signin/index.ts
+export { SignInForm } from './ui/SignInForm';
+export { useSignInForm } from './model/useSignInForm';
+export type { SignInRequest } from './api/types';
+```
+
+외부에서는 슬라이스 루트 import만 허용:
+
+```ts
+//  허용
+import { SignInForm } from '@features/auth-signin';
+
+//  금지 — 내부 경로 직접 접근
+import { SignInForm } from '@features/auth-signin/ui/SignInForm';
+```
+
+ESLint `boundaries/entry-point` + `boundaries/no-private`가 강제한다.
+
+---
+
+## 5. Path Alias 규칙
+
+`tsconfig.json`에 정의된 alias만 사용. 상대경로(`../../../`)는 슬라이스 내부로만 허용.
+
+| Alias | 매핑 |
+|---|---|
+| `@app/*` | `src/app/*` |
+| `@views/*` | `src/views/*` |
+| `@widgets/*` | `src/widgets/*` |
+| `@features/*` | `src/features/*` |
+| `@entities/*` | `src/entities/*` |
+| `@shared/*` | `src/shared/*` |
+| `@styles/*` | `src/styles/*` |
+| `@public/*` | `public/*` |
+
+---
+
+## 6. Next.js 통합 규칙
+
+- **`src/app/**/page.tsx`는 `views/`만 import**. 비즈니스 로직·합성은 view에 위임.
+  ```tsx
+  // src/app/(domain)/post/(list)/page.tsx
+  import { PostListView } from '@views/post-list';
+  export default PostListView;
+  ```
+- 메타데이터(`export const metadata`, `generateMetadata`)는 `page.tsx`에 둔다(Next.js 요구사항).
+- 클라이언트/서버 컴포넌트 분기(`'use client'`)는 view 또는 widget에서 결정.
+- `middleware.ts`, `app/api/**/route.ts`는 FSD 레이어 적용 외 — 그대로 유지.
+- Route Group(`(domain)`, `(auth)` 등) 네이밍은 라우팅 표현이며 FSD 슬라이스와 1:1 매핑하지 않는다.
+
+---
+
+## 7. 결정 가이드 — "이 코드는 어디에 둬야 하나"
+
+1. **도메인과 무관한가?** (버튼, 스피너, 날짜 유틸 등) → `shared`
+2. **특정 도메인의 모델/공용 UI인가?** (Post 타입, AuthHeader) → `entities`
+3. **사용자 인터랙션/플로우인가?** (폼 제출, 리스트 필터링) → `features`
+4. **여러 features/entities를 한 화면 블록으로 묶어야 하나?** → `widgets`
+5. **하나의 라우트 화면 전체 합성인가?** → `views`
+6. **Next.js 라우팅·메타데이터 필요?** → `app` (얇게)
+
+같은 코드가 여러 features에서 쓰이면 하단 레이어로 끌어내려 공유한다 (entities 또는 shared).
+
+---
+
+## 8. 마이그레이션 매핑 표
+
+현재 → 목표 (Phase C에서 단계적 적용):
+
+| 현재 위치 | 이동 후 |
+|---|---|
+| `src/domains/auth/_components/AuthHeader.tsx` | `src/entities/auth/ui/AuthHeader.tsx` |
+| `src/domains/auth/_components/AuthForm/*` | `src/entities/auth/ui/AuthForm/*` |
+| `src/domains/auth/_constants/auth.ts` | `src/entities/auth/config/auth.ts` |
+| `src/domains/auth/_services/userServices.ts` | `src/entities/auth/api/userServices.ts` |
+| `src/domains/auth/_types/api.ts` | `src/entities/auth/api/types.ts` |
+| `src/domains/auth/signin/**` | `src/features/auth-signin/{ui,model,api}/` |
+| `src/domains/auth/signup/**` | `src/features/auth-signup/{ui,model,api}/` |
+| `src/domains/auth/account/**` | `src/features/auth-account/{ui,model,api}/` |
+| `src/domains/post/_components/Pagination.tsx` | `src/entities/post/ui/Pagination.tsx` |
+| `src/domains/post/_components/{Editor,Form/*}` | `src/entities/post/ui/*` |
+| `src/domains/post/_constants/post.ts` | `src/entities/post/config/post.ts` |
+| `src/domains/post/_types/postType.ts` | `src/entities/post/model/types.ts` |
+| `src/domains/post/list/**` | `src/features/post-list/{ui,model,api}/` |
+| `src/domains/post/detail/**` | `src/features/post-detail/{ui,model,api}/` |
+| `src/domains/post/create/**` | `src/features/post-create/{ui,model,api}/` |
+| `src/domains/post/update/**` | `src/features/post-update/{ui,model,api}/` |
+| `src/shared/components/{Layout,Provider,Spinner,Error}` | `src/shared/ui/{layout,provider,spinner,error}/` |
+| `src/shared/utils/{api,date,url}.ts` | `src/shared/lib/{api,date,url}/` |
+| `src/shared/types/{api,pagination}.ts` | `src/shared/api/types.ts` |
+| `src/shared/types/declare/*` | `src/shared/config/declare/*` |
+| `src/lib/tanstackQuery/*` | `src/shared/api/tanstack-query/*` |
+| `src/lib/mocks/*` | `src/shared/api/mocks/*` |
+| `src/tests/mocks/*` | `src/shared/lib/testing/*` |
+| `src/app/(domain)/.../page.tsx` 합성 로직 | `src/views/<route>/` (page.tsx는 view import만) |
+
+widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/post-list-container/` (Phase C-5에서 결정).
+
+---
+
+## 9. ESLint 강제 규칙
+
+`eslint-plugin-boundaries`로 다음을 차단한다:
+
+- 레이어 방향 위반 (`shared`가 `features` import 등)
+- 동일 레이어 슬라이스 간 직접 import (`features/post-list`가 `features/post-detail` import)
+- 슬라이스 내부 경로 deep import (`@features/auth-signin/ui/SignInForm`)
+- 정의되지 않은 디렉터리에 코드 추가
+
+마이그레이션 진행 중에는 `severity: 'warn'`, Phase C 완료 시 `'error'`로 승격한다.
+
+---
+
+## 10. 참고 자료
+
+- 공식 문서: https://feature-sliced.design
+- Next.js 통합 가이드: https://feature-sliced.design/docs/guides/tech/with-nextjs
+- `eslint-plugin-boundaries`: https://github.com/javierbrea/eslint-plugin-boundaries
