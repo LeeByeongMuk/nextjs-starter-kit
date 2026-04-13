@@ -1,8 +1,8 @@
 'use client';
 
 import AuthHeader from '@entities/auth/ui/AuthHeader';
-import SignInForm from '@domains/auth/signin/_components/SignInForm';
-import { useSignInForm } from '@domains/auth/signin/_hooks/useSignInForm';
+import SignInForm from '@features/auth-signin/ui/SignInForm';
+import { useSignInForm } from '@features/auth-signin/model/useSignInForm';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';

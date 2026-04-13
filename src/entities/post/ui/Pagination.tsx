@@ -1,5 +1,5 @@
 import { PAGE_GROUP_NUMBER } from '@entities/post/config/post';
-import { PostsReq } from '@domains/post/list/_types/api';
+import { PostsReq } from '@features/post-list/api/types';
 import { PaginationMeta } from '@shared/api/pagination';
 import classNames from 'classnames';
 import React from 'react';

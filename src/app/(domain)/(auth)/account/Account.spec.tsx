@@ -1,6 +1,6 @@
 import Account from '@app_domain/(auth)/account/page';
-import useDeleteAccount from '@domains/auth/account/_hooks/useDeleteAccount';
-import useUpdateAccount from '@domains/auth/account/_hooks/useUpdateAccount';
+import useDeleteAccount from '@features/auth-account/model/useDeleteAccount';
+import useUpdateAccount from '@features/auth-account/model/useUpdateAccount';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';

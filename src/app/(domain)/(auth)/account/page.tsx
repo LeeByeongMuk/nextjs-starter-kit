@@ -1,8 +1,8 @@
 'use client';
 
-import AccountForm from '@domains/auth/account/_components/AccountForm';
-import DeleteAccountButton from '@domains/auth/account/_components/DeleteAccountButton';
-import { useAccountManager } from '@domains/auth/account/_hooks/useAccountManager';
+import AccountForm from '@features/auth-account/ui/AccountForm';
+import DeleteAccountButton from '@features/auth-account/ui/DeleteAccountButton';
+import { useAccountManager } from '@features/auth-account/model/useAccountManager';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';

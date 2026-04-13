@@ -1,5 +1,5 @@
 import CreatePost from '@app_domain/post/create/page';
-import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
+import useCreatePost from '@features/post-create/model/useCreatePost';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';

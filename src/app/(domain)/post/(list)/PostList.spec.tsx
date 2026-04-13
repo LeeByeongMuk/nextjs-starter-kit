@@ -1,6 +1,6 @@
 import PostList from '@app_domain/post/(list)/page';
-import usePostList from '@domains/post/list/_hooks/usePostList';
-import { PostsReq } from '@domains/post/list/_types/api';
+import usePostList from '@features/post-list/model/usePostList';
+import { PostsReq } from '@features/post-list/api/types';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';

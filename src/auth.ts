@@ -1,5 +1,5 @@
 import { fetchUser } from '@entities/auth/api/userServices';
-import { fetchSignIn } from '@domains/auth/signin/_services/signinService';
+import { fetchSignIn } from '@features/auth-signin/api/signinService';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 

@@ -1,6 +1,6 @@
 import UpdatePost from '@app_domain/post/[id]/update/page';
-import useUpdatePost from '@domains/post/update/_hooks/useUpdatePost';
-import useUpdatePostResource from '@domains/post/update/_hooks/useUpdatePostResource';
+import useUpdatePost from '@features/post-update/model/useUpdatePost';
+import useUpdatePostResource from '@features/post-update/model/useUpdatePostResource';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';

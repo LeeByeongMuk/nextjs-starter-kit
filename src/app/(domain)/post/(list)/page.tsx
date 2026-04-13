@@ -1,9 +1,9 @@
 'use client';
 
 import Pagination from '@entities/post/ui/Pagination';
-import PostListContainer from '@domains/post/list/_components/PostListContainer';
-import ListFilter from '@domains/post/list/_components/PostListFilter';
-import usePostListManager from '@domains/post/list/_hooks/usePostListManager';
+import PostListContainer from '@features/post-list/ui/PostListContainer';
+import ListFilter from '@features/post-list/ui/PostListFilter';
+import usePostListManager from '@features/post-list/model/usePostListManager';
 import React from 'react';
 
 export default function PostListPage() {

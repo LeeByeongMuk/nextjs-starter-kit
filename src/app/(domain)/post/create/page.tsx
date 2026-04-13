@@ -1,9 +1,9 @@
 'use client';
 
-import CreatePostForm from '@domains/post/create/_components/CreatePostForm';
-import useCreatePost from '@domains/post/create/_hooks/useCreatePost';
-import useCreatePostForm from '@domains/post/create/_hooks/useCreatePostForm';
-import { CreatePostFormInput } from '@domains/post/create/_types/form';
+import CreatePostForm from '@features/post-create/ui/CreatePostForm';
+import useCreatePost from '@features/post-create/model/useCreatePost';
+import useCreatePostForm from '@features/post-create/model/useCreatePostForm';
+import { CreatePostFormInput } from '@features/post-create/model/form';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';

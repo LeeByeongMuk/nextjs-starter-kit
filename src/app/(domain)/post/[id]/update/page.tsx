@@ -1,7 +1,7 @@
 'use client';
 
-import UpdatePostForm from '@domains/post/update/_components/UpdatePostForm';
-import { useUpdatePostManager } from '@domains/post/update/_hooks/usePostUpdateManager';
+import UpdatePostForm from '@features/post-update/ui/UpdatePostForm';
+import { useUpdatePostManager } from '@features/post-update/model/usePostUpdateManager';
 import Spinner from '@shared/ui/spinner';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';

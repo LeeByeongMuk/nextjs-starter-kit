@@ -1,10 +1,10 @@
 'use client';
 
 import AuthHeader from '@entities/auth/ui/AuthHeader';
-import SignUpForm from '@domains/auth/signup/_components/SignUpForm';
-import useSignup from '@domains/auth/signup/_hooks/useSignup';
-import { useSignupForm } from '@domains/auth/signup/_hooks/useSignupForm';
-import { SignUpReq } from '@domains/auth/signup/_types/api';
+import SignUpForm from '@features/auth-signup/ui/SignUpForm';
+import useSignup from '@features/auth-signup/model/useSignup';
+import { useSignupForm } from '@features/auth-signup/model/useSignupForm';
+import { SignUpReq } from '@features/auth-signup/api/types';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';

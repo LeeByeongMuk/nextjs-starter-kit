@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import Signup from '@app_domain/(auth)/signup/page';
-import useSignup from '@domains/auth/signup/_hooks/useSignup';
+import useSignup from '@features/auth-signup/model/useSignup';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';

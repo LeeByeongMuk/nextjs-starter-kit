@@ -1,6 +1,6 @@
 import PostDetail from '@app_domain/post/[id]/(detail)/page';
-import usePost from '@domains/post/detail/_hooks/usePost';
-import usePostDetail from '@domains/post/detail/_hooks/usePostDetail';
+import usePost from '@features/post-detail/model/usePost';
+import usePostDetail from '@features/post-detail/model/usePostDetail';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';
