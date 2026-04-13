@@ -1,9 +1,10 @@
 'use client';
 
-import { fetchUpdatePost } from '@features/post-update/api/postUpdateServices';
-import { UpdatePostReq } from '@features/post-update/api/types';
 import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
+
+import { fetchUpdatePost } from '../api/postUpdateServices';
+import { UpdatePostReq } from '../api/types';
 
 export default function useUpdatePost() {
   const router = useRouter();

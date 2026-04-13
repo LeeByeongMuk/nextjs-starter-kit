@@ -7,5 +7,3 @@ export { default as PasswordConfirmInput } from './ui/AuthForm/PasswordConfirmIn
 export { default as PasswordInput } from './ui/AuthForm/PasswordInput';
 
 export type { UserData, UserRes } from './api/types';
-
-export { TOKEN_KEY } from './config/auth';

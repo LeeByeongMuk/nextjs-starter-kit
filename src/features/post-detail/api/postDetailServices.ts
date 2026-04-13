@@ -1,7 +1,8 @@
 'use server';
 
-import { PostReq, PostRes } from '@features/post-detail/api/types';
 import { fetchApi } from '@shared/lib/api';
+
+import { PostReq, PostRes } from './types';
 
 export const fetchPost = async ({ id }: PostReq) => {
   return (await fetchApi(`/api/posts/${id}`, {

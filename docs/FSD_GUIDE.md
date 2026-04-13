@@ -122,7 +122,7 @@ ESLint `boundaries/entry-point` + `boundaries/no-private`가 강제한다.
 
 ### NextAuth 설정 위치
 
-NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 따라서 본 프로젝트는 **FSD 원칙에 따라 `src/shared/api/auth/`로 이동하기로 결정**한다(현재 위치는 `src/auth.ts` — Phase C에서 이동). 이후 middleware/route handler는 alias(`@shared/api/auth`)로 import.
+NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 본 프로젝트는 NextAuth 설정을 **app 레이어 (`src/app/auth/config.ts`)에 둔다**. 이유: 이 파일은 인증 플로우(`fetchSignIn`, `fetchUser`)를 오케스트레이션하므로 features/entities를 호출할 권한이 필요하고, 이는 app 레이어에서만 허용되기 때문. middleware와 route handler는 `@app/auth/config`로 import.
 
 ---
 
@@ -149,7 +149,7 @@ NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 따라서 본 프�
 |---|---|
 | `src/domains/auth/_components/AuthHeader.tsx` | `src/entities/auth/ui/AuthHeader.tsx` |
 | `src/domains/auth/_components/AuthForm/*` | `src/entities/auth/ui/AuthForm/*` |
-| `src/domains/auth/_constants/auth.ts` | `src/entities/auth/config/auth.ts` |
+| `src/domains/auth/_constants/auth.ts` (TOKEN_KEY) | `src/shared/config/auth.ts` (cross-cutting cookie key) |
 | `src/domains/auth/_services/userServices.ts` | `src/entities/auth/api/userServices.ts` |
 | `src/domains/auth/_types/api.ts` | `src/entities/auth/api/types.ts` |
 | `src/domains/auth/signin/**` | `src/features/auth-signin/{ui,model,api}/` |
@@ -170,7 +170,7 @@ NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 따라서 본 프�
 | `src/lib/tanstackQuery/*` | `src/shared/api/tanstack-query/*` |
 | `src/lib/mocks/*` | `src/shared/api/mocks/*` |
 | `src/tests/mocks/*` | `src/shared/lib/testing/*` |
-| `src/auth.ts` | `src/shared/api/auth/index.ts` |
+| `src/auth.ts` | `src/app/auth/config.ts` (NextAuth orchestration belongs to app layer) |
 | `src/app/(domain)/.../page.tsx` 합성 로직 | `src/views/<route>/` (page.tsx는 view import만) |
 | `src/app/(domain)/.../layout.tsx` 합성 로직 | `src/views/<route>/` 또는 `src/widgets/<name>/` (layout.tsx는 import만) |
 | `src/middleware.ts` | (이동 없음) — Next.js 강제. 내부 로직은 entities/shared로 추출 후 import |

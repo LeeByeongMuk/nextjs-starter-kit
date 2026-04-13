@@ -1,10 +1,11 @@
+import { fetchApi } from '@shared/lib/api';
+
 import {
   UpdatePostReq,
   UpdatePostRes,
   UpdatePostResourceReq,
   UpdatePostResourceRes,
-} from '@features/post-update/api/types';
-import { fetchApi } from '@shared/lib/api';
+} from './types';
 
 export const fetchUpdatePost = async ({
   id,

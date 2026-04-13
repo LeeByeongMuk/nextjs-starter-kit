@@ -1,9 +1,11 @@
-import ButtonBox from '@entities/auth/ui/AuthForm/ButtonBox';
-import EmailInput from '@entities/auth/ui/AuthForm/EmailInput';
-import PasswordInput from '@entities/auth/ui/AuthForm/PasswordInput';
-import { SignInReq } from '@features/auth-signin/api/types';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+
+import { ButtonBox } from '@entities/auth';
+import { EmailInput } from '@entities/auth';
+import { PasswordInput } from '@entities/auth';
+
+import { SignInReq } from '../api/types';
 
 interface SignInFormProps {
   handleSignIn: (req: SignInReq) => void;

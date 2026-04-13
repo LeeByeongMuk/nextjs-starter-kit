@@ -1,4 +1,4 @@
-import { PostType } from '@entities/post/model/types';
+import { type PostType } from '@entities/post';
 import { ApiResponse } from '@shared/api/types';
 
 export interface CreatePostReq {

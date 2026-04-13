@@ -1,10 +1,11 @@
+import { fetchApi } from '@shared/lib/api';
+
 import {
   DeleteAccountReq,
   DeleteAccountRes,
   UpdateAccountReq,
   UpdateAccountRes,
-} from '@features/auth-account/api/types';
-import { fetchApi } from '@shared/lib/api';
+} from './types';
 
 export const fetchUpdateAccount = async (req: UpdateAccountReq) => {
   return (await fetchApi('/api/users', {

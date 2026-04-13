@@ -1,8 +1,8 @@
 'use client';
 
-import usePostList from '@features/post-list/model/usePostList';
-import useReplaceSearchParams from '@features/post-list/model/useReplaceSearchParams';
-import useSearchFilters from '@features/post-list/model/useSearchFilters';
+import usePostList from './usePostList';
+import useReplaceSearchParams from './useReplaceSearchParams';
+import useSearchFilters from './useSearchFilters';
 
 export default function usePostListManager() {
   const { searchFilters, setSearchFilters } = useSearchFilters();

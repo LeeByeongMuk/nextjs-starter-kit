@@ -1,15 +1,15 @@
-import { PAGE_GROUP_NUMBER } from '@entities/post/config/post';
-import { PostsReq } from '@features/post-list/api/types';
-import { PaginationMeta } from '@shared/api/pagination';
 import classNames from 'classnames';
 import React from 'react';
 
+import { PAGE_GROUP_NUMBER } from '@entities/post/config/post';
+import { PaginationMeta } from '@shared/api/pagination';
+
 interface Props {
   meta: PaginationMeta;
-  setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;
+  onPageChange: (page: number) => void;
 }
 
-export default function Pagination({ meta, setSearchFilters }: Props) {
+export default function Pagination({ meta, onPageChange }: Props) {
   const getPageGroup = () => {
     const pageGroupNum = Math.ceil(meta.current_page / PAGE_GROUP_NUMBER);
     const firstPageNum = (pageGroupNum - 1) * PAGE_GROUP_NUMBER + 1;
@@ -25,17 +25,17 @@ export default function Pagination({ meta, setSearchFilters }: Props) {
   };
 
   const onUpdatePage = (page: number) => {
-    setSearchFilters(prev => ({ ...prev, page }));
+    onPageChange(page);
   };
 
   const onPrevPage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
-    setSearchFilters(prev => ({ ...prev, page: meta.current_page - 1 }));
+    onPageChange(meta.current_page - 1);
   };
 
   const onNextPage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
-    setSearchFilters(prev => ({ ...prev, page: meta.current_page + 1 }));
+    onPageChange(meta.current_page + 1);
   };
 
   const pageGroup = getPageGroup();

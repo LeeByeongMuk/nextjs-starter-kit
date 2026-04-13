@@ -1,4 +1,4 @@
-import { PostType } from '@entities/post/model/types';
+import { type PostType } from '@entities/post';
 
 export interface UpdatePostFormInput {
   title: string;

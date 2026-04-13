@@ -1,6 +1,8 @@
-import { PostData } from '@features/post-detail/api/types';
-import { getFormattedDate } from '@shared/lib/date';
 import React from 'react';
+
+import { getFormattedDate } from '@shared/lib/date';
+
+import { PostData } from '../api/types';
 
 interface PostDetailProps {
   isLoading: boolean;

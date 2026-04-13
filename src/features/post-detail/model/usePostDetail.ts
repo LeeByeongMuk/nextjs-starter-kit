@@ -1,9 +1,11 @@
 'use client';
 
-import usePost from '@features/post-detail/model/usePost';
-import useDeletePost from '@features/post-update/model/useDeletePost';
 import { useRouter, useParams } from 'next/navigation';
 import { useCallback } from 'react';
+
+import { useDeletePost } from '@entities/post';
+
+import usePost from './usePost';
 
 export default function usePostDetail() {
   const router = useRouter();

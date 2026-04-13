@@ -1,9 +1,11 @@
-import useDeleteAccount from '@features/auth-account/model/useDeleteAccount';
-import useUpdateAccount from '@features/auth-account/model/useUpdateAccount';
-import { UpdateAccountReq } from '@features/auth-account/api/types';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { UpdateAccountReq } from '../api/types';
+
+import useDeleteAccount from './useDeleteAccount';
+import useUpdateAccount from './useUpdateAccount';
 
 export function useAccountManager() {
   const { data: session } = useSession();

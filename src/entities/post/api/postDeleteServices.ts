@@ -1,4 +1,4 @@
-import { DeletePostReq, DeletePostRes } from '@features/post-update/api/types';
+import { DeletePostReq, DeletePostRes } from '@entities/post/api/types';
 import { fetchApi } from '@shared/lib/api';
 
 export const fetchDeletePost = async ({ id }: DeletePostReq) => {

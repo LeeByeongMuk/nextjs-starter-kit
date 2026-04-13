@@ -1,9 +1,10 @@
 'use client';
 
-import { fetchPosts } from '@features/post-list/api/postsServices';
-import { PostsReq, PostsRes } from '@features/post-list/api/types';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+
+import { fetchPosts } from '../api/postsServices';
+import { PostsReq, PostsRes } from '../api/types';
 
 interface Props {
   searchFilters: PostsReq;

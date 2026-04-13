@@ -1,6 +1,7 @@
-import ValidationError from '@shared/ui/error/ValidationError';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+
+import ValidationError from '@shared/ui/error/ValidationError';
 
 export default function PasswordConfirmInput() {
   const {

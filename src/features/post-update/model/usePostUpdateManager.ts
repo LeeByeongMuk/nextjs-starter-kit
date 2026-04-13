@@ -1,12 +1,12 @@
 'use client';
 
-import useUpdatePost from '@features/post-update/model/useUpdatePost';
-import useUpdatePostForm from '@features/post-update/model/useUpdatePostForm';
-import useUpdatePostResource from '@features/post-update/model/useUpdatePostResource';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { UpdatePostFormInput } from './form';
+import useUpdatePost from './useUpdatePost';
+import useUpdatePostForm from './useUpdatePostForm';
+import useUpdatePostResource from './useUpdatePostResource';
 
 export function useUpdatePostManager() {
   const params = useParams<{ id: string }>();

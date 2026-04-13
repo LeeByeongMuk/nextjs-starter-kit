@@ -1,12 +1,14 @@
-import ButtonBox from '@entities/auth/ui/AuthForm/ButtonBox';
-import EmailInput from '@entities/auth/ui/AuthForm/EmailInput';
-import NameInput from '@entities/auth/ui/AuthForm/NameInput';
-import NickNameInput from '@entities/auth/ui/AuthForm/NickNameInput';
-import PasswordConfirmInput from '@entities/auth/ui/AuthForm/PasswordConfirmInput';
-import PasswordInput from '@entities/auth/ui/AuthForm/PasswordInput';
-import { SignUpReq } from '@features/auth-signup/api/types';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+
+import { ButtonBox } from '@entities/auth';
+import { EmailInput } from '@entities/auth';
+import { NameInput } from '@entities/auth';
+import { NickNameInput } from '@entities/auth';
+import { PasswordConfirmInput } from '@entities/auth';
+import { PasswordInput } from '@entities/auth';
+
+import { SignUpReq } from '../api/types';
 
 interface SignUpFormProps {
   handleSignUp: (req: SignUpReq) => void;

@@ -1,10 +1,12 @@
 'use client';
 
-import { PostType } from '@entities/post/model/types';
-import { PostListSearch, PostsReq } from '@features/post-list/api/types';
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+
+import { type PostType } from '@entities/post';
+
+import { PostListSearch, PostsReq } from '../api/types';
 
 interface UsePostListFormProps {
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;

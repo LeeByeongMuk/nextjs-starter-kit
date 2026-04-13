@@ -1,11 +1,13 @@
-import SearchInput from '@features/post-list/ui/PostListFilter/SearchInput';
-import TypeSelect from '@features/post-list/ui/PostListFilter/TypeSelect';
-import { usePostListForm } from '@features/post-list/model/usePostListForm';
-import { PostsReq } from '@features/post-list/api/types';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 import { FormProvider } from 'react-hook-form';
+
+import { PostsReq } from '../../api/types';
+import { usePostListForm } from '../../model/usePostListForm';
+
+import SearchInput from './SearchInput';
+import TypeSelect from './TypeSelect';
 
 interface Props {
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;

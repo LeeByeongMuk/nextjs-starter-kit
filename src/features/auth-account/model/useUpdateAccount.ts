@@ -1,6 +1,7 @@
-import { fetchUpdateAccount } from '@features/auth-account/api/accountService';
 import { useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
+
+import { fetchUpdateAccount } from '../api/accountService';
 
 export default function useUpdateAccount() {
   const { update } = useSession();

@@ -9,7 +9,10 @@ export { default as TypeSelect } from './ui/Form/TypeSelect';
 //   import Editor from '@entities/post/ui/Editor';
 //   import ContentsEditor from '@entities/post/ui/Form/ContentsEditor';
 
+export { default as useDeletePost } from './model/useDeletePost';
+
 export type { PostType } from './model/types';
+export type { DeletePostReq, DeletePostRes } from './api/types';
 
 export {
   TYPE_OPTIONS,

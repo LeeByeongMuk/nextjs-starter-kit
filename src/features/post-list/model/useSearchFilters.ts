@@ -1,9 +1,11 @@
 'use client';
 
-import { PostType } from '@entities/post/model/types';
-import { PostsReq } from '@features/post-list/api/types';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+
+import { type PostType } from '@entities/post';
+
+import { PostsReq } from '../api/types';
 
 export default function useSearchFilters() {
   const searchParams = useSearchParams();

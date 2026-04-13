@@ -1,4 +1,4 @@
-import { PostType } from '@entities/post/model/types';
+import { type PostType } from '@entities/post';
 import { ApiResponse } from '@shared/api/types';
 
 export interface UpdatePostReq {
@@ -30,9 +30,3 @@ export interface UpdatePostResourceReq {
 export interface UpdatePostResourceRes extends ApiResponse {
   data: UpdatePostResourceData;
 }
-
-export interface DeletePostReq {
-  id: number;
-}
-
-export type DeletePostRes = ApiResponse;

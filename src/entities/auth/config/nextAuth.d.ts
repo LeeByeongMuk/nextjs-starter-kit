@@ -1,5 +1,6 @@
-import { UserData } from '@entities/auth/api/types';
 import { DefaultSession } from 'next-auth';
+
+import { UserData } from '@entities/auth';
 
 declare module 'next-auth' {
   interface Session {

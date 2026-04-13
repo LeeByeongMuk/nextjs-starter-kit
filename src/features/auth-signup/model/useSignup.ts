@@ -1,6 +1,7 @@
-import { fetchSignUp } from '@features/auth-signup/api/signupServices';
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
+
+import { fetchSignUp } from '../api/signupServices';
 
 export default function useSignup() {
   return useMutation({

@@ -1,5 +1,6 @@
-import { DUMMY_DATA } from '@entities/post/config/post';
 import React from 'react';
+
+import { DUMMY_DATA } from '@entities/post';
 
 export default function PostListSkeletonUI() {
   return DUMMY_DATA.map(post => (

@@ -19,7 +19,10 @@ export default function PostListView() {
 
       <PostListContainer posts={posts} isLoading={isLoading || isError} />
 
-      <Pagination meta={meta} setSearchFilters={setSearchFilters} />
+      <Pagination
+        meta={meta}
+        onPageChange={page => setSearchFilters(prev => ({ ...prev, page }))}
+      />
     </section>
   );
 }

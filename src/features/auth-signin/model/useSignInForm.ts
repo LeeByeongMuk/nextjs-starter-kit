@@ -1,10 +1,11 @@
 'use client';
 
-import { SignInReq } from '@features/auth-signin/api/types';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { SignInReq } from '../api/types';
 
 export function useSignInForm() {
   const [isLoading, setIsLoading] = useState(false);

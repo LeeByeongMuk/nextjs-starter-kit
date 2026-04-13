@@ -47,21 +47,6 @@
       ],
       "@public/*": [
         "./public/*"
-      ],
-      "@app_domain/*": [
-        "./src/app/(domain)/*"
-      ],
-      "@app_api/*": [
-        "./src/app/api/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ],
-      "@domains/*": [
-        "./src/domains/*"
-      ],
-      "@tests/*": [
-        "./src/tests/*"
       ]
     }
   },

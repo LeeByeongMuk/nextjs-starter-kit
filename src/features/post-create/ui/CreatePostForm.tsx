@@ -1,11 +1,19 @@
-import ButtonBox from '@entities/post/ui/Form/ButtonBox';
-import ContentsEditor from '@entities/post/ui/Form/ContentsEditor';
-import IsOpenCheckbox from '@entities/post/ui/Form/IsOpenCheckbox';
-import TitleInput from '@entities/post/ui/Form/TitleInput';
-import TypeSelect from '@entities/post/ui/Form/TypeSelect';
-import { CreatePostFormInput } from '@features/post-create/model/form';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+
+import {
+  ButtonBox,
+  IsOpenCheckbox,
+  TitleInput,
+  TypeSelect,
+} from '@entities/post';
+// ContentsEditor wraps TUI Editor which references DOM globals at module
+// load; it is excluded from the @entities/post barrel to keep SSR pages
+// safe, so consumers must deep-import it from a `'use client'` file.
+// eslint-disable-next-line boundaries/entry-point
+import ContentsEditor from '@entities/post/ui/Form/ContentsEditor';
+
+import { CreatePostFormInput } from '../model/form';
 
 interface CreatePostFormProps {
   handleCreatePost: (req: CreatePostFormInput) => void;

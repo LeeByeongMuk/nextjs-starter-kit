@@ -63,11 +63,6 @@ export default [
         { type: 'features', pattern: 'src/features/*', mode: 'folder' },
         { type: 'entities', pattern: 'src/entities/*', mode: 'folder' },
         { type: 'shared', pattern: 'src/shared/**' },
-        // legacy locations — removed after Phase C-7
-        { type: 'legacy', pattern: 'src/domains/**' },
-        { type: 'legacy', pattern: 'src/lib/**' },
-        { type: 'legacy', pattern: 'src/tests/**' },
-        { type: 'legacy', pattern: 'src/auth.ts' },
       ],
       'import/resolver': {
         typescript: { project: './tsconfig.json' },
@@ -76,7 +71,7 @@ export default [
     },
     rules: {
       'boundaries/element-types': [
-        'warn',
+        'error',
         {
           default: 'allow',
           rules: [
@@ -89,11 +84,11 @@ export default [
         },
       ],
       'boundaries/entry-point': [
-        'warn',
+        'error',
         {
           default: 'disallow',
           rules: [
-            { target: ['app', 'shared', 'legacy'], allow: '**' },
+            { target: ['app', 'shared'], allow: '**' },
             { target: ['views', 'widgets', 'features', 'entities'], allow: 'index.{ts,tsx}' },
           ],
         },

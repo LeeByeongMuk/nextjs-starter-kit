@@ -1,15 +1,16 @@
-import PostDetail from '@app_domain/post/[id]/(detail)/page';
-import usePost from '@features/post-detail/model/usePost';
-import usePostDetail from '@features/post-detail/model/usePostDetail';
-import { server } from '@shared/api/mocks/testServer';
-import { getQueryClient } from '@shared/api/tanstack-query/client';
-import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
+
+import PostDetail from '@app/(domain)/post/[id]/(detail)/page';
+import { usePost } from '@features/post-detail';
+import { usePostDetail } from '@features/post-detail';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { getHandlerURI } from '@shared/lib/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

@@ -1,10 +1,11 @@
 'use client';
 
-import { fetchUpdatePostResource } from '@features/post-update/api/postUpdateServices';
-import { UpdatePostResourceRes } from '@features/post-update/api/types';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+
+import { fetchUpdatePostResource } from '../api/postUpdateServices';
+import { UpdatePostResourceRes } from '../api/types';
 
 export default function useUpdatePostResource() {
   const router = useRouter();

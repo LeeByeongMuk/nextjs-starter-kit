@@ -1,7 +1,9 @@
-import { PostListData } from '@features/post-list/api/types';
-import { getFormattedDate } from '@shared/lib/date';
 import Link from 'next/link';
 import React from 'react';
+
+import { getFormattedDate } from '@shared/lib/date';
+
+import { PostListData } from '../api/types';
 
 interface Props {
   post: PostListData;

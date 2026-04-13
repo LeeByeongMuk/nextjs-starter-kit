@@ -1,7 +1,8 @@
 'use server';
 
-import { TOKEN_KEY } from '@entities/auth/config/auth';
 import { cookies } from 'next/headers';
+
+import { TOKEN_KEY } from '@shared/config/auth';
 
 export const fetchApi = async <Response>(
   url: string,
