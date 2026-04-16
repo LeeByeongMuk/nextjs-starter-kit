@@ -24,26 +24,26 @@
       }
     ],
     "paths": {
-      "@app_domain/*": [
-        "./src/app/(domain)/*"
+      "@app/*": [
+        "./src/app/*"
       ],
-      "@app_api/*": [
-        "./src/app/api/*"
+      "@views/*": [
+        "./src/views/*"
+      ],
+      "@widgets/*": [
+        "./src/widgets/*"
+      ],
+      "@features/*": [
+        "./src/features/*"
+      ],
+      "@entities/*": [
+        "./src/entities/*"
       ],
       "@shared/*": [
         "./src/shared/*"
       ],
       "@styles/*": [
         "./src/styles/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ],
-      "@domains/*": [
-        "./src/domains/*"
-      ],
-      "@tests/*": [
-        "./src/tests/*"
       ],
       "@public/*": [
         "./public/*"

@@ -1,4 +1,4 @@
-import { auth as middleware } from './auth';
+import { auth as middleware } from '@app/auth/config';
 
 export default middleware;
 

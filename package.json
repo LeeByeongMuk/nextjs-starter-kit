@@ -49,6 +49,8 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.3",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-boundaries": "^6.0.2",
     "eslint-plugin-prettier": "^5.5.5",
     "express": "^5.2.1",
     "jest": "^30.3.0",

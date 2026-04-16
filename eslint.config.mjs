@@ -1,5 +1,6 @@
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import tanstackQuery from '@tanstack/eslint-plugin-query';
+import boundaries from 'eslint-plugin-boundaries';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default [
@@ -47,6 +48,53 @@ export default [
         },
       ],
       complexity: 'warn',
+    },
+  },
+  // FSD boundaries — warn during Phase B+C migration, promoted to error after Phase C-7
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { boundaries },
+    settings: {
+      'boundaries/elements': [
+        { type: 'app', pattern: 'src/app/**' },
+        { type: 'app', pattern: 'src/middleware.ts' },
+        { type: 'views', pattern: 'src/views/*', mode: 'folder' },
+        { type: 'widgets', pattern: 'src/widgets/*', mode: 'folder' },
+        { type: 'features', pattern: 'src/features/*', mode: 'folder' },
+        { type: 'entities', pattern: 'src/entities/*', mode: 'folder' },
+        { type: 'shared', pattern: 'src/shared/**' },
+      ],
+      'import/resolver': {
+        typescript: { project: './tsconfig.json' },
+        node: true,
+      },
+    },
+    rules: {
+      'boundaries/element-types': [
+        'error',
+        {
+          default: 'allow',
+          rules: [
+            { from: 'shared', disallow: ['app', 'views', 'widgets', 'features', 'entities'] },
+            { from: 'entities', disallow: ['app', 'views', 'widgets', 'features'] },
+            { from: 'features', disallow: ['app', 'views', 'widgets', 'features'] },
+            { from: 'widgets', disallow: ['app', 'views', 'widgets'] },
+            { from: 'views', disallow: ['app', 'views'] },
+          ],
+        },
+      ],
+      'boundaries/entry-point': [
+        'error',
+        {
+          default: 'disallow',
+          rules: [
+            { target: ['app', 'shared'], allow: '**' },
+            { target: ['views', 'widgets', 'features', 'entities'], allow: 'index.{ts,tsx}' },
+          ],
+        },
+      ],
+      'boundaries/no-unknown': 'off',
+      'boundaries/no-unknown-files': 'off',
     },
   },
   eslintPluginPrettierRecommended,

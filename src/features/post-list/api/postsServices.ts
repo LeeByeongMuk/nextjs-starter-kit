@@ -1,0 +1,16 @@
+import { fetchApi } from '@shared/lib/api';
+
+import { PostsReq, PostsRes } from './types';
+
+export const fetchPosts = async ({ page, type, q }: PostsReq) => {
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('type', type);
+  params.append('q', q);
+
+  const url = `/api/posts?${params.toString()}`;
+
+  return (await fetchApi(url, {
+    method: 'GET',
+  })) as PostsRes;
+};
