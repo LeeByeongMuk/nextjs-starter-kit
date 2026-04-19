@@ -32,7 +32,7 @@ Reasoning and edge cases: `docs/FSD_GUIDE.md` §7.
 - Use only the `@<layer>/*` aliases from `docs/FSD_GUIDE.md` §5; no relative imports across slices
 - Inside a slice, relative imports (`./model/foo`) are fine
 - App-layer files at Next.js-fixed paths (`src/middleware.ts`, `src/app/**/{page,layout,loading,error,route}.tsx?`) cannot move — but the same FSD rule applies: keep them thin and import composition from `views` / `widgets`
-- `src/auth.ts` (NextAuth config) is **not** Next.js-fixed — it lives at `src/shared/api/auth/` per FSD. Import via `@shared/api/auth`
+- NextAuth config lives at `src/app/auth/config.ts` (app layer — it orchestrates features/entities). Import via `@app/auth/config`. See `docs/FSD_GUIDE.md` §6 "NextAuth 설정 위치"
 
 ## When in doubt
 

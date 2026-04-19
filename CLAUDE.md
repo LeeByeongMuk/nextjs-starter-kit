@@ -17,6 +17,19 @@ When deciding where new code goes, walk the decision tree in `docs/FSD_GUIDE.md`
 
 Path aliases — full table in `docs/FSD_GUIDE.md` §5. Use only the configured `@<layer>/*` aliases; no relative imports across slices.
 
+## Conventions beyond FSD
+
+FSD만으로는 **파일 위치**만 정해진다. 슬라이스 안쪽의 코딩 스타일은 주제별 문서에 분리돼 있다. 신규 코드 작성 전 해당 문서 확인:
+
+- 가로지르는 원칙 (TypeScript / 네이밍 / 에러 정책) — `docs/CONVENTIONS.md`
+- 데이터 페칭 (TanStack Query, `fetchApi`) — `docs/DATA_FETCHING.md`
+- 폼 (React Hook Form, `defaultValues` 필수) — `docs/FORMS.md`
+- 인증 (NextAuth v5, deep-import 예외) — `docs/AUTH.md`
+- 스타일링 (Tailwind v4) — `docs/STYLING.md`
+- 테스팅 (Jest / RTL / MSW) — `docs/TESTING.md`
+
+라이브러리 전환 판단은 `docs/LIBRARY_DECISIONS.md` 참조. 새 의존성 추가 제안 전에 그 문서에서 이미 기각/보류된 후보인지 확인.
+
 ## Quality gates (PR-ready)
 
 ```
@@ -37,4 +50,11 @@ npm run build    # next production build
 ## Related docs
 
 - `docs/FSD_GUIDE.md` — canonical FSD spec (layers, segments, public API, mapping table)
+- `docs/CONVENTIONS.md` — cross-cutting coding conventions (index of topic docs below)
+- `docs/DATA_FETCHING.md` — TanStack Query v5 + `fetchApi` wrapper
+- `docs/FORMS.md` — React Hook Form 7 patterns
+- `docs/AUTH.md` — NextAuth v5 config, deep-import exceptions, session/JWT
+- `docs/STYLING.md` — Tailwind v4 conventions
+- `docs/TESTING.md` — Jest / RTL / MSW patterns and coverage gate
+- `docs/LIBRARY_DECISIONS.md` — keep/replace decisions for dependencies (Jest, Zod, Biome, …)
 - `docs/MIGRATION_GUIDE.md` — historical major-dependency upgrade record
