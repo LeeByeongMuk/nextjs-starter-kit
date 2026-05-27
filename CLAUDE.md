@@ -7,6 +7,7 @@ Stack: **Next.js 16 (App Router) · React 19 · TanStack Query v5 · NextAuth v5
 This codebase follows Feature-Sliced Design. **Canonical spec: `docs/FSD_GUIDE.md`** — read it before adding any new file. The bullets below are a cheat-sheet that points back to the spec; if anything here disagrees with the spec, the spec wins.
 
 Critical rules:
+
 - Layer order top → bottom only: `app → views → widgets → features → entities → shared` — see `docs/FSD_GUIDE.md` §1
 - FSD's standard "pages" layer is named `views` here, because Next.js owns `src/app` for routing — see §6
 - Slice isolation: same-layer slices cannot import each other; push shared code one layer down — see §1, §7
@@ -22,6 +23,8 @@ Path aliases — full table in `docs/FSD_GUIDE.md` §5. Use only the configured 
 FSD만으로는 **파일 위치**만 정해진다. 슬라이스 안쪽의 코딩 스타일은 주제별 문서에 분리돼 있다. 신규 코드 작성 전 해당 문서 확인:
 
 - 가로지르는 원칙 (TypeScript / 네이밍 / 에러 정책) — `docs/CONVENTIONS.md`
+- 코드 스타일 (JSDoc / 주석 금지 규칙 / async-await / 불변 구성) — `docs/CODE_STYLE.md`
+- API 패턴 (응답 `ApiResponse` extends / 매핑 함수 금지 / Service·hook 배치) — `docs/API_PATTERNS.md`
 - 데이터 페칭 (TanStack Query, `fetchApi`) — `docs/DATA_FETCHING.md`
 - 폼 (React Hook Form, `defaultValues` 필수) — `docs/FORMS.md`
 - 인증 (NextAuth v5, deep-import 예외) — `docs/AUTH.md`
@@ -51,6 +54,8 @@ npm run build    # next production build
 
 - `docs/FSD_GUIDE.md` — canonical FSD spec (layers, segments, public API, mapping table)
 - `docs/CONVENTIONS.md` — cross-cutting coding conventions (index of topic docs below)
+- `docs/CODE_STYLE.md` — JSDoc, comment bans, async/await, immutable construction
+- `docs/API_PATTERNS.md` — response envelope SSOT (`ApiResponse` extends), no-mapping rule, fetch/hook placement
 - `docs/DATA_FETCHING.md` — TanStack Query v5 + `fetchApi` wrapper
 - `docs/FORMS.md` — React Hook Form 7 patterns
 - `docs/AUTH.md` — NextAuth v5 config, deep-import exceptions, session/JWT
