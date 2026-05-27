@@ -10,6 +10,8 @@ paths:
 **Canonical specs**:
 
 - 가로지르는 원칙 — `docs/CONVENTIONS.md`
+- 코드 스타일 (JSDoc·주석·비동기·불변 구성) — `docs/CODE_STYLE.md` (체크리스트: `code-style.md`)
+- API 패턴 (envelope SSOT·매핑 금지·파일 배치) — `docs/API_PATTERNS.md` (체크리스트: `api-patterns.md`)
 - 데이터 페칭 — `docs/DATA_FETCHING.md`
 - 폼 — `docs/FORMS.md`
 - 인증 — `docs/AUTH.md`
@@ -31,6 +33,8 @@ This file is a Claude-only operational checklist; if it disagrees with any spec 
 4. **에러 피드백**: **신규 `alert()` 호출 금지** — `docs/CONVENTIONS.md` §3.4
 5. **NextAuth deep-import**: `src/app/auth/config.ts`에서만 허용. 다른 곳에서 복제 금지 — `docs/AUTH.md` §2
 6. **테스트**: 파일명 `*.spec.tsx` 고정, MSW 오버라이드는 `server.use(http....)` — `docs/TESTING.md`
+7. **코드 스타일**: export에 JSDoc, 구분선·이력·호출자 주석 금지, async/await(`.then` 체인 금지) — `code-style.md` / `docs/CODE_STYLE.md`
+8. **API 패턴**: 응답은 `ApiResponse` `extends`, 매핑 함수(`mapXxx`) 금지, fetch service↔hook 세그먼트 분리 — `api-patterns.md` / `docs/API_PATTERNS.md`
 
 ## Hard rules
 
