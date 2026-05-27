@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.pfx)",
+      "Read(**/*.crt)",
+      "Read(**/*.cer)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -E '\\.(ts|tsx|js|jsx|json|css|md)$' | xargs -I{} npx prettier --write '{}' 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/warn-debug.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
