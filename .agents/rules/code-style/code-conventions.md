@@ -139,6 +139,18 @@ export type PostType = (typeof POST_TYPES)[number];
 
 ---
 
+## 2.2 주석 작성 원칙
+
+- **신규 소스 파일 첫 줄**(directive/shebang 바로 아래)에 파일 역할을 설명하는 **한국어 한 줄 주석**을 둔다. 설정 파일(`*.config.*`, `package.json` 등)은 예외
+  ```ts
+  // 같은 FSD 슬라이스 내부에서 자기 슬라이스 alias import를 금지하는 커스텀 ESLint 룰
+  ```
+- 본문 주석은 **코드가 보여주지 못하는 제약**을 적을 때만 쓴다 (예: "msw ≥2.15는 중첩 ESM 의존성을 끌고 오므로 두 홉 다 transform 필요")
+- 금지: 다음 줄이 뭘 하는지 반복하는 주석, 작업 이력·리뷰 맥락·AI 흔적 주석, `// ────` 구분선 주석
+- `eslint-disable`은 반드시 **사유 주석과 함께, 해당 라인에만** (`-next-line`). 파일 전체 disable 금지
+
+---
+
 ## 3. 에러 / 피드백 정책
 
 ### 3.1 현행

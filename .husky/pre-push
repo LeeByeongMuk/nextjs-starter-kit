@@ -1,2 +1,3 @@
 #!/bin/sh
+# pre-push 훅 — 타입체크
 npm run tsc

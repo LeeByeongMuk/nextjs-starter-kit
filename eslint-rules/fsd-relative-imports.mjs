@@ -47,15 +47,11 @@ const fsdRelativeImportsRule = {
     };
 
     return {
-      // import ... from '...'
       ImportDeclaration: node => checkSource(node.source),
-      // export { x } from '...' / export * from '...'
       ExportNamedDeclaration: node => checkSource(node.source),
       ExportAllDeclaration: node => checkSource(node.source),
-      // 동적 import('...')
       ImportExpression: node =>
         node.source.type === 'Literal' ? checkSource(node.source) : undefined,
-      // require('...') / jest.mock('...') 류
       CallExpression: node => {
         const { callee } = node;
         const isRequire =
