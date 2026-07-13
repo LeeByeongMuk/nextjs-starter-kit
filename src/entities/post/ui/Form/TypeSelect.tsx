@@ -1,8 +1,8 @@
+import ValidationError from '@shared/ui/error/ValidationError';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { TYPE_OPTIONS } from '@entities/post/config/post';
-import ValidationError from '@shared/ui/error/ValidationError';
+import { TYPE_OPTIONS } from '../../config/post';
 
 export default function TypeSelect() {
   const {

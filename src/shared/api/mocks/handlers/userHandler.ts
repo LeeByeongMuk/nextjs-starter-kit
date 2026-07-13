@@ -1,7 +1,6 @@
-import { http, HttpResponse } from 'msw';
-
 import userData from '@shared/api/mocks/data/user.json';
 import { getHandlerURI } from '@shared/lib/url';
+import { http, HttpResponse } from 'msw';
 
 export const userHandler = [
   http.post(getHandlerURI('/api/users/signup'), () => {

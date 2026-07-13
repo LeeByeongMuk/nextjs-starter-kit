@@ -1,11 +1,10 @@
-import { useSession } from 'next-auth/react';
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
-
 import { ButtonBox } from '@entities/auth';
 import { EmailInput } from '@entities/auth';
 import { NameInput } from '@entities/auth';
 import { NickNameInput } from '@entities/auth';
+import { useSession } from 'next-auth/react';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { UpdateAccountReq } from '../api/types';
 

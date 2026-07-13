@@ -1,9 +1,8 @@
 'use client';
 
+import { TOKEN_KEY } from '@shared/config/auth';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
-
-import { TOKEN_KEY } from '@shared/config/auth';
 
 export default function Header() {
   const { status } = useSession();

@@ -1,12 +1,11 @@
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
-
 import { ButtonBox } from '@entities/auth';
 import { EmailInput } from '@entities/auth';
 import { NameInput } from '@entities/auth';
 import { NickNameInput } from '@entities/auth';
 import { PasswordConfirmInput } from '@entities/auth';
 import { PasswordInput } from '@entities/auth';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { SignUpReq } from '../api/types';
 

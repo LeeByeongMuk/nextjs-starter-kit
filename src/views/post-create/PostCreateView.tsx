@@ -1,14 +1,13 @@
 'use client';
 
-import { FormProvider } from 'react-hook-form';
-
 import {
   CreatePostForm,
+  type CreatePostFormInput,
   useCreatePost,
   useCreatePostForm,
-  type CreatePostFormInput,
 } from '@features/post-create';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
+import { FormProvider } from 'react-hook-form';
 
 export default function PostCreateView() {
   const methods = useCreatePostForm();

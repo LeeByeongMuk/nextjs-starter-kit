@@ -1,4 +1,4 @@
-import { QueryClient, isServer } from '@tanstack/react-query';
+import { isServer, QueryClient } from '@tanstack/react-query';
 
 export const defaultStaleTime = 60 * 1000;
 

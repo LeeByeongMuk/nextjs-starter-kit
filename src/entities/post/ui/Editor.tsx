@@ -1,9 +1,9 @@
+import '@toast-ui/editor/dist/toastui-editor.css';
+import '@toast-ui/editor/dist/i18n/ko-kr';
+
 import { Editor as TuiEditor } from '@toast-ui/react-editor';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-
-import '@toast-ui/editor/dist/toastui-editor.css';
-import '@toast-ui/editor/dist/i18n/ko-kr';
 
 interface Props {
   onChange: (contents: string) => void;

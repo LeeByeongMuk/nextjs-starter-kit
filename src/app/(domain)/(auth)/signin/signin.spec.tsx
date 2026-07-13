@@ -1,3 +1,6 @@
+import SignIn from '@app/(domain)/(auth)/signin/page';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
@@ -5,10 +8,6 @@ import { cookies } from 'next/headers';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import React from 'react';
-
-import SignIn from '@app/(domain)/(auth)/signin/page';
-import { server } from '@shared/api/mocks/testServer';
-import { getQueryClient } from '@shared/api/tanstack-query/client';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

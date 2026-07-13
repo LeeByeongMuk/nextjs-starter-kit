@@ -38,7 +38,7 @@ NextAuth 설정은 **`src/app/auth/config.ts`** — app 레이어 멤버.
 
 ```ts
 // server-only — excluded from @features/auth-signin barrel to keep client bundle clean
-// eslint-disable-next-line boundaries/entry-point
+// eslint-disable-next-line boundaries/dependencies
 import { fetchSignIn } from '@features/auth-signin/api/signinService';
 ```
 

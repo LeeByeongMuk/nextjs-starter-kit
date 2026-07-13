@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { getFormattedDate } from '@shared/lib/date';
+import React from 'react';
 
 import { PostData } from '../api/types';
 

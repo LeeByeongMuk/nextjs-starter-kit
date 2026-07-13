@@ -1,7 +1,6 @@
+import { getFormattedDate } from '@shared/lib/date';
 import Link from 'next/link';
 import React from 'react';
-
-import { getFormattedDate } from '@shared/lib/date';
 
 import { PostListData } from '../api/types';
 

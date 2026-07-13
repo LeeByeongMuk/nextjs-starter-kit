@@ -1,10 +1,9 @@
-import type { Metadata } from 'next';
-import React, { Suspense } from 'react';
+import '@styles/globals.css';
 
 import Layout from '@shared/ui/layout';
 import Provider from '@shared/ui/provider';
-
-import '@styles/globals.css';
+import type { Metadata } from 'next';
+import React, { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'next-starter-kit',

@@ -1,3 +1,8 @@
+import CreatePost from '@app/(domain)/post/create/page';
+import { useCreatePost } from '@features/post-create';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -12,12 +17,6 @@ import { cookies } from 'next/headers';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
-
-import CreatePost from '@app/(domain)/post/create/page';
-import { useCreatePost } from '@features/post-create';
-import { server } from '@shared/api/mocks/testServer';
-import { getQueryClient } from '@shared/api/tanstack-query/client';
-import { getHandlerURI } from '@shared/lib/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

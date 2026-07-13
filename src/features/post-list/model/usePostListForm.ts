@@ -1,10 +1,9 @@
 'use client';
 
+import { type PostType } from '@entities/post';
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-
-import { type PostType } from '@entities/post';
 
 import { PostListSearch, PostsReq } from '../api/types';
 

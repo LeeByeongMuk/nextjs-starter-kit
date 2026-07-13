@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { UpdateAccountReq } from '../api/types';
-
 import useDeleteAccount from './useDeleteAccount';
 import useUpdateAccount from './useUpdateAccount';
 

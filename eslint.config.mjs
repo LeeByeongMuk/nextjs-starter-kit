@@ -1,7 +1,11 @@
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import tanstackQuery from '@tanstack/eslint-plugin-query';
 import boundaries from 'eslint-plugin-boundaries';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import unusedImports from 'eslint-plugin-unused-imports';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+
+import fsd from './eslint-rules/fsd-relative-imports.mjs';
 
 export default [
   {
@@ -27,10 +31,18 @@ export default [
   ...nextVitals,
   ...tanstackQuery.configs['flat/recommended'],
   {
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+      'unused-imports': unusedImports,
+    },
     rules: {
       'no-alert': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
         {
           vars: 'all',
           varsIgnorePattern: '^_',
@@ -38,31 +50,33 @@ export default [
           argsIgnorePattern: '^_',
         },
       ],
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': ['warn'],
-      'import/order': [
-        'warn',
+      '@typescript-eslint/naming-convention': [
+        'error',
         {
-          groups: [['builtin', 'external'], 'internal', 'parent', ['sibling', 'index'], 'object'],
-          'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
+          selector: ['interface', 'typeAlias', 'class', 'enum'],
+          format: ['PascalCase'],
+          custom: { regex: '^(I|T)[A-Z]', match: false },
         },
       ],
       complexity: 'warn',
     },
   },
-  // FSD boundaries — warn during Phase B+C migration, promoted to error after Phase C-7
+  // FSD boundaries — layer direction + public API (boundaries v7 syntax)
   {
     files: ['src/**/*.{ts,tsx}'],
-    plugins: { boundaries },
+    plugins: { boundaries, fsd },
     settings: {
       'boundaries/elements': [
         { type: 'app', pattern: 'src/app/**' },
-        { type: 'app', pattern: 'src/middleware.ts' },
-        { type: 'views', pattern: 'src/views/*', mode: 'folder' },
-        { type: 'widgets', pattern: 'src/widgets/*', mode: 'folder' },
-        { type: 'features', pattern: 'src/features/*', mode: 'folder' },
-        { type: 'entities', pattern: 'src/entities/*', mode: 'folder' },
+        { type: 'views', pattern: 'src/views/*' },
+        { type: 'widgets', pattern: 'src/widgets/*' },
+        { type: 'features', pattern: 'src/features/*' },
+        { type: 'entities', pattern: 'src/entities/*' },
         { type: 'shared', pattern: 'src/shared/**' },
+        { type: 'styles', pattern: 'src/styles/**' },
       ],
       'import/resolver': {
         typescript: { project: './tsconfig.json' },
@@ -70,32 +84,75 @@ export default [
       },
     },
     rules: {
-      'boundaries/element-types': [
+      'boundaries/dependencies': [
         'error',
         {
           default: 'allow',
-          rules: [
-            { from: 'shared', disallow: ['app', 'views', 'widgets', 'features', 'entities'] },
-            { from: 'entities', disallow: ['app', 'views', 'widgets', 'features'] },
-            { from: 'features', disallow: ['app', 'views', 'widgets', 'features'] },
-            { from: 'widgets', disallow: ['app', 'views', 'widgets'] },
-            { from: 'views', disallow: ['app', 'views'] },
+          policies: [
+            // 레이어 방향: 상→하 단방향만 허용
+            {
+              from: { element: { type: 'shared' } },
+              disallow: {
+                to: {
+                  element: {
+                    type: ['app', 'views', 'widgets', 'features', 'entities'],
+                  },
+                },
+              },
+            },
+            {
+              from: { element: { type: 'entities' } },
+              disallow: {
+                to: {
+                  element: { type: ['app', 'views', 'widgets', 'features'] },
+                },
+              },
+            },
+            // 같은 레이어 형제 슬라이스 import 금지 포함 (features→features, views→views)
+            {
+              from: { element: { type: 'features' } },
+              disallow: {
+                to: {
+                  element: { type: ['app', 'views', 'widgets', 'features'] },
+                },
+              },
+            },
+            {
+              from: { element: { type: 'widgets' } },
+              disallow: {
+                to: { element: { type: ['app', 'views', 'widgets'] } },
+              },
+            },
+            {
+              from: { element: { type: 'views' } },
+              disallow: { to: { element: { type: ['app', 'views'] } } },
+            },
+            // Public API: 슬라이스 레이어는 index.{ts,tsx}로만 진입 (deep import 금지)
+            {
+              from: { element: { type: '*' } },
+              disallow: {
+                to: {
+                  element: {
+                    type: ['views', 'widgets', 'features', 'entities'],
+                    fileInternalPath: '!index.{ts,tsx}',
+                  },
+                },
+              },
+            },
           ],
         },
       ],
-      'boundaries/entry-point': [
-        'error',
-        {
-          default: 'disallow',
-          rules: [
-            { target: ['app', 'shared'], allow: '**' },
-            { target: ['views', 'widgets', 'features', 'entities'], allow: 'index.{ts,tsx}' },
-          ],
-        },
-      ],
-      'boundaries/no-unknown': 'off',
-      'boundaries/no-unknown-files': 'off',
+      'boundaries/no-unknown-dependencies': 'error',
+      'boundaries/no-unknown-files': 'error',
+      // 같은 슬라이스 내부에서는 alias 대신 상대 경로
+      'fsd/relative-imports': 'error',
     },
+  },
+  // src/middleware.ts는 Next.js 고정 경로의 단일 파일 — v7 elements는 폴더만
+  // 매칭하므로 app 레이어로 분류할 수 없어 unknown-files 검사만 제외한다
+  {
+    files: ['src/middleware.ts'],
+    rules: { 'boundaries/no-unknown-files': 'off' },
   },
   eslintPluginPrettierRecommended,
 ];

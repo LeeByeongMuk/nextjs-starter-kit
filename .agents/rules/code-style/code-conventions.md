@@ -109,6 +109,10 @@ export const POST_TYPES = ['notice', 'general'] as const;
 export type PostType = (typeof POST_TYPES)[number];
 ```
 
+### 1.5 `I*`/`T*` 타입 접두사 금지 (ESLint 강제)
+
+헝가리안 접두사(`IProps`, `TResult`)를 쓰지 않는다. interface/typeAlias/class/enum 이름은 접두사 없는 PascalCase — `@typescript-eslint/naming-convention`이 error로 잡는다. 역할은 suffix로 구분한다 (`Req`/`Res`, `<컴포넌트>Props`, `FormInput`).
+
 ---
 
 ## 2. 파일 / 디렉터리 네이밍
@@ -125,6 +129,13 @@ export type PostType = (typeof POST_TYPES)[number];
 | 테스트 | `<file>.spec.tsx` | `signin.spec.tsx` |
 
 슬라이스 이름 자체의 규칙(kebab-case, `<도메인>-<액션>`)은 `.agents/rules/architecture/fsd-architecture.md` §2 참조.
+
+### 2.1 import 규칙 (ESLint 강제)
+
+- **정렬**: `simple-import-sort`가 import/export 순서를 강제한다 — 위반은 `npm run lint:fix`로 자동 정렬
+- **미사용 import**: `unused-imports/no-unused-imports`가 error — 자동 제거됨
+- **같은 슬라이스 내부는 상대 경로**: 자기 슬라이스를 `@features/post-list/...` alias로 import하면 `fsd/relative-imports`가 error — `./`, `../` 사용
+- 레이어 경계·Public API 규칙은 `boundaries/dependencies` (v7 policies) — `.agents/rules/architecture/fsd-architecture.md` §1, §4
 
 ---
 
