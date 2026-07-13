@@ -55,6 +55,19 @@ const fsdRelativeImportsRule = {
       // 동적 import('...')
       ImportExpression: node =>
         node.source.type === 'Literal' ? checkSource(node.source) : undefined,
+      // require('...') / jest.mock('...') 류
+      CallExpression: node => {
+        const { callee } = node;
+        const isRequire =
+          callee.type === 'Identifier' && callee.name === 'require';
+        const isJestCall =
+          callee.type === 'MemberExpression' &&
+          callee.object.type === 'Identifier' &&
+          callee.object.name === 'jest';
+        if (isRequire || isJestCall) {
+          checkSource(node.arguments[0]);
+        }
+      },
     };
   },
 };
