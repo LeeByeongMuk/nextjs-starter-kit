@@ -1,4 +1,3 @@
-// 같은 FSD 슬라이스 내부에서 자기 슬라이스를 alias로 import하는 것을 금지하고 상대 경로를 강제하는 커스텀 ESLint 룰
 const FSD_LAYERS = ['views', 'widgets', 'features', 'entities'];
 
 const FILE_PATH_REGEX = new RegExp(`src/(${FSD_LAYERS.join('|')})/([^/]+)`);
@@ -68,6 +67,7 @@ const fsdRelativeImportsRule = {
   },
 };
 
+/** 같은 FSD 슬라이스 내에서 alias 대신 상대 경로 import를 강제하는 ESLint 플러그인 */
 const plugin = {
   rules: { 'relative-imports': fsdRelativeImportsRule },
 };

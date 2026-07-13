@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// npm run setup — 의존성 + 벤더링 에이전트 스킬 설치
-// 모든 명령어는 하드코딩된 빌드 스크립트 (사용자 입력 없음)
+// npm run setup — 의존성 설치 + 벤더링 에이전트 스킬 재설치
 
 import { execFileSync } from 'child_process';
 import { dirname, resolve } from 'path';

@@ -1,5 +1,4 @@
 #!/bin/sh
-# pre-commit 훅 — 보호 브랜치 직커밋 차단 + 시크릿/conflict 스캔 + lint-staged
 
 # 1. develop/main 브랜치 직접 커밋 차단 (merge 커밋은 허용)
 branch=$(git rev-parse --abbrev-ref HEAD)

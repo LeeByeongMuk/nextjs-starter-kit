@@ -1,3 +1,2 @@
 #!/bin/sh
-# commit-msg 훅 — conventional commits 메시지 검증
 npx --no -- commitlint --edit "$1"
