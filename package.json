@@ -2,6 +2,7 @@
   "name": "next-starter-kit",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@11.6.2",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
