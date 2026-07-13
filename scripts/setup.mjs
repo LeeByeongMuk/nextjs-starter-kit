@@ -7,8 +7,13 @@ import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// Windows에서 npm/npx는 .cmd 셔틀이라 shell 없이 spawn되지 않는다
 const run = (cmd, args) =>
-  execFileSync(cmd, args, { cwd: ROOT, stdio: 'inherit' });
+  execFileSync(cmd, args, {
+    cwd: ROOT,
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  });
 
 const cyan = s => `\x1b[36m${s}\x1b[0m`;
 const title = (step, msg) => console.log(`\n${cyan(`[${step}]`)} ${msg}`);
@@ -22,20 +27,17 @@ const skills = [
   'vercel-composition-patterns',
   'web-design-guidelines',
 ];
-for (const skill of skills) {
-  try {
-    run('npx', [
-      '-y',
-      'skills',
-      'add',
-      'vercel-labs/agent-skills',
-      '--skill',
-      skill,
-      '--yes',
-    ]);
-  } catch {
-    console.log(`  → ${skill} 설치 실패 (건너뜀)`);
-  }
+try {
+  run('npx', [
+    '-y',
+    'skills',
+    'add',
+    'vercel-labs/agent-skills',
+    ...skills.flatMap(skill => ['--skill', skill]),
+    '--yes',
+  ]);
+} catch {
+  console.log('  → 스킬 설치 실패 (건너뜀)');
 }
 
 console.log('\n\x1b[32m설정 완료!\x1b[0m');

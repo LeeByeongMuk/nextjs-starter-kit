@@ -1,9 +1,9 @@
 ---
 paths:
-  - "**/*.spec.tsx"
-  - "jest.config.ts"
-  - "jest.setup.ts"
-  - "src/shared/api/mocks/**"
+  - '**/*.spec.tsx'
+  - 'jest.config.ts'
+  - 'jest.setup.ts'
+  - 'src/shared/api/mocks/**'
 ---
 
 # Testing Guide
@@ -25,10 +25,17 @@ paths:
 `jest.config.ts`의 `extraTransformPkgs`:
 
 ```ts
-const extraTransformPkgs = ['rettime', 'until-async', 'next-auth', '@auth'];
+const extraTransformPkgs = [
+  'rettime',
+  'until-async',
+  'next-auth',
+  '@auth',
+  'msw',
+  '@open-draft',
+];
 ```
 
-NextAuth / Auth.js 계열은 ESM 전환이 잦다. **테스트가 갑자기 깨지면 여기를 먼저 확인**. 예외 추가 시 `npm test` 전체 재실행 필수.
+NextAuth / Auth.js 계열은 ESM 전환이 잦고, msw ≥2.15는 ESM 전용 `@open-draft/deferred-promise`를 중첩 node_modules로 끌고 온다 (중첩 경로는 바깥 패키지 `msw`도 예외 목록에 있어야 변환된다). **테스트가 갑자기 깨지면 여기를 먼저 확인**. 예외 추가 시 `npm test` 전체 재실행 필수.
 
 ---
 
@@ -42,11 +49,11 @@ NextAuth / Auth.js 계열은 ESM 전환이 잦다. **테스트가 갑자기 깨�
 
 ## 4. 테스트 위치 정책
 
-| 대상 | 위치 | 네이밍 |
-|---|---|---|
-| 페이지 통합 테스트 (현행) | `src/app/**/*.spec.tsx` | `signin.spec.tsx` |
-| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 (`model/` 또는 `api/`) | `<file>.spec.ts` |
-| 컴포넌트 렌더 테스트 | feature view 레벨 통합으로 대체 | — |
+| 대상                           | 위치                                 | 네이밍            |
+| ------------------------------ | ------------------------------------ | ----------------- |
+| 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx`              | `signin.spec.tsx` |
+| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 (`model/` 또는 `api/`) | `<file>.spec.ts`  |
+| 컴포넌트 렌더 테스트           | feature view 레벨 통합으로 대체      | —                 |
 
 UI 컴포넌트 단위 snapshot 테스트는 지양 — 렌더 구조 변경에 취약하고 가치 낮음.
 
@@ -63,7 +70,9 @@ UI 컴포넌트 단위 snapshot 테스트는 지양 — 렌더 구조 변경에 
 ```ts
 // src/shared/api/mocks/handlers/auth.ts
 export const authHandlers = [
-  http.post('/api/auth/signin', () => HttpResponse.json({ user: mockUser, accessToken: '...' })),
+  http.post('/api/auth/signin', () =>
+    HttpResponse.json({ user: mockUser, accessToken: '...' })
+  ),
 ];
 ```
 
@@ -71,7 +80,9 @@ export const authHandlers = [
 
 ```ts
 server.use(
-  http.post('/api/auth/signin', () => HttpResponse.json({ error: 'invalid' }, { status: 401 }))
+  http.post('/api/auth/signin', () =>
+    HttpResponse.json({ error: 'invalid' }, { status: 401 })
+  )
 );
 ```
 

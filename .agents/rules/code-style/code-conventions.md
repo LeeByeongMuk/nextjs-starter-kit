@@ -1,8 +1,8 @@
 ---
 paths:
-  - "src/**/*"
-  - "jest.config.ts"
-  - "jest.setup.ts"
+  - 'src/**/*'
+  - 'jest.config.ts'
+  - 'jest.setup.ts'
 ---
 
 # Coding Conventions Guide
@@ -41,13 +41,13 @@ paths:
 
 ## 하위 문서
 
-| 주제 | 문서 |
-|---|---|
+| 주제                                     | 문서                                                                              |
+| ---------------------------------------- | --------------------------------------------------------------------------------- |
 | 데이터 페칭 (TanStack Query, `fetchApi`) | [`.agents/rules/architecture/data-fetching.md`](../architecture/data-fetching.md) |
-| 폼 (React Hook Form) | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md) |
-| 인증 (NextAuth v5) | [`.agents/rules/architecture/auth.md`](../architecture/auth.md) |
-| 스타일링 (Tailwind v4) | [`.agents/rules/code-style/styling.md`](../code-style/styling.md) |
-| 테스팅 (Jest / RTL / MSW) | [`.agents/rules/testing/unit-testing.md`](../testing/unit-testing.md) |
+| 폼 (React Hook Form)                     | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md)     |
+| 인증 (NextAuth v5)                       | [`.agents/rules/architecture/auth.md`](../architecture/auth.md)                   |
+| 스타일링 (Tailwind v4)                   | [`.agents/rules/code-style/styling.md`](../code-style/styling.md)                 |
+| 테스팅 (Jest / RTL / MSW)                | [`.agents/rules/testing/unit-testing.md`](../testing/unit-testing.md)             |
 
 파일 배치(어떤 레이어에 두는가)는 `.agents/rules/architecture/fsd-architecture.md`. 라이브러리 교체 여부는 `.agents/rules/infra/library-decisions.md`.
 
@@ -68,7 +68,7 @@ paths:
 
 - `tsconfig.json`: `strict: true`, `noEmit: true` (tsc는 타입체크 전용, 빌드는 Next.js가 수행)
 - `moduleResolution: bundler`, `module: esnext`, `isolatedModules: true` — 신규 파일은 항상 ESM 문법 사용
-- import 순서: ESLint `import/order` 자동 정렬 (`npm run lint:fix`)에 위임. 수동 조정 금지
+- import 순서: ESLint `simple-import-sort` 자동 정렬 (`npm run lint:fix`)에 위임. 수동 조정 금지
 
 ### 1.1 요청/응답 타입: `interface` + `Req`/`Res` suffix
 
@@ -117,16 +117,16 @@ export type PostType = (typeof POST_TYPES)[number];
 
 ## 2. 파일 / 디렉터리 네이밍
 
-| 대상 | 네이밍 | 예시 |
-|---|---|---|
-| 컴포넌트 파일 | `PascalCase.tsx` | `PostListItem.tsx` |
-| 훅 파일 | `camelCase.ts`, `use` 접두사 | `useCreatePostForm.ts` |
-| 서비스 / 유틸 | `camelCase.ts` | `signinService.ts`, `fetchApi.ts` |
-| API 타입 전용 | `types.ts` | `src/features/*/api/types.ts` |
-| 폼 타입 전용 | `form.ts` | `src/features/*/model/form.ts` |
-| 상수 | `<domain>.ts` | `src/entities/post/config/post.ts` |
-| 슬라이스 barrel | `index.ts` (고정) | `src/features/post-list/index.ts` |
-| 테스트 | `<file>.spec.tsx` | `signin.spec.tsx` |
+| 대상            | 네이밍                       | 예시                               |
+| --------------- | ---------------------------- | ---------------------------------- |
+| 컴포넌트 파일   | `PascalCase.tsx`             | `PostListItem.tsx`                 |
+| 훅 파일         | `camelCase.ts`, `use` 접두사 | `useCreatePostForm.ts`             |
+| 서비스 / 유틸   | `camelCase.ts`               | `signinService.ts`, `fetchApi.ts`  |
+| API 타입 전용   | `types.ts`                   | `src/features/*/api/types.ts`      |
+| 폼 타입 전용    | `form.ts`                    | `src/features/*/model/form.ts`     |
+| 상수            | `<domain>.ts`                | `src/entities/post/config/post.ts` |
+| 슬라이스 barrel | `index.ts` (고정)            | `src/features/post-list/index.ts`  |
+| 테스트          | `<file>.spec.tsx`            | `signin.spec.tsx`                  |
 
 슬라이스 이름 자체의 규칙(kebab-case, `<도메인>-<액션>`)은 `.agents/rules/architecture/fsd-architecture.md` §2 참조.
 

@@ -47,7 +47,7 @@ const extraTransformPkgs = [
 
 const nextConfig = createJestConfig(config);
 
-export default async () => {
+const jestConfig = async () => {
   const resolved = await nextConfig();
   if (resolved.transformIgnorePatterns) {
     const pkgList = extraTransformPkgs.join('|');
@@ -60,3 +60,5 @@ export default async () => {
   }
   return resolved;
 };
+
+export default jestConfig;

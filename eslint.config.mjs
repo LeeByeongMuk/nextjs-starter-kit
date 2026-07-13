@@ -7,7 +7,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 import fsd from './eslint-rules/fsd-relative-imports.mjs';
 
-export default [
+const config = [
   {
     ignores: [
       '.next/**',
@@ -42,7 +42,7 @@ export default [
       'simple-import-sort/exports': 'error',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
-        'warn',
+        'error',
         {
           vars: 'all',
           varsIgnorePattern: '^_',
@@ -53,6 +53,11 @@ export default [
       'no-unused-vars': 'off',
       complexity: 'warn',
     },
+  },
+  // 스크립트/개발용 mock 서버는 콘솔 출력이 본질
+  {
+    files: ['scripts/**', 'src/shared/api/mocks/server.ts'],
+    rules: { 'no-console': 'off' },
   },
   // @typescript-eslint 플러그인은 nextVitals가 ts/tsx에만 등록하므로 별도 스코프
   {
@@ -83,6 +88,10 @@ export default [
         { type: 'entities', pattern: 'src/entities/*' },
         { type: 'shared', pattern: 'src/shared/**' },
         { type: 'styles', pattern: 'src/styles/**' },
+      ],
+      // 단일 파일은 v7에서 file descriptor로 분류 (middleware는 app 레이어 취급)
+      'boundaries/files': [
+        { pattern: 'src/middleware.ts', category: 'app-file' },
       ],
       'import/resolver': {
         typescript: { project: './tsconfig.json' },
@@ -145,6 +154,18 @@ export default [
                 },
               },
             },
+            // middleware(app-file)에도 동일한 Public API 규칙 적용
+            {
+              from: { file: { categories: 'app-file' } },
+              disallow: {
+                to: {
+                  element: {
+                    type: ['views', 'widgets', 'features', 'entities'],
+                    fileInternalPath: '!index.{ts,tsx}',
+                  },
+                },
+              },
+            },
           ],
         },
       ],
@@ -154,11 +175,7 @@ export default [
       'fsd/relative-imports': 'error',
     },
   },
-  // src/middleware.ts는 Next.js 고정 경로의 단일 파일 — v7 elements는 폴더만
-  // 매칭하므로 app 레이어로 분류할 수 없어 unknown-files 검사만 제외한다
-  {
-    files: ['src/middleware.ts'],
-    rules: { 'boundaries/no-unknown-files': 'off' },
-  },
   eslintPluginPrettierRecommended,
 ];
+
+export default config;

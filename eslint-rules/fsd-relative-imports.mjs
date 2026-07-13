@@ -26,31 +26,41 @@ const fsdRelativeImportsRule = {
 
     const [, fileLayer, fileSlice] = fileMatch;
 
+    const checkSource = sourceNode => {
+      if (!sourceNode || typeof sourceNode.value !== 'string') {
+        return;
+      }
+
+      const importMatch = sourceNode.value.match(IMPORT_PATH_REGEX);
+      if (!importMatch) {
+        return;
+      }
+
+      const [, importLayer, importSlice] = importMatch;
+      if (importLayer === fileLayer && importSlice === fileSlice) {
+        context.report({
+          node: sourceNode,
+          messageId: 'useRelativeImport',
+          data: { layer: fileLayer, slice: fileSlice },
+        });
+      }
+    };
+
     return {
-      ImportDeclaration(node) {
-        const importPath = node.source.value;
-        if (typeof importPath !== 'string') {
-          return;
-        }
-
-        const importMatch = importPath.match(IMPORT_PATH_REGEX);
-        if (!importMatch) {
-          return;
-        }
-
-        const [, importLayer, importSlice] = importMatch;
-        if (importLayer === fileLayer && importSlice === fileSlice) {
-          context.report({
-            node: node.source,
-            messageId: 'useRelativeImport',
-            data: { layer: fileLayer, slice: fileSlice },
-          });
-        }
-      },
+      // import ... from '...'
+      ImportDeclaration: node => checkSource(node.source),
+      // export { x } from '...' / export * from '...'
+      ExportNamedDeclaration: node => checkSource(node.source),
+      ExportAllDeclaration: node => checkSource(node.source),
+      // 동적 import('...')
+      ImportExpression: node =>
+        node.source.type === 'Literal' ? checkSource(node.source) : undefined,
     };
   },
 };
 
-export default {
+const plugin = {
   rules: { 'relative-imports': fsdRelativeImportsRule },
 };
+
+export default plugin;
