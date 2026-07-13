@@ -34,7 +34,16 @@ const config: Config = {
 };
 
 // Packages that ship ESM and need Jest transformation
-const extraTransformPkgs = ['rettime', 'until-async', 'next-auth', '@auth'];
+const extraTransformPkgs = [
+  'rettime',
+  'until-async',
+  'next-auth',
+  '@auth',
+  // msw ≥2.15 nests an ESM-only @open-draft/deferred-promise under
+  // node_modules/msw/node_modules — both hops must be transformable
+  'msw',
+  '@open-draft',
+];
 
 const nextConfig = createJestConfig(config);
 
