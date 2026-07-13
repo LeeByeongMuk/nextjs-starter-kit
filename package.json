@@ -13,7 +13,8 @@
     "prettier:fix": "prettier --write ./src",
     "test": "jest",
     "tsc": "tsc",
-    "mock": "npx tsx watch ./src/shared/api/mocks/server.ts"
+    "mock": "npx tsx watch ./src/shared/api/mocks/server.ts",
+    "setup": "node scripts/setup.mjs"
   },
   "overrides": {
     "@toast-ui/react-editor": {
