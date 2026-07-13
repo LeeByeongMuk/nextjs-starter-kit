@@ -1,4 +1,39 @@
+---
+paths:
+  - "src/**/*"
+  - "jest.config.ts"
+  - "jest.setup.ts"
+---
+
 # Coding Conventions Guide
+
+## 프리플라이트 (새 코드 작성 전 순서대로 확인)
+
+1. **Type 이름**: API 경계 타입이면 `interface` + `Req`/`Res` suffix — §1.1
+2. **TanStack Query 훅** — [`data-fetching.md`](../architecture/data-fetching.md)
+   - 위치: 여러 슬라이스 공용 → `entities/<e>/model/`, 한 슬라이스 전용 → `features/<slice>/model/`
+   - 쿼리키: `[entity, paramsObject]` 고정 (파라미터는 항상 객체 래핑)
+3. **React Hook Form** — [`form-patterns.md`](../code-style/form-patterns.md)
+   - 파일 3분할: `model/form.ts` + `model/use<Slice>Form.ts` + `ui/<Slice>Form.tsx`
+   - `useForm()` 호출에 **`defaultValues` 필수**
+   - `FormProvider` + `useFormContext()` (prop drilling 금지)
+4. **에러 피드백**: **신규 `alert()` 호출 금지** — §3.4
+5. **NextAuth deep-import**: `src/app/auth/config.ts`에서만 허용. 다른 곳에서 복제 금지 — [`auth.md`](../architecture/auth.md) §2
+6. **테스트**: 파일명 `*.spec.tsx` 고정, MSW 오버라이드는 `server.use(http....)` — [`unit-testing.md`](../testing/unit-testing.md)
+
+**Hard rules** (ESLint가 못 잡는 것 포함).
+
+- `useForm()`에서 `defaultValues` 누락 → 작성 전에 반드시 추가
+- `alert()` 신규 호출 → 작성 금지 (기존 호출은 교체 대상)
+- TS `enum` 사용 → as-const union으로 대체 — §1.4
+- `QueryClient` 새로 생성 → `src/shared/api/tanstack-query/client.ts`만 사용
+- `classnames` 신규 import → 금지 (기존 2곳 외 확산 방지) — [`styling.md`](./styling.md) §1
+
+**라이브러리 추가**: 새 런타임 의존성을 제안하기 전에 [`library-decisions.md`](../infra/library-decisions.md) 결정 테이블을 확인한다. "유지" 결정이 박힌 후보의 역(교체)을 무단 제안하지 말 것. 재검토 조건이 충족됐다면 그 조건을 인용해 사용자에게 확인 요청. 예외: **Zod**는 "도입" 결정이므로 후속 PR에서 능동 적용 가능.
+
+**When in doubt**: 새 패턴을 도입하기 전에 사용자에게 묻는다. 컨벤션에서 벗어난 한 줄은 수개월 후 표준을 오염시킨다.
+
+---
 
 > 작성일: 2026-04-19
 > 대상 브랜치: `develop`
@@ -8,13 +43,13 @@
 
 | 주제 | 문서 |
 |---|---|
-| 데이터 페칭 (TanStack Query, `fetchApi`) | [`docs/DATA_FETCHING.md`](./DATA_FETCHING.md) |
-| 폼 (React Hook Form) | [`docs/FORMS.md`](./FORMS.md) |
-| 인증 (NextAuth v5) | [`docs/AUTH.md`](./AUTH.md) |
-| 스타일링 (Tailwind v4) | [`docs/STYLING.md`](./STYLING.md) |
-| 테스팅 (Jest / RTL / MSW) | [`docs/TESTING.md`](./TESTING.md) |
+| 데이터 페칭 (TanStack Query, `fetchApi`) | [`.agents/rules/architecture/data-fetching.md`](../architecture/data-fetching.md) |
+| 폼 (React Hook Form) | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md) |
+| 인증 (NextAuth v5) | [`.agents/rules/architecture/auth.md`](../architecture/auth.md) |
+| 스타일링 (Tailwind v4) | [`.agents/rules/code-style/styling.md`](../code-style/styling.md) |
+| 테스팅 (Jest / RTL / MSW) | [`.agents/rules/testing/unit-testing.md`](../testing/unit-testing.md) |
 
-파일 배치(어떤 레이어에 두는가)는 `docs/FSD_GUIDE.md`. 라이브러리 교체 여부는 `docs/LIBRARY_DECISIONS.md`.
+파일 배치(어떤 레이어에 두는가)는 `.agents/rules/architecture/fsd-architecture.md`. 라이브러리 교체 여부는 `.agents/rules/infra/library-decisions.md`.
 
 ---
 
@@ -89,7 +124,7 @@ export type PostType = (typeof POST_TYPES)[number];
 | 슬라이스 barrel | `index.ts` (고정) | `src/features/post-list/index.ts` |
 | 테스트 | `<file>.spec.tsx` | `signin.spec.tsx` |
 
-슬라이스 이름 자체의 규칙(kebab-case, `<도메인>-<액션>`)은 `docs/FSD_GUIDE.md` §2 참조.
+슬라이스 이름 자체의 규칙(kebab-case, `<도메인>-<액션>`)은 `.agents/rules/architecture/fsd-architecture.md` §2 참조.
 
 ---
 
@@ -120,6 +155,6 @@ export type PostType = (typeof POST_TYPES)[number];
 
 ## 4. 참고 자료
 
-- FSD 배치 규칙: [`docs/FSD_GUIDE.md`](./FSD_GUIDE.md)
-- 라이브러리 교체 판단: [`docs/LIBRARY_DECISIONS.md`](./LIBRARY_DECISIONS.md)
-- 의존성 마이그레이션 이력: [`docs/MIGRATION_GUIDE.md`](./MIGRATION_GUIDE.md)
+- FSD 배치 규칙: [`.agents/rules/architecture/fsd-architecture.md`](../architecture/fsd-architecture.md)
+- 라이브러리 교체 판단: [`.agents/rules/infra/library-decisions.md`](../infra/library-decisions.md)
+- 의존성 마이그레이션 이력: [`.agents/rules/infra/migration-history.md`](../infra/migration-history.md)

@@ -1,4 +1,31 @@
+---
+paths:
+  - "src/**/*"
+  - "eslint.config.mjs"
+  - "tsconfig.json"
+---
+
 # Feature-Sliced Design (FSD) Guide
+
+## 프리플라이트 (새 파일 배치 결정 — 순서대로 걷다가 첫 매치에서 멈춘다)
+
+1. 도메인 무관 프리미티브 (button, spinner, date util, env config) → `src/shared/<segment>/...`
+2. 도메인 모델·도메인 공용 UI (Post 타입, AuthHeader, Pagination) → `src/entities/<entity>/<segment>/...`
+3. 사용자 행동 플로우 (sign-in form, post-create mutation, list filter) → `src/features/<domain>-<action>/<segment>/...`
+4. 여러 features/entities를 한 UI 블록으로 조합 → `src/widgets/<widget-name>/<segment>/...`
+5. 한 라우트의 전체 화면 조합 → `src/views/<route-name>/`
+6. Next.js 라우팅/라이프사이클 산물 (`src/app/**`의 `page/layout/loading/error/route`, `src/middleware.ts`) → 얇게 유지, `views`/`widgets`만 import
+
+**워크플로 규칙.**
+
+- 새 슬라이스 = 같은 편집에서 `index.ts` 생성 (빈 파일도 의도적이면 OK)
+- §5의 `@<layer>/*` alias만 사용. 슬라이스를 가로지르는 상대 import 금지 (슬라이스 내부 상대 import는 OK)
+- 역방향 import · 같은 레이어 형제 슬라이스 import · deep import는 ESLint가 잡는다 — 룰과 싸우지 말고 배치를 고친다 (§1, §4)
+- NextAuth 설정은 `src/app/auth/config.ts` (§6)
+
+의심스러우면 파일을 만들기 전에 사용자에게 묻는다. 상세 근거와 엣지 케이스는 §7.
+
+---
 
 > 작성일: 2026-04-13
 > 대상 브랜치: `develop`

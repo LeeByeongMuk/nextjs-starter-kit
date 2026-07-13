@@ -1,7 +1,15 @@
+---
+paths:
+  - "**/*.spec.tsx"
+  - "jest.config.ts"
+  - "jest.setup.ts"
+  - "src/shared/api/mocks/**"
+---
+
 # Testing Guide
 
 > 대상: **Jest 30 + Testing Library + MSW 2**
-> 상위 문서: [`docs/CONVENTIONS.md`](./CONVENTIONS.md)
+> 상위 문서: [`.agents/rules/code-style/code-conventions.md`](../code-style/code-conventions.md)
 
 ## 1. 환경 구성
 
@@ -102,7 +110,7 @@ const createTestQueryClient = () =>
 
 ## 8. Vitest 전환?
 
-현재 **유지 결정** — 근거와 재검토 조건은 `docs/LIBRARY_DECISIONS.md` §Jest → Vitest 참조.
+현재 **유지 결정** — 근거와 재검토 조건은 `.agents/rules/infra/library-decisions.md` §Jest → Vitest 참조.
 
 ---
 

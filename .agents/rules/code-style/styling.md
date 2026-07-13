@@ -1,7 +1,13 @@
+---
+paths:
+  - "src/**/*.tsx"
+  - "src/styles/**"
+---
+
 # Styling Guide
 
 > 대상: **Tailwind v4**
-> 상위 문서: [`docs/CONVENTIONS.md`](./CONVENTIONS.md)
+> 상위 문서: [`.agents/rules/code-style/code-conventions.md`](../code-style/code-conventions.md)
 
 ## 1. 원칙: 유틸리티 클래스 직접 작성
 
@@ -18,7 +24,7 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 <button className={`px-4 py-2 ${isActive ? 'bg-teal-600 text-white' : 'bg-gray-300 text-gray-700'}`}>
 ```
 
-재검토 조건은 `docs/LIBRARY_DECISIONS.md` §classnames → clsx 참조.
+재검토 조건은 `.agents/rules/infra/library-decisions.md` §classnames → clsx 참조.
 
 ---
 
@@ -47,7 +53,7 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 | Primary | `teal-600` |
 | Form focus ring | `indigo-600` |
 | Neutral | `gray-300`, `gray-700`, `gray-900` |
-| Error | 미정 — 토스트 도입 시 정의 (`docs/CONVENTIONS.md` §3) |
+| Error | 미정 — 토스트 도입 시 정의 (`.agents/rules/code-style/code-conventions.md` §3) |
 
 새 색상 도입 시 본 섹션을 먼저 업데이트.
 
@@ -66,4 +72,4 @@ v3 방식(`tailwind.config.js`의 `content` 배열)은 쓰지 않는다 — v4 �
 ## 6. 참고 자료
 
 - Tailwind v4 공식: https://tailwindcss.com/docs
-- 디자인 시스템 강화 여부: `docs/LIBRARY_DECISIONS.md` 기타 섹션 (Storybook 등)
+- 디자인 시스템 강화 여부: `.agents/rules/infra/library-decisions.md` 기타 섹션 (Storybook 등)

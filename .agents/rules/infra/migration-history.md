@@ -1,3 +1,8 @@
+---
+paths:
+  - "package.json"
+---
+
 # Major Dependency Migration Guide
 
 > 작성일: 2026-03-12

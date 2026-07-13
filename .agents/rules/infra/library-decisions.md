@@ -1,3 +1,8 @@
+---
+paths:
+  - "package.json"
+---
+
 # Library Decisions
 
 > 작성일: 2026-04-19
@@ -136,7 +141,7 @@
 - **교체 반**: 없음 — 현재 beta가 이미 메인 패키지
 - **비용**: 릴리스 내용에 따라 다르나 통상 Small
 - **결정**: **stable 릴리스 즉시 업그레이드**
-- **재검토 조건**: `next-auth@5.0.0` (non-beta) 릴리스 시 `docs/MIGRATION_GUIDE.md`에 업그레이드 기록 남기고 즉시 진행
+- **재검토 조건**: `next-auth@5.0.0` (non-beta) 릴리스 시 `.agents/rules/infra/migration-history.md`에 업그레이드 기록 남기고 즉시 진행
 
 ---
 
@@ -168,11 +173,11 @@
 
 ## 참고 자료
 
-- 가로지르는 컨벤션: `docs/CONVENTIONS.md`
-- 데이터 페칭: `docs/DATA_FETCHING.md`
-- 폼: `docs/FORMS.md`
-- 인증: `docs/AUTH.md`
-- 스타일링: `docs/STYLING.md`
-- 테스팅: `docs/TESTING.md`
-- FSD: `docs/FSD_GUIDE.md`
-- 의존성 마이그레이션 이력: `docs/MIGRATION_GUIDE.md`
+- 가로지르는 컨벤션: `.agents/rules/code-style/code-conventions.md`
+- 데이터 페칭: `.agents/rules/architecture/data-fetching.md`
+- 폼: `.agents/rules/code-style/form-patterns.md`
+- 인증: `.agents/rules/architecture/auth.md`
+- 스타일링: `.agents/rules/code-style/styling.md`
+- 테스팅: `.agents/rules/testing/unit-testing.md`
+- FSD: `.agents/rules/architecture/fsd-architecture.md`
+- 의존성 마이그레이션 이력: `.agents/rules/infra/migration-history.md`
