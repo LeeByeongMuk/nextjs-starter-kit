@@ -17,6 +17,11 @@
 - **Jest**
 - **MSW (Mock API)**
 
+### 문서 / AI 에이전트
+
+- 프로젝트 규칙의 단일 원본은 [`.agents/rules/**`](.agents/rules)이며, AI 에이전트 진입점은 [`AGENTS.md`](AGENTS.md)입니다 (`CLAUDE.md`/`GEMINI.md`는 심볼릭 링크).
+- 처음 클론했다면 `npm run setup`으로 의존성과 벤더링 에이전트 스킬을 설치하세요.
+
 ### 설치 및 실행
 
 - Docker 를 사용하여 로컬 환경을 설정합니다.
