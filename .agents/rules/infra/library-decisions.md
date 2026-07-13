@@ -137,7 +137,7 @@ paths:
 
 ## NextAuth v5 beta → stable
 
-- **현황**: `next-auth: 5.0.0-beta.30`. 수 개월째 beta. 설정은 `src/app/auth/config.ts` (FSD app 레이어)
+- **현황**: `next-auth: 5.0.0-beta.31`. 수 개월째 beta. 설정은 `src/app/auth/config.ts` (FSD app 레이어)
 - **교체 찬**: beta 탈출 시 API 안정성 보장, 메이저 변경 위험 감소
 - **교체 반**: 없음 — 현재 beta가 이미 메인 패키지
 - **비용**: 릴리스 내용에 따라 다르나 통상 Small

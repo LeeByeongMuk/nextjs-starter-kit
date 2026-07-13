@@ -216,7 +216,7 @@ widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/pos
 - 슬라이스 내부 경로 deep import (`@features/auth-signin/ui/SignInForm`) — `boundaries/dependencies` (Public API policy)
 - 어느 레이어에도 속하지 않는 디렉터리 추가 — `boundaries/no-unknown-files`
 
-마이그레이션 진행 중에는 `severity: 'warn'`, Phase C 완료 시 `'error'`로 승격한다.
+모든 FSD boundaries 위반은 `error`로 처리하며 CI를 차단한다.
 
 ---
 

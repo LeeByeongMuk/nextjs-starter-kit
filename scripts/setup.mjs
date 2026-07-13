@@ -26,17 +26,13 @@ const skills = [
   'vercel-composition-patterns',
   'web-design-guidelines',
 ];
-try {
-  run('npx', [
-    '-y',
-    'skills',
-    'add',
-    'vercel-labs/agent-skills',
-    ...skills.flatMap(skill => ['--skill', skill]),
-    '--yes',
-  ]);
-} catch {
-  console.log('  → 스킬 설치 실패 (건너뜀)');
-}
+run('npx', [
+  '-y',
+  'skills',
+  'add',
+  'vercel-labs/agent-skills',
+  ...skills.flatMap(skill => ['--skill', skill]),
+  '--yes',
+]);
 
 console.log('\n\x1b[32m설정 완료!\x1b[0m');
