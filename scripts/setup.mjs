@@ -10,7 +10,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const run = (cmd, args) =>
   execFileSync(cmd, args, { cwd: ROOT, stdio: 'inherit' });
 
-const cyan = (s) => `\x1b[36m${s}\x1b[0m`;
+const cyan = s => `\x1b[36m${s}\x1b[0m`;
 const title = (step, msg) => console.log(`\n${cyan(`[${step}]`)} ${msg}`);
 
 title('1/2', '의존성 설치');

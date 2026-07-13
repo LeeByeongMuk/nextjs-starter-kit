@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# 1. develop/main 브랜치 직접 커밋 차단 (merge 커밋은 허용)
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "main" ] || [ "$branch" = "develop" ]; then
+  if [ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]; then
+    echo "✅ merge 커밋 허용: $branch"
+  else
+    echo "❌ '$branch' 브랜치에 직접 커밋할 수 없습니다."
+    echo "   feature/*, fix/*, refactor/*, chore/* 브랜치를 사용하세요."
+    exit 1
+  fi
+fi
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# 2. 민감 파일/비밀 키 탐지
+SECRETS_PATTERN='\.env$|\.env\.|\.p12$|\.pem$|\.key$|credentials\.json$'
+SECRETS_ALLOW='\.env\.example$'
+MATCHED_FILES=$(echo "$STAGED_FILES" | grep -E "$SECRETS_PATTERN" | grep -vE "$SECRETS_ALLOW" || true)
+if [ -n "$MATCHED_FILES" ]; then
+  echo "❌ 민감한 파일이 커밋에 포함되어 있습니다:"
+  echo "$MATCHED_FILES" | while read -r file; do echo "   - $file"; done
+  echo "   이 파일들을 unstage하세요: git reset HEAD <파일>"
+  exit 1
+fi
+
+CONTENT_PATTERN='PRIVATE_KEY|sk_live_|pk_live_|AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|ghp_[0-9a-zA-Z]{36}|gho_[0-9a-zA-Z]{36}'
+for file in $STAGED_FILES; do
+  case "$file" in .husky/*|*.config.*) continue ;; esac
+  if [ -f "$file" ]; then
+    MATCH=$(git diff --cached "$file" | grep -E "^\+" | grep -vE "^\+\+\+" | grep -E "$CONTENT_PATTERN" || true)
+    if [ -n "$MATCH" ]; then
+      echo "❌ 비밀 키가 감지되었습니다: $file"
+      echo "$MATCH" | head -3
+      echo "   하드코딩된 키를 제거하고 환경 변수를 사용하세요."
+      exit 1
+    fi
+  fi
+done
+
+# 3. conflict 마커 잔류 검사
+for file in $STAGED_FILES; do
+  if [ -f "$file" ]; then
+    if grep -qE '^(<<<<<<< |>>>>>>> )' "$file"; then
+      echo "❌ merge conflict 마커가 남아있습니다: $file"
+      exit 1
+    fi
+  fi
+done
+
+# 4. lint-staged (eslint + prettier)
+npx lint-staged

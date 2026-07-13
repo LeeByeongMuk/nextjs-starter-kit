@@ -1,9 +1,9 @@
-import nextVitals from 'eslint-config-next/core-web-vitals';
 import tanstackQuery from '@tanstack/eslint-plugin-query';
+import nextVitals from 'eslint-config-next/core-web-vitals';
 import boundaries from 'eslint-plugin-boundaries';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import unusedImports from 'eslint-plugin-unused-imports';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 import fsd from './eslint-rules/fsd-relative-imports.mjs';
 
@@ -51,6 +51,13 @@ export default [
         },
       ],
       'no-unused-vars': 'off',
+      complexity: 'warn',
+    },
+  },
+  // @typescript-eslint 플러그인은 nextVitals가 ts/tsx에만 등록하므로 별도 스코프
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': ['warn'],
       '@typescript-eslint/naming-convention': [
@@ -61,7 +68,6 @@ export default [
           custom: { regex: '^(I|T)[A-Z]', match: false },
         },
       ],
-      complexity: 'warn',
     },
   },
   // FSD boundaries — layer direction + public API (boundaries v7 syntax)
