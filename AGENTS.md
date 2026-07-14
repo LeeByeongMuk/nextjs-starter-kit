@@ -4,14 +4,14 @@
 
 ## 기술 스택
 
-| 영역 | 선택 |
-| --- | --- |
-| 프레임워크 | Next.js 16 (App Router) · React 19 |
-| 데이터 페칭 | TanStack Query v5 + `fetchApi` 래퍼 |
-| 폼 | React Hook Form 7 (`defaultValues` 필수) |
-| 인증 | NextAuth v5 (beta) |
-| 스타일 | Tailwind CSS v4 |
-| 언어/테스트 | TypeScript 6 · Jest 30 + RTL + MSW |
+| 영역          | 선택                                     |
+| ------------- | ---------------------------------------- |
+| 프레임워크    | Next.js 16 (App Router) · React 19       |
+| 데이터 페칭   | TanStack Query v5 + `fetchApi` 래퍼      |
+| 폼            | React Hook Form 7 (`defaultValues` 필수) |
+| 인증          | NextAuth v5 (beta)                       |
+| 스타일        | Tailwind CSS v4                          |
+| 언어/테스트   | TypeScript 6 · Jest 30 + RTL + MSW       |
 | 패키지 매니저 | npm (단일 lockfile: `package-lock.json`) |
 
 ## 아키텍처 — Feature-Sliced Design
@@ -37,6 +37,8 @@ FSD는 파일 위치만 정한다. 슬라이스 안쪽 스타일은 주제별 �
 > 인증 (NextAuth v5, deep-import 예외): `.agents/rules/architecture/auth.md`
 > 스타일링 (Tailwind v4): `.agents/rules/code-style/styling.md`
 > 테스팅 (Jest / RTL / MSW): `.agents/rules/testing/unit-testing.md`
+
+**주석은 최소화한다.** 코드가 보여주지 못하는 제약만 주석으로 적는다. 파일 헤더 주석 금지(export JSDoc 한 줄로 대체), 구분선·이력·"다음 줄 설명" 주석 금지 — `src/`는 ESLint(`comments/comment-conventions`)가 error로 강제하며, src 밖 파일도 동일 원칙을 적용한다 (`.agents/rules/code-style/code-conventions.md` §2.2).
 
 라이브러리 전환/도입 판단은 `.agents/rules/infra/library-decisions.md`를 먼저 확인한다. 이미 기각/보류된 후보를 재제안하지 말 것. 과거 메이저 업그레이드 이력은 `.agents/rules/infra/migration-history.md`.
 

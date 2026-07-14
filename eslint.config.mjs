@@ -5,6 +5,7 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import unusedImports from 'eslint-plugin-unused-imports';
 
+import comments from './eslint-rules/comment-conventions.mjs';
 import fsd from './eslint-rules/fsd-relative-imports.mjs';
 
 const config = [
@@ -78,7 +79,7 @@ const config = [
   // FSD boundaries — layer direction + public API (boundaries v7 syntax)
   {
     files: ['src/**/*.{ts,tsx}'],
-    plugins: { boundaries, fsd },
+    plugins: { boundaries, comments, fsd },
     settings: {
       'boundaries/elements': [
         { type: 'app', pattern: 'src/app/**' },
@@ -173,6 +174,7 @@ const config = [
       'boundaries/no-unknown-files': 'error',
       // 같은 슬라이스 내부에서는 alias 대신 상대 경로
       'fsd/relative-imports': 'error',
+      'comments/comment-conventions': 'error',
     },
   },
   eslintPluginPrettierRecommended,

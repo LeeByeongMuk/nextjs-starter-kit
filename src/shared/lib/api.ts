@@ -7,7 +7,7 @@ export const fetchApi = async <Response>(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> => {
-  // API 서버 밖으로 나가는 요청 차단 (SSRF) — '/' 시작 상대 경로만 허용, '//'는 프로토콜 상대 URL이라 제외
+  // '//'는 프로토콜 상대 URL이라 외부로 나갈 수 있어 함께 차단 (SSRF)
   if (!url.startsWith('/') || url.startsWith('//')) {
     throw new Error(`fetchApi는 '/'로 시작하는 상대 경로만 허용합니다: ${url}`);
   }
