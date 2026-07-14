@@ -1,14 +1,13 @@
 'use client';
 
-import React from 'react';
-import { FormProvider } from 'react-hook-form';
-
 import {
   AccountForm,
   DeleteAccountButton,
   useAccountManager,
 } from '@features/auth-account';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
+import React from 'react';
+import { FormProvider } from 'react-hook-form';
 
 export default function AccountView() {
   const { methods, handleUpdateAccount, handleDeleteAccount, isLoading } =

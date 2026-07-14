@@ -1,8 +1,8 @@
+import { PaginationMeta } from '@shared/api/pagination';
 import classNames from 'classnames';
 import React from 'react';
 
-import { PAGE_GROUP_NUMBER } from '@entities/post/config/post';
-import { PaginationMeta } from '@shared/api/pagination';
+import { PAGE_GROUP_NUMBER } from '../config/post';
 
 interface Props {
   meta: PaginationMeta;

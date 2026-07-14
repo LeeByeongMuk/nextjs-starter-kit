@@ -1,3 +1,9 @@
+import PostList from '@app/(domain)/post/(list)/page';
+import { type PostsReq } from '@features/post-list';
+import { usePostList } from '@features/post-list';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   fireEvent,
@@ -11,13 +17,6 @@ import { cookies } from 'next/headers';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
-
-import PostList from '@app/(domain)/post/(list)/page';
-import { type PostsReq } from '@features/post-list';
-import { usePostList } from '@features/post-list';
-import { server } from '@shared/api/mocks/testServer';
-import { getQueryClient } from '@shared/api/tanstack-query/client';
-import { getHandlerURI } from '@shared/lib/url';
 
 jest.mock('next/headers');
 jest.mock('next/navigation');

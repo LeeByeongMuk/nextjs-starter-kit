@@ -5,7 +5,6 @@ import { FormProvider } from 'react-hook-form';
 
 import { PostsReq } from '../../api/types';
 import { usePostListForm } from '../../model/usePostListForm';
-
 import SearchInput from './SearchInput';
 import TypeSelect from './TypeSelect';
 

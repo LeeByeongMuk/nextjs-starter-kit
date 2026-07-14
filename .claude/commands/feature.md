@@ -14,7 +14,7 @@ $ARGUMENTS
 
 fsd-architect 에이전트를 호출하여 다음을 결정한다:
 
-- FSD 레이어/슬라이스 배치 (`docs/FSD_GUIDE.md` §7 결정 트리)
+- FSD 레이어/슬라이스 배치 (`.agents/rules/architecture/fsd-architecture.md` §7 결정 트리)
 - 생성할 파일 목록과 세그먼트 구성
 - RSC vs Client Component 판단
 - Public API (index.ts) 노출 심볼

@@ -1,3 +1,8 @@
+---
+paths:
+  - 'package.json'
+---
+
 # Library Decisions
 
 > 작성일: 2026-04-19
@@ -17,16 +22,17 @@
 
 ## 결정 요약
 
-| 후보 | 결정 | 재검토 조건 |
-|---|---|---|
-| [Jest → Vitest](#jest--vitest) | **유지 (Jest 30)** | 테스트 파일 > 30 또는 CI 테스트 시간 > 3분 |
-| [폼/API 런타임 검증: Zod](#zod-도입) | **도입 (별도 PR)** | 즉시 유효 — 후속 `feat/zod-validation` |
-| [`classnames` → `clsx`](#classnames--clsx) | **유지** | 사용처 5개 이상 또는 번들 최적화 패스 |
-| [MSW 2](#msw-2) | **유지** | — |
-| [Toast UI Editor → TipTap/Lexical](#toast-ui-editor--tiptaplexical) | **유지 (보류)** | Editor 성능·SSR 이슈 재발 또는 협업 기능 요구 |
-| [Prettier + ESLint → Biome](#prettier--eslint--biome) | **유지** | ESLint 플러그인 호환 대란 또는 lint 시간 > 30s |
-| [NextAuth v5 beta → stable](#nextauth-v5-beta--stable) | **stable 즉시 업그레이드** | stable 릴리스 시 |
-| [HTTP client (ky/ofetch)](#http-client-kyofetch) | **유지 (자체 `fetchApi`)** | 재시도/타임아웃/인터셉터 중 2개 이상 필요 |
+| 후보                                                                                | 결정                       | 재검토 조건                                    |
+| ----------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------- |
+| [Jest → Vitest](#jest--vitest)                                                      | **유지 (Jest 30)**         | 테스트 파일 > 30 또는 CI 테스트 시간 > 3분     |
+| [폼/API 런타임 검증: Zod](#zod-도입)                                                | **도입 (별도 PR)**         | 즉시 유효 — 후속 `feat/zod-validation`         |
+| [`classnames` → `clsx`](#classnames--clsx)                                          | **유지**                   | 사용처 5개 이상 또는 번들 최적화 패스          |
+| [MSW 2](#msw-2)                                                                     | **유지**                   | —                                              |
+| [Toast UI Editor → TipTap/Lexical](#toast-ui-editor--tiptaplexical)                 | **유지 (보류)**            | Editor 성능·SSR 이슈 재발 또는 협업 기능 요구  |
+| [Prettier + ESLint → Biome](#prettier--eslint--biome)                               | **유지**                   | ESLint 플러그인 호환 대란 또는 lint 시간 > 30s |
+| [NextAuth v5 beta → stable](#nextauth-v5-beta--stable)                              | **stable 즉시 업그레이드** | stable 릴리스 시                               |
+| [HTTP client (ky/ofetch)](#http-client-kyofetch)                                    | **유지 (자체 `fetchApi`)** | 재시도/타임아웃/인터셉터 중 2개 이상 필요      |
+| [npm workspaces + `packages/eslint-config`](#npm-workspaces--packageseslint-config) | **보류**                   | 두 번째 앱 또는 외부 소비자 발생 시            |
 
 ---
 
@@ -131,12 +137,12 @@
 
 ## NextAuth v5 beta → stable
 
-- **현황**: `next-auth: 5.0.0-beta.30`. 수 개월째 beta. 설정은 `src/app/auth/config.ts` (FSD app 레이어)
+- **현황**: `next-auth: 5.0.0-beta.31`. 수 개월째 beta. 설정은 `src/app/auth/config.ts` (FSD app 레이어)
 - **교체 찬**: beta 탈출 시 API 안정성 보장, 메이저 변경 위험 감소
 - **교체 반**: 없음 — 현재 beta가 이미 메인 패키지
 - **비용**: 릴리스 내용에 따라 다르나 통상 Small
 - **결정**: **stable 릴리스 즉시 업그레이드**
-- **재검토 조건**: `next-auth@5.0.0` (non-beta) 릴리스 시 `docs/MIGRATION_GUIDE.md`에 업그레이드 기록 남기고 즉시 진행
+- **재검토 조건**: `next-auth@5.0.0` (non-beta) 릴리스 시 `.agents/rules/infra/migration-history.md`에 업그레이드 기록 남기고 즉시 진행
 
 ---
 
@@ -158,6 +164,20 @@
 
 ---
 
+## npm workspaces + `packages/eslint-config`
+
+- **현황**: 커스텀 ESLint 룰은 루트 `eslint-rules/fsd-relative-imports.mjs` 1파일, FSD 정책은 `eslint.config.mjs`에 인라인. 모노레포 워크스페이스 없음
+- **도입 찬**: 터보레포식 `packages/eslint-config`로 분리하면 설정이 패키지 단위로 캡슐화되고, 여러 앱이 생겼을 때 공유 가능
+- **도입 반**:
+  - 단일 앱 레포 — 공유할 두 번째 소비자가 없음
+  - 옮길 실체가 룰 1파일 + 설정 블록뿐. workspaces를 켜면 install 호이스팅·lint-staged 경로·CI 캐시 등 관리 표면만 증가
+  - "2곳 이상에서 실제 재사용될 때 승격" 원칙과 충돌
+- **비용**: Small~Medium (workspaces 전환 + 경로 재배선 + CI 검증)
+- **결정**: **보류** (2026-07-13)
+- **재검토 조건**: 이 레포에 두 번째 앱이 생겨 모노레포로 전환하거나, 다른 레포가 이 ESLint 설정을 소비하게 될 때. 그때 npm workspaces + `packages/eslint-config`(자체 스코프 패키지)로 승격
+
+---
+
 ## 기타 (논의 여지 있으나 본 문서에서 제외)
 
 - **State manager (Zustand/Jotai 등)**: TanStack Query가 서버 상태를 커버하고, 현재 클라이언트 상태는 폼(RHF)과 로컬 `useState`로 충분. 도입 필요성 없음 — 복잡한 클라이언트 상태 요구가 생기면 재검토
@@ -168,11 +188,11 @@
 
 ## 참고 자료
 
-- 가로지르는 컨벤션: `docs/CONVENTIONS.md`
-- 데이터 페칭: `docs/DATA_FETCHING.md`
-- 폼: `docs/FORMS.md`
-- 인증: `docs/AUTH.md`
-- 스타일링: `docs/STYLING.md`
-- 테스팅: `docs/TESTING.md`
-- FSD: `docs/FSD_GUIDE.md`
-- 의존성 마이그레이션 이력: `docs/MIGRATION_GUIDE.md`
+- 가로지르는 컨벤션: `.agents/rules/code-style/code-conventions.md`
+- 데이터 페칭: `.agents/rules/architecture/data-fetching.md`
+- 폼: `.agents/rules/code-style/form-patterns.md`
+- 인증: `.agents/rules/architecture/auth.md`
+- 스타일링: `.agents/rules/code-style/styling.md`
+- 테스팅: `.agents/rules/testing/unit-testing.md`
+- FSD: `.agents/rules/architecture/fsd-architecture.md`
+- 의존성 마이그레이션 이력: `.agents/rules/infra/migration-history.md`

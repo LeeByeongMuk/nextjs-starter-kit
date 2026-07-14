@@ -1,6 +1,3 @@
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
-
 import {
   ButtonBox,
   IsOpenCheckbox,
@@ -10,8 +7,10 @@ import {
 // ContentsEditor wraps TUI Editor which references DOM globals at module
 // load; it is excluded from the @entities/post barrel to keep SSR pages
 // safe, so consumers must deep-import it from a `'use client'` file.
-// eslint-disable-next-line boundaries/entry-point
+// eslint-disable-next-line boundaries/dependencies
 import ContentsEditor from '@entities/post/ui/Form/ContentsEditor';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { CreatePostFormInput } from '../model/form';
 

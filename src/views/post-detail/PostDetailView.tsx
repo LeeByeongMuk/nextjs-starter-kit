@@ -1,12 +1,11 @@
 'use client';
 
-import React from 'react';
-
 import {
   PostDetail,
   PostDetailActions,
   usePostDetail,
 } from '@features/post-detail';
+import React from 'react';
 
 export default function PostDetailView() {
   const {

@@ -1,11 +1,10 @@
 'use client';
 
-import React from 'react';
-import { FormProvider } from 'react-hook-form';
-
 import { AuthHeader } from '@entities/auth';
 import { SignInForm, useSignInForm } from '@features/auth-signin';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
+import React from 'react';
+import { FormProvider } from 'react-hook-form';
 
 export default function SignInView() {
   const { isLoading, handleSignIn, methods } = useSignInForm();

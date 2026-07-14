@@ -1,13 +1,22 @@
+---
+paths:
+  - "src/app/auth/**"
+  - "src/app/api/auth/**"
+  - "src/features/auth-*/**"
+  - "src/entities/auth/**"
+  - "src/middleware.ts"
+---
+
 # Auth Guide
 
 > 대상: **NextAuth v5 (beta)** + 토큰 쿠키 기반 인증
-> 상위 문서: [`docs/CONVENTIONS.md`](./CONVENTIONS.md)
+> 상위 문서: [`.agents/rules/code-style/code-conventions.md`](../code-style/code-conventions.md)
 
 ## 1. 설정 위치
 
 NextAuth 설정은 **`src/app/auth/config.ts`** — app 레이어 멤버.
 
-이유: NextAuth config가 인증 플로우 오케스트레이션을 담당하며 `fetchSignIn`(features) + `fetchUser`(entities)를 호출해야 한다 → app 레이어에서만 해당 호출이 허용된다. 자세한 배경은 `docs/FSD_GUIDE.md` §6 "NextAuth 설정 위치" 참조.
+이유: NextAuth config가 인증 플로우 오케스트레이션을 담당하며 `fetchSignIn`(features) + `fetchUser`(entities)를 호출해야 한다 → app 레이어에서만 해당 호출이 허용된다. 자세한 배경은 `.agents/rules/architecture/fsd-architecture.md` §6 "NextAuth 설정 위치" 참조.
 
 ### 관련 파일
 
@@ -29,7 +38,7 @@ NextAuth 설정은 **`src/app/auth/config.ts`** — app 레이어 멤버.
 
 ```ts
 // server-only — excluded from @features/auth-signin barrel to keep client bundle clean
-// eslint-disable-next-line boundaries/entry-point
+// eslint-disable-next-line boundaries/dependencies
 import { fetchSignIn } from '@features/auth-signin/api/signinService';
 ```
 
@@ -102,4 +111,4 @@ export const config = {
 ## 7. 참고 자료
 
 - NextAuth v5 공식: https://authjs.dev
-- stable 전환 계획: `docs/LIBRARY_DECISIONS.md` §NextAuth v5 beta → stable
+- stable 전환 계획: `.agents/rules/infra/library-decisions.md` §NextAuth v5 beta → stable

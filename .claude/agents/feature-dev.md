@@ -111,7 +111,7 @@ export type { SomeReq, SomeRes } from './api/types';
 
 ## References
 
-- `docs/FSD_GUIDE.md` — FSD 전체 규칙
+- `.agents/rules/architecture/fsd-architecture.md` — FSD 전체 규칙
 - `src/features/post-list/` — feature 참조 구현
 - `src/entities/post/` — entity 참조 구현
 - `src/shared/lib/api.ts` — API wrapper

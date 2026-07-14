@@ -1,4 +1,10 @@
 import '@testing-library/jest-dom';
+
+import Signup from '@app/(domain)/(auth)/signup/page';
+import { useSignup } from '@features/auth-signup';
+import { server } from '@shared/api/mocks/testServer';
+import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -11,12 +17,6 @@ import {
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
 import React from 'react';
-
-import Signup from '@app/(domain)/(auth)/signup/page';
-import { useSignup } from '@features/auth-signup';
-import { server } from '@shared/api/mocks/testServer';
-import { getQueryClient } from '@shared/api/tanstack-query/client';
-import { getHandlerURI } from '@shared/lib/url';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),

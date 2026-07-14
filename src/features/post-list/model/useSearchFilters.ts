@@ -1,9 +1,8 @@
 'use client';
 
+import { type PostType } from '@entities/post';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-
-import { type PostType } from '@entities/post';
 
 import { PostsReq } from '../api/types';
 

@@ -1,11 +1,10 @@
 'use client';
 
-import React from 'react';
-import { FormProvider } from 'react-hook-form';
-
 import { UpdatePostForm, useUpdatePostManager } from '@features/post-update';
 import Spinner from '@shared/ui/spinner';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
+import React from 'react';
+import { FormProvider } from 'react-hook-form';
 
 export default function PostUpdateView() {
   const {

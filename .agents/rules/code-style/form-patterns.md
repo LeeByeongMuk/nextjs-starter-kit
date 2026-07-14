@@ -1,7 +1,13 @@
+---
+paths:
+  - "src/**/model/**"
+  - "src/**/ui/**"
+---
+
 # Forms Guide
 
 > 대상: **React Hook Form v7**
-> 상위 문서: [`docs/CONVENTIONS.md`](./CONVENTIONS.md)
+> 상위 문서: [`.agents/rules/code-style/code-conventions.md`](../code-style/code-conventions.md)
 
 ## 1. 파일 3분할 규약
 
@@ -76,7 +82,7 @@ const { register, handleSubmit, formState: { errors } } = useFormContext<CreateP
 
 ### 4.2 목표
 
-**Zod 도입** 후 `zodResolver(schema)`로 검증 로직을 스키마 한 곳으로 단일화. API 응답 검증도 동일 스키마 재사용. 상세는 `docs/LIBRARY_DECISIONS.md` §Zod 도입 — 4단계 체크리스트.
+**Zod 도입** 후 `zodResolver(schema)`로 검증 로직을 스키마 한 곳으로 단일화. API 응답 검증도 동일 스키마 재사용. 상세는 `.agents/rules/infra/library-decisions.md` §Zod 도입 — 4단계 체크리스트.
 
 ### 4.3 지금의 규칙
 

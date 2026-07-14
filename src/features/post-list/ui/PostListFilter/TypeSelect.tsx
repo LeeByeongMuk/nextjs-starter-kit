@@ -1,7 +1,6 @@
+import { LIST_TYPE_OPTIONS } from '@entities/post';
 import classNames from 'classnames';
 import { useFormContext } from 'react-hook-form';
-
-import { LIST_TYPE_OPTIONS } from '@entities/post';
 
 interface Props {
   onChange: () => void;

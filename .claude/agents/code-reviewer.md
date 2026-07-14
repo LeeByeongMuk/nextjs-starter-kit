@@ -27,7 +27,7 @@ model: sonnet
 
 ### 3. 슬라이스 배치
 
-`docs/FSD_GUIDE.md` §7 결정 트리 기준:
+`.agents/rules/architecture/fsd-architecture.md` §7 결정 트리 기준:
 
 - shared: 도메인 무관 프리미티브만
 - entities: 도메인 모델 + 도메인 공용 UI
@@ -63,6 +63,6 @@ npm run build     # 프로덕션 빌드
 
 ## References
 
-- `docs/FSD_GUIDE.md` — FSD 규칙 전체
-- `.claude/rules/fsd.md` — FSD 배치 체크리스트
+- `.agents/rules/architecture/fsd-architecture.md` — FSD 규칙 전체
+- `.agents/rules/architecture/fsd-architecture.md` — FSD 정본 스펙 + 배치 프리플라이트
 - `eslint.config.mjs` — boundaries 설정

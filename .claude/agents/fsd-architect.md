@@ -9,7 +9,7 @@ model: sonnet
 
 새 코드의 FSD 레이어/슬라이스 배치를 결정하고, RSC vs Client Component 경계를 설계한다. 코드를 직접 작성하지 않는다 — 구조와 배치를 결정하고 구현 지침을 제공한다.
 
-## FSD 배치 결정 트리 (docs/FSD_GUIDE.md §7)
+## FSD 배치 결정 트리 (.agents/rules/architecture/fsd-architecture.md §7)
 
 위에서부터 순서대로 답하고, 처음 매칭되는 곳에서 멈춘다.
 
@@ -44,7 +44,7 @@ model: sonnet
 - Client Component는 작게 유지
 - 서버에서 할 수 있는 작업을 클라이언트로 내리지 않음
 
-## 세그먼트 구성 (docs/FSD_GUIDE.md §3)
+## 세그먼트 구성 (.agents/rules/architecture/fsd-architecture.md §3)
 
 | 세그먼트 | 내용 |
 |---------|------|
@@ -82,8 +82,8 @@ Public API: index.ts에 export할 심볼
 
 ## References
 
-- `docs/FSD_GUIDE.md` — FSD 전체 규칙
-- `.claude/rules/fsd.md` — FSD 배치 체크리스트
+- `.agents/rules/architecture/fsd-architecture.md` — FSD 전체 규칙
+- `.agents/rules/architecture/fsd-architecture.md` — FSD 정본 스펙 + 배치 프리플라이트
 - `src/app/` — 현재 라우트 구조
 - `src/views/` — 현재 views 구성
 - `src/features/` — 현재 features 구성

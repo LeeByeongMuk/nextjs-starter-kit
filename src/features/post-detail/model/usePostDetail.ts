@@ -1,9 +1,8 @@
 'use client';
 
-import { useRouter, useParams } from 'next/navigation';
-import { useCallback } from 'react';
-
 import { useDeletePost } from '@entities/post';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 import usePost from './usePost';
 

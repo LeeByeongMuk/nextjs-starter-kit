@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { PostListData } from '../api/types';
-
 import PostListEmptyUI from './PostListEmptyUI';
 import ListItem from './PostListItem';
 import PostListSkeletonUI from './PostListSkeletonUI';

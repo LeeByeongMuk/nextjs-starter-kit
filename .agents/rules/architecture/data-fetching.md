@@ -1,7 +1,14 @@
+---
+paths:
+  - "src/**/api/**"
+  - "src/**/model/**"
+  - "src/shared/lib/api.ts"
+---
+
 # Data Fetching Guide
 
 > 대상: **TanStack Query v5** + `src/shared/lib/api.ts`의 `fetchApi` 래퍼
-> 상위 문서: [`docs/CONVENTIONS.md`](./CONVENTIONS.md)
+> 상위 문서: [`.agents/rules/code-style/code-conventions.md`](../code-style/code-conventions.md)
 
 ## 1. 계층 분리
 
@@ -22,7 +29,7 @@ RSC에서 TanStack Query 사용 금지 — 의존 에러와 dehydrate boundary �
 - **특정 feature 전용** → `src/features/<slice>/model/`
   - 예: `usePostList` → `src/features/post-list/model/usePostList.ts`
 
-슬라이스 격리 규칙(`docs/FSD_GUIDE.md` §4) 위반 시 — 한 feature의 훅을 다른 feature가 import 하려 하면 — 훅을 `entities`로 끌어내려 공유한다.
+슬라이스 격리 규칙(`.agents/rules/architecture/fsd-architecture.md` §4) 위반 시 — 한 feature의 훅을 다른 feature가 import 하려 하면 — 훅을 `entities`로 끌어내려 공유한다.
 
 ---
 
@@ -54,7 +61,7 @@ useQuery({ queryKey: ['post', { id }], ... });
 ## 5. Mutation 콜백
 
 - `onSuccess`: `queryClient.invalidateQueries({ queryKey: [entity] })` + 라우팅/알림
-- `onError`: 현재는 `alert()` — 토스트 도입 후 중앙 핸들러로 교체 예정 (`docs/CONVENTIONS.md` §3)
+- `onError`: 현재는 `alert()` — 토스트 도입 후 중앙 핸들러로 교체 예정 (`.agents/rules/code-style/code-conventions.md` §3)
 
 ```ts
 useMutation({
@@ -86,7 +93,7 @@ export const fetchApi = async <Response>(
 ): Promise<Response> => { ... };
 ```
 
-- 외부 클라이언트 라이브러리(ky/ofetch) 도입 여부: `docs/LIBRARY_DECISIONS.md` §HTTP client 참조 (현재 유지 결정)
+- 외부 클라이언트 라이브러리(ky/ofetch) 도입 여부: `.agents/rules/infra/library-decisions.md` §HTTP client 참조 (현재 유지 결정)
 - 모든 feature의 `api/*Service.ts` 파일은 이 `fetchApi`를 사용. 직접 `fetch()` 호출 금지
 
 ---

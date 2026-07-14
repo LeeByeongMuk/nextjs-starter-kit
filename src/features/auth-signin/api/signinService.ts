@@ -1,7 +1,6 @@
-import { cookies } from 'next/headers';
-
 import { TOKEN_KEY } from '@shared/config/auth';
 import { fetchApi } from '@shared/lib/api';
+import { cookies } from 'next/headers';
 
 import { SignInReq, SignInRes } from './types';
 

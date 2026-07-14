@@ -1,14 +1,21 @@
 name: CI
 
+permissions:
+  contents: read
+
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
       - develop
       - main
 
 jobs:
   lint:
+    if: ${{ !github.event.pull_request.draft }}
+    # 스타일 자동 수정 커밋을 푸시하므로 이 잡만 쓰기 권한
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
 
     strategy:
@@ -32,6 +39,7 @@ jobs:
           commit_message: Fix styling
 
   build:
+    if: ${{ !github.event.pull_request.draft }}
     needs: lint
     runs-on: ubuntu-latest
 

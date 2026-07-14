@@ -1,15 +1,14 @@
 import { createMiddleware } from '@mswjs/http-middleware';
+import { handlers } from '@shared/api/mocks/handlers';
 import cors from 'cors';
 import express from 'express';
-
-import { handlers } from '@shared/api/mocks/handlers';
 
 const app = express();
 const port = process.env.APP_API_PORT || 9090;
 
 app.use(
   cors({
-    origin: '*', // 테스트용으로 모든 Origin 허용
+    origin: /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
     optionsSuccessStatus: 200,
     credentials: true,
   })

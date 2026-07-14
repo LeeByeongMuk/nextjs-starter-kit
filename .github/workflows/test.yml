@@ -1,14 +1,17 @@
 name: coverage
 
+permissions:
+  contents: read
+
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
       - develop
       - main
 jobs:
   coverage:
-    environment: development
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -18,24 +21,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: .env setting
-        run: |
-          touch .env
-          echo "APP_API_URL=${{ secrets.APP_API_URL }}" >> .env
-          echo "AUTH_URL=${{ secrets.AUTH_URL }}" >> .env
-          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
-        env:
-          APP_API_URL: ${{ secrets.APP_API_URL }}
-          AUTH_URL: ${{ secrets.AUTH_URL }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
       - name: Install dependencies
         run: npm ci
@@ -48,8 +38,3 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
-
-      - name: Annotate PR with coverage
-        uses: ArtiomTr/jest-coverage-report-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}

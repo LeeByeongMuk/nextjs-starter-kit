@@ -1,14 +1,11 @@
+// server-only — excluded from @entities/auth barrel to keep client bundle clean
+// eslint-disable-next-line boundaries/dependencies
+import { fetchUser } from '@entities/auth/api/userServices';
+// server-only — excluded from @features/auth-signin barrel to keep client bundle clean
+// eslint-disable-next-line boundaries/dependencies
+import { fetchSignIn } from '@features/auth-signin/api/signinService';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-
-// Deep imports here are intentional: fetchUser and fetchSignIn use
-// next/headers (server-only) and are deliberately excluded from their
-// public-API barrels so importing the barrel from a client component
-// doesn't pull server-only code into the client bundle.
-// eslint-disable-next-line boundaries/entry-point
-import { fetchUser } from '@entities/auth/api/userServices';
-// eslint-disable-next-line boundaries/entry-point
-import { fetchSignIn } from '@features/auth-signin/api/signinService';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
