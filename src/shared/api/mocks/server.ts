@@ -8,7 +8,8 @@ const port = process.env.APP_API_PORT || 9090;
 
 app.use(
   cors({
-    origin: '*', // 테스트용으로 모든 Origin 허용
+    // 로컬 개발 전용 서버 — localhost 계열 Origin만 허용
+    origin: /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
     optionsSuccessStatus: 200,
     credentials: true,
   })
