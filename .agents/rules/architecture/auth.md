@@ -51,12 +51,14 @@ import { fetchSignIn } from '@features/auth-signin/api/signinService';
 ```ts
 callbacks: {
   async jwt({ token, user, trigger }) {
-    if (trigger === 'update') token.user = await fetchUser();
-    if (user) token.user = user;
-    return token;
+    if (trigger === 'update') {
+      const updateUser = await fetchUser();
+      return { ...token, ...user, ...updateUser.data };
+    }
+    return { ...token, ...user };
   },
   async session({ session, token }) {
-    session.user = token.user as User;
+    session.user = { ...session.user, ...token };
     return session;
   },
 },
