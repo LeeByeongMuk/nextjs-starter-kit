@@ -1,10 +1,10 @@
 ---
 paths:
-  - "src/app/auth/**"
-  - "src/app/api/auth/**"
-  - "src/features/auth-*/**"
-  - "src/entities/auth/**"
-  - "src/middleware.ts"
+  - 'src/app/auth/**'
+  - 'src/app/api/auth/**'
+  - 'src/features/auth-*/**'
+  - 'src/entities/auth/**'
+  - 'src/middleware.ts'
 ---
 
 # Auth Guide
@@ -29,10 +29,10 @@ NextAuth 설정은 **`src/app/auth/config.ts`** — app 레이어 멤버.
 
 `src/app/auth/config.ts`는 다음 두 함수를 **슬라이스 내부 경로**로 직접 import한다:
 
-| 함수 | 경로 | 이유 |
-|---|---|---|
-| `fetchUser` | `@entities/auth/api/userServices` | `next/headers`(server-only) 사용 → barrel로 내보내면 클라이언트 번들 오염 |
-| `fetchSignIn` | `@features/auth-signin/api/signinService` | 동일 |
+| 함수          | 경로                                      | 이유                                                                      |
+| ------------- | ----------------------------------------- | ------------------------------------------------------------------------- |
+| `fetchUser`   | `@entities/auth/api/userServices`         | `next/headers`(server-only) 사용 → barrel로 내보내면 클라이언트 번들 오염 |
+| `fetchSignIn` | `@features/auth-signin/api/signinService` | 동일                                                                      |
 
 호출부에는 반드시 다음을 같이 적는다:
 
@@ -51,12 +51,14 @@ import { fetchSignIn } from '@features/auth-signin/api/signinService';
 ```ts
 callbacks: {
   async jwt({ token, user, trigger }) {
-    if (trigger === 'update') token.user = await fetchUser();
-    if (user) token.user = user;
-    return token;
+    if (trigger === 'update') {
+      const updateUser = await fetchUser();
+      return { ...token, ...user, ...updateUser.data };
+    }
+    return { ...token, ...user };
   },
   async session({ session, token }) {
-    session.user = token.user as User;
+    session.user = { ...session.user, ...token };
     return session;
   },
 },
@@ -105,6 +107,17 @@ export const config = {
 ```
 
 여기 추가/제거는 middleware 한 곳에서만. page.tsx 내부에서 수동 `redirect()` 금지 — 일관성/중복 방지.
+
+미인증 차단은 `config.ts`의 `callbacks.authorized`가 담당한다 — `false`를 반환하면 NextAuth 미들웨어가 `pages.signIn`(`/signin`)으로 리다이렉트한다. 이 콜백이 없으면 미들웨어는 세션만 노출하고 차단하지 않으므로 삭제 금지.
+
+```ts
+callbacks: {
+  authorized({ auth }) {
+    return !!auth?.user;
+  },
+  ...
+}
+```
 
 ---
 
