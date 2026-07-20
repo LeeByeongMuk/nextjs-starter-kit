@@ -51,20 +51,18 @@ export default function useDeleteSomething(id: number) {
   return useMutation({
     mutationFn: () => fetchDeleteSomething({ id }),
     onSuccess: () => {
-      alert('삭제되었습니다.');
       router.push('/');
-    },
-    onError: () => {
-      alert('삭제에 실패했습니다.');
     },
   });
 }
 ```
 
+에러 피드백에 `alert()` 신규 도입 금지 — 기존 코드의 `alert()`는 교체 대상이므로 따라 쓰지 않는다 (`.agents/rules/code-style/code-conventions.md` §3.4).
+
 ### API Service (api/)
 
 ```typescript
-import fetchApi from '@shared/lib/api';
+import { fetchApi } from '@shared/lib/api';
 import type { SomeReq, SomeRes } from './types';
 
 export const fetchSomething = async (params: SomeReq) => {

@@ -1,6 +1,7 @@
 ---
 name: test-writer
-description: Jest + Testing Library 테스트 코드 작성 전문가. 컴포넌트 테스트, 훅 테스트,
+description:
+  Jest + Testing Library 테스트 코드 작성 전문가. 컴포넌트 테스트, 훅 테스트,
   API 서비스 테스트, MSW 핸들러 작성 시 사용. Use PROACTIVELY when tests are needed
   for new or changed code.
 tools: Read, Write, Edit, Bash, Glob, Grep
@@ -20,22 +21,25 @@ model: sonnet
 
 ## 테스트 파일 위치
 
-테스트 파일은 대상 파일 옆에 `__tests__/` 디렉토리를 만들어 배치한다.
+정본은 `.agents/rules/testing/unit-testing.md` §4. 확장자는 `.spec.tsx`/`.spec.ts` 고정 — `.test.*` 사용 금지.
+
+| 대상                           | 위치                                     | 예시                  |
+| ------------------------------ | ---------------------------------------- | --------------------- |
+| 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx` (페이지 옆 배치) | `signin.spec.tsx`     |
+| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 `model/` 또는 `api/`       | `usePostList.spec.ts` |
+| 컴포넌트 렌더 테스트           | feature view 레벨 통합으로 대체          | —                     |
 
 ```
+src/app/(domain)/(auth)/signin/
+├── page.tsx
+└── signin.spec.tsx          # 페이지 통합 테스트
 src/features/post-list/
-├── ui/
-│   ├── PostListContainer.tsx
-│   └── __tests__/
-│       └── PostListContainer.test.tsx
 ├── model/
 │   ├── usePostList.ts
-│   └── __tests__/
-│       └── usePostList.test.ts
+│   └── usePostList.spec.ts  # 훅 단위 테스트 (권장)
 └── api/
     ├── postsServices.ts
-    └── __tests__/
-        └── postsServices.test.ts
+    └── postsServices.spec.ts
 ```
 
 ## 테스트 패턴
@@ -43,8 +47,7 @@ src/features/post-list/
 ### 컴포넌트 테스트
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SomeComponent from '../SomeComponent';
 
@@ -64,10 +67,11 @@ describe('SomeComponent', () => {
   });
 
   it('handles user interaction', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<SomeComponent />);
-    await user.click(screen.getByRole('button', { name: '삭제' }));
-    expect(screen.getByText('삭제되었습니다')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '삭제' }));
+    await waitFor(() =>
+      expect(screen.getByText('삭제되었습니다')).toBeInTheDocument()
+    );
   });
 });
 ```
@@ -121,14 +125,19 @@ describe('fetchSomething', () => {
 
 ### NextAuth Mock 사용
 
+`jest.config.ts`의 moduleNameMapper가 `next-auth/react`를 `src/shared/lib/testing/nextAuthReact.tsx`로 매핑한다. `useSession`/`signIn`/`signOut`이 이미 `jest.fn()`이므로 그대로 캐스팅해 오버라이드한다.
+
 ```typescript
-import { mockSession, mockUseSession } from '@shared/lib/testing/nextAuthReact';
+import { useSession, signIn } from 'next-auth/react';
+
+jest.mock('next-auth/react');
 
 beforeEach(() => {
-  mockUseSession.mockReturnValue({
-    data: mockSession,
+  (useSession as jest.Mock).mockReturnValue({
+    data: { user: { name: 'tester' } },
     status: 'authenticated',
   });
+  (signIn as jest.Mock).mockResolvedValue({ ok: true });
 });
 ```
 
@@ -139,7 +148,7 @@ beforeEach(() => {
 - MSW handler는 테스트별로 `server.use()`로 오버라이드
 - QueryClient는 테스트마다 새로 생성 (캐시 격리)
 - `waitFor`로 비동기 상태 변화 대기
-- `userEvent`로 사용자 인터랙션 시뮬레이션 (`fireEvent` 대신)
+- 사용자 인터랙션은 `fireEvent` 사용 (`@testing-library/user-event`는 미설치 — 도입 시 예시 갱신)
 
 ## Verification
 

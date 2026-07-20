@@ -8,14 +8,15 @@
 
 ### 기술스택
 
-- **Next.js** 14
-- **React** 18
-- **TypeScript**
-- **Tailwind CSS**
-- **React Query**
-- **React Hook Form**
-- **Jest**
-- **MSW (Mock API)**
+- **Next.js** 16 (App Router)
+- **React** 19
+- **TypeScript** 6
+- **Tailwind CSS** v4
+- **TanStack Query** v5
+- **React Hook Form** 7
+- **NextAuth** v5 (beta)
+- **Jest** 30 + Testing Library
+- **MSW** 2 (Mock API)
 
 ### 문서 / AI 에이전트
 

@@ -1,612 +1,77 @@
 ---
 paths:
-  - "package.json"
+  - 'package.json'
 ---
 
-# Major Dependency Migration Guide
+# Major Dependency Migration History
 
-> 작성일: 2026-03-12
-> 대상 브랜치: `develop`
-> 현재 Node.js 요구사항: `>=18.18.0`
+> 작성일: 2026-03-12 · 최종 갱신: 2026-07-20 (완료 이력으로 재정리)
+> 대상 브랜치: `develop` · Node.js 요구사항: `>=18.18.0` (CI는 20.x)
 
 ## 개요
 
-본 문서는 프로젝트의 모든 주요 의존성을 최신 메이저 버전으로 업그레이드하기 위한 마이그레이션 가이드입니다.
-
-### 업그레이드 대상 요약
-
-| 패키지 | 현재 | 목표 | 난이도 | 리스크 |
-|---|---|---|---|---|
-| react / react-dom | 18 | 19 | 낮음 | 낮음 |
-| next | 15.5.10 | 16.x | 낮음 | 낮음 |
-| eslint | 8.57.1 | 9.x (flat config) | 중간 | 낮음 |
-| eslint-config-next | 15.5.10 | 16.x | 낮음 | 낮음 |
-| eslint-config-prettier | 9.1.2 | 10.x | 낮음 | 매우 낮음 |
-| tailwindcss | 3.4.19 | 4.x | 낮음 | 매우 낮음 |
-| jest / jest-environment-jsdom | 29.7.0 | 30.x | 중간 | 낮음~중간 |
-| ts-jest / @types/jest | 29.x | 30.x | 낮음 | 낮음 |
-| @types/node | 22 | 25 | 낮음 | 낮음 |
-| @types/react / react-dom | 18 | 19 | 낮음 | 낮음 |
-| express | 4.22.1 | 5.x | 낮음 | 낮음 |
-| next-auth | 4.24.13 | 5.x (Auth.js) | **높음** | **중간** |
-
----
-
-## Phase 1: Quick Wins (예상 소요: 30분)
-
-리스크가 거의 없는 의존성을 먼저 업데이트합니다.
-
-### 1-1. eslint-config-prettier 9 → 10
-
-**Breaking change 없음.** `@stylistic` 규칙 지원 추가, Unicode BOM 처리 변경(Prettier 동작과 일치).
-
-```bash
-npm install eslint-config-prettier@^10 --save-dev
-```
-
-현재 설정(`plugin:prettier/recommended`)이 그대로 동작합니다. 추가 변경 불필요.
-
-### 1-2. express 4 → 5
-
-mock 서버(`src/lib/mocks/server.ts`)에서만 사용 중이며, deprecated API(`req.param()`, `req.host`, `app.del()` 등)를 사용하지 않습니다.
-
-```bash
-npm install express@^5 --save-dev
-```
-
-`@types/express`는 이미 `^5.0.6`이므로 변경 불필요.
-
-**검증:**
-
-```bash
-npm run mock  # mock 서버 정상 기동 확인
-```
-
-### 1-3. @types/node 22 → 25
-
-타입 정의만 변경되므로 영향 없음.
-
-```bash
-npm install @types/node@^25 --save-dev
-```
-
----
-
-## Phase 2: Tailwind CSS 3 → 4 (예상 소요: 1~2시간)
-
-### 분석 결과
-
-- `@apply` 디렉티브 미사용
-- 커스텀 테마 확장 없음 (`theme.extend: {}`)
-- `@tailwindcss/forms` 플러그인만 사용
-- CSS 파일은 표준 디렉티브만 포함 (`@tailwind base/components/utilities`)
-
-### 마이그레이션 절차
-
-**1) 패키지 업데이트:**
-
-```bash
-npm install tailwindcss@^4 --save-dev
-npm install @tailwindcss/forms@latest --save-dev
-```
-
-**2) CSS 파일 변경 — `src/styles/globals.css`:**
-
-Tailwind v4에서는 `@tailwind` 디렉티브가 `@import`로 변경됩니다.
-
-```css
-/* Before (v3) */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* After (v4) */
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
-```
-
-**3) PostCSS 설정 변경 — `postcss.config.js`:**
-
-Tailwind v4는 PostCSS 플러그인 설정이 달라집니다.
-
-```js
-// Before (v3)
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-  },
-};
-
-// After (v4)
-module.exports = {
-  plugins: {
-    '@tailwindcss/postcss': {},
-  },
-};
-```
-
-**4) `tailwind.config.js` 처리:**
-
-Tailwind v4는 CSS-first 설정을 사용합니다. 현재 설정이 최소한이므로:
-- `content` 경로는 v4에서 자동 감지됨 → 설정 불필요
-- `@tailwindcss/forms`는 CSS 파일에서 `@plugin`으로 이동
-- `tailwind.config.js` 파일 삭제 가능
-
-**5) eslint-plugin-tailwindcss 호환성 확인:**
-
-```bash
-npm install eslint-plugin-tailwindcss@latest --save-dev
-```
-
-**검증:**
-
-```bash
-npm run build    # 빌드 정상 확인
-npm run dev      # 개발 서버에서 스타일 깨짐 없는지 육안 검증
-npm run lint     # lint 통과 확인
-```
-
-### 주의사항
-
-- v4에서 일부 기본 color palette가 변경됨 → 사용 중인 `teal-600`, `gray-100` 등은 유지됨
-- 기본 font stack 변경 → 시각적 차이 확인 필요
-- CSS specificity 규칙 변경 → 대부분의 유틸리티 클래스에는 영향 없음
-
----
-
-## Phase 3: React 19 + Next.js 16 (예상 소요: 반나절)
-
-### 분석 결과
-
-프로젝트에서 React 19 breaking change에 해당하는 패턴이 **전혀 발견되지 않았습니다:**
-- ~~forwardRef~~ 미사용
-- ~~class component~~ 미사용
-- ~~string ref~~ 미사용
-- ~~defaultProps (function component)~~ 미사용
-- ~~Legacy Context API~~ 미사용
-- ~~PropTypes~~ 미사용
-
-모든 페이지가 `'use client'`이므로 Next.js 16의 서버 컴포넌트 관련 변경에도 영향 없음.
-
-### 마이그레이션 절차
-
-**1) 패키지 업데이트:**
-
-```bash
-npm install react@^19 react-dom@^19
-npm install @types/react@^19 @types/react-dom@^19 --save-dev
-npm install next@^16
-npm install eslint-config-next@^16 --save-dev
-```
-
-**2) `package.json` overrides 수정:**
-
-`@toast-ui/react-editor`의 React peerDep override를 업데이트합니다.
-
-```json
-{
-  "overrides": {
-    "@toast-ui/react-editor": {
-      "react": "^19"
-    }
-  }
-}
-```
-
-> **주의:** `@toast-ui/react-editor`는 공식적으로 React 17만 지원하며, 더 이상 업데이트되지 않는 패키지입니다. React 19에서 정상 동작하는지 반드시 수동 테스트가 필요합니다.
-> 동작하지 않을 경우 대체 에디터(BlockNote, TipTap 등) 전환을 검토해야 합니다.
-
-**3) `next.config.js` 환경변수 확인:**
-
-Next.js 16에서도 현재 설정은 호환됩니다. 변경 불필요.
-
-```js
-// 현재 설정 그대로 유지
-const nextConfig = {
-  reactStrictMode: true,
-  distDir: 'build',
-  // ...
-};
-```
-
-**검증:**
-
-```bash
-npm run build          # 빌드 정상 확인
-npm run dev            # 개발 서버 기동 및 전체 페이지 수동 테스트
-npm test               # 테스트 통과 확인
-```
-
-**중점 테스트 항목:**
-- [ ] Toast UI Editor 렌더링 및 입력 동작
-- [ ] 로그인/회원가입 폼 동작
-- [ ] 게시글 CRUD 전체 흐름
-- [ ] useEffect 의존 로직(에러 리다이렉트 등)
-
----
-
-## Phase 4: ESLint 9 Flat Config 전환 (예상 소요: 반나절)
-
-### 분석 결과
-
-현재 `.eslintrc.json`에서 사용 중인 모든 플러그인이 flat config를 지원합니다:
-- `eslint-config-next` ≥ 15.x
-- `eslint-config-prettier` ≥ 9.x
-- `eslint-plugin-prettier` ≥ 5.x
-- `eslint-plugin-tailwindcss` ≥ 3.x (4.0.0-beta.0 사용)
-- `@tanstack/eslint-plugin-query` ≥ 5.x
-
-### 마이그레이션 절차
-
-**1) 패키지 업데이트:**
-
-```bash
-npm install eslint@^9 --save-dev
-npm install eslint-plugin-tailwindcss@latest --save-dev
-npm install eslint-plugin-prettier@latest --save-dev
-npm install @tanstack/eslint-plugin-query@latest --save-dev
-```
-
-**2) `.eslintrc.json` → `eslint.config.mjs` 전환:**
-
-`eslint-config-next`와 `@tanstack/eslint-plugin-query`가 native flat config를 지원하므로 `FlatCompat` 없이 직접 사용합니다.
-
-```js
-// eslint.config.mjs
-import nextVitals from 'eslint-config-next/core-web-vitals';
-import tanstackQuery from '@tanstack/eslint-plugin-query';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-
-export default [
-  {
-    ignores: [
-      '.next/**',
-      '.build/**',
-      'build/**',
-      'next-env.d.ts',
-      'yarn.lock',
-      'public/**',
-      'next.config.js',
-      'README.md',
-      'Dockerfile',
-      '.nvmrc',
-      '.vscode/**',
-      '.idea/**',
-      '.yarn/**',
-      '.pnp.*',
-      'jest.setup.ts',
-      'jest.polyfills.js',
-    ],
-  },
-  ...nextVitals,
-  ...tanstackQuery.configs['flat/recommended'],
-  {
-    rules: {
-      'no-alert': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
-        },
-      ],
-      '@typescript-eslint/no-explicit-any': ['warn'],
-      'import/order': [
-        'warn',
-        {
-          groups: [['builtin', 'external'], 'internal', 'parent', ['sibling', 'index'], 'object'],
-          'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
-        },
-      ],
-      complexity: 'warn',
-    },
-  },
-  eslintPluginPrettierRecommended,
-];
-```
-
-**3) 이전 설정 파일 삭제:**
-
-```bash
-rm .eslintrc.json
-rm .eslintignore
-```
-
-**4) `.eslintignore` 처리:**
-
-ESLint 9 flat config에서는 `.eslintignore` 대신 config 파일 내 `ignores` 속성을 사용합니다. 위 설정의 첫 번째 객체에 포함되어 있습니다.
-
-**검증:**
-
-```bash
-npm run lint         # lint 정상 통과
-npm run lint:fix     # auto-fix 정상 동작
-```
-
----
-
-## Phase 5: Jest 30 (예상 소요: 반나절)
-
-### 분석 결과
-
-- `jest-fixed-jsdom` 패키지의 Jest 30 호환성 확인 필요
-- 테스트 9개 파일, MSW + React Query + Testing Library 조합
-- `ts-jest` preset 사용 중
-
-### 마이그레이션 절차
-
-**1) jest-fixed-jsdom 호환성 확인:**
-
-```bash
-# jest-fixed-jsdom이 Jest 30을 지원하는지 확인
-npm info jest-fixed-jsdom peerDependencies
-```
-
-미지원 시 대안:
-- 공식 `jest-environment-jsdom@^30` 사용
-- `jest.config.ts`에서 `testEnvironment: 'jest-environment-jsdom'`으로 변경
-
-**2) 패키지 업데이트:**
-
-```bash
-npm install jest@^30 jest-environment-jsdom@^30 --save-dev
-npm install ts-jest@^30 --save-dev
-npm install @types/jest@^30 --save-dev
-```
-
-**3) `jest.config.ts` 수정 (jest-fixed-jsdom 미지원 시):**
-
-```diff
-  const config: Config = {
-    // ...
--   testEnvironment: 'jest-fixed-jsdom',
-+   testEnvironment: 'jest-environment-jsdom',
-    // ...
-  };
-```
-
-**4) Jest 30 주요 변경사항 대응:**
-
-- `fakeTimers` 기본값 변경 확인
-- snapshot 포맷 변경 시 스냅샷 갱신 (`npm test -- -u`)
-- `jest.fn()` 타입 변경 사항 확인
-
-**검증:**
-
-```bash
-npm test             # 전체 테스트 통과 확인
-```
-
----
-
-## Phase 6: next-auth 4 → 5 (Auth.js) (예상 소요: 2~3일)
-
-### 분석 결과
-
-가장 큰 마이그레이션 작업입니다. 아키텍처가 전면 변경됩니다.
-
-**영향 받는 파일:**
-- `src/app/api/auth/[...nextauth]/route.ts` — 설정 구조 변경
-- `src/middleware.ts` — import 변경
-- `src/shared/types/declare/nextAuth.d.ts` — 타입 변경
-- `next.config.js` — 환경변수 prefix 변경
-- 인증 관련 hooks/components (약 10개 파일)
-
-### 마이그레이션 절차
-
-**1) 패키지 업데이트:**
-
-```bash
-npm uninstall next-auth
-npm install next-auth@^5
-```
-
-**2) 루트 설정 파일 생성 — `src/auth.ts`:**
-
-```ts
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-
-import { fetchUser } from '@domains/auth/_services/userServices';
-import { fetchSignIn } from '@domains/auth/signin/_services/signinService';
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: 'Email', type: 'text', placeholder: 'your@mail.com' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const {
-          data: { id },
-        } = await fetchSignIn({
-          email: (credentials?.email as string) || '',
-          password: (credentials?.password as string) || '',
-        });
-        const user = await fetchUser();
-
-        if (user) {
-          return { ...user.data, id: id.toString() };
-        }
-        return null;
-      },
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, user, trigger }) {
-      if (trigger === 'update') {
-        const updateUser = await fetchUser();
-        return { ...token, ...user, ...updateUser.data };
-      }
-      return { ...token, ...user };
-    },
-    async session({ session, token }) {
-      session.user = token as never;
-      return session;
-    },
-  },
-  pages: {
-    signIn: '/signin',
-  },
-});
-```
-
-**3) API Route 변경 — `src/app/api/auth/[...nextauth]/route.ts`:**
-
-```ts
-import { handlers } from '@/auth';
-
-export const { GET, POST } = handlers;
-```
-
-**4) Middleware 변경 — `src/middleware.ts`:**
-
-```ts
-export { auth as middleware } from '@/auth';
-
-export const config = {
-  matcher: ['/post/create', '/post/:path*/update', '/account'],
-};
-```
-
-**5) 환경변수 변경:**
-
-```env
-# Before
-NEXTAUTH_URL=...
-NEXTAUTH_SECRET=...
-
-# After
-AUTH_URL=...           # 또는 자동 감지 (Vercel 등에서)
-AUTH_SECRET=...
-```
-
-`next.config.js`의 `env` 설정도 함께 업데이트:
-
-```diff
-  env: {
-    APP_API_URL: process.env.APP_API_URL,
--   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
--   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-+   AUTH_URL: process.env.AUTH_URL,
-+   AUTH_SECRET: process.env.AUTH_SECRET,
-  },
-```
-
-**6) 타입 선언 변경 — `src/shared/types/declare/nextAuth.d.ts`:**
-
-```ts
-import { DefaultSession } from 'next-auth';
-
-import { UserData } from '@domains/auth/_types/api';
-
-declare module 'next-auth' {
-  interface Session {
-    user: UserData & DefaultSession['user'];
-  }
-}
-```
-
-타입 구조는 동일하나, import 경로가 변경될 수 있으므로 빌드 시 확인.
-
-**7) 클라이언트 코드 변경:**
-
-`useSession()`, `signIn()`, `signOut()`은 여전히 `next-auth/react`에서 import하며, 기본적인 사용법은 동일합니다. 다만 일부 옵션이 변경되었을 수 있으므로 확인 필요.
-
-```ts
-// 기존과 동일하게 사용 가능
-import { useSession, signIn, signOut } from 'next-auth/react';
-```
-
-**8) SessionProvider 확인:**
-
-`SessionProvider`가 사용되고 있다면 `next-auth/react`에서의 import는 유지됩니다.
-
-**검증:**
-
-```bash
-npm run build
-npm run dev
-```
-
-**중점 테스트 항목:**
-- [ ] 로그인 (Credentials Provider)
-- [ ] 로그아웃
-- [ ] 세션 유지 및 갱신 (`trigger: 'update'`)
-- [ ] 미인증 상태에서 보호 라우트 접근 시 리다이렉트
-- [ ] JWT 콜백의 사용자 정보 매핑
-- [ ] 회원가입 후 로그인 플로우
-- [ ] 계정 정보 수정 후 세션 업데이트
-
----
-
-## 마이그레이션 체크리스트
-
-### Phase 1: Quick Wins ✅
-- [x] `eslint-config-prettier` 10.x 업데이트
-- [x] `express` 5.x 업데이트
-- [x] `@types/node` 25 업데이트
-- [x] lint, build, test 통과 확인
-
-### Phase 2: Tailwind CSS ✅
-- [x] `tailwindcss` 4.x 업데이트
-- [x] `globals.css` 디렉티브 변경
-- [x] `postcss.config.js` 업데이트
-- [x] `tailwind.config.js` 제거
-- [x] 빌드 및 스타일 검증
-
-### Phase 3: React 19 + Next.js 16 ✅
-- [x] `react`, `react-dom` 19 업데이트
-- [x] `next` 16.x 업데이트
-- [x] `@types/react`, `@types/react-dom` 19 업데이트
-- [x] `eslint-config-next` 15.x backport 유지 (eslint 8 호환)
-- [x] `overrides` 수정 (toast-ui)
-- [ ] Toast UI Editor 수동 테스트
-- [x] 전체 빌드 및 테스트
-
-### Phase 4: ESLint 9 Flat Config ✅
-- [x] `eslint` 9.x 업데이트
-- [x] `eslint.config.mjs` 생성 (native flat config, `FlatCompat` 미사용)
-- [x] `.eslintrc.json` 삭제
-- [x] `.eslintignore` 삭제 (flat config `ignores`로 이관)
-- [x] lint 통과 확인
-
-### Phase 5: Jest 30 ✅
-- [x] `jest-fixed-jsdom` 호환성 확인
-- [x] `jest`, `jest-environment-jsdom`, `@types/jest` 30.x 업데이트
-- [x] `jest.config.ts` 수정 (`transformIgnorePatterns`, `moduleNameMapper` 추가)
-- [x] `next-auth/react` 테스트 mock 추가 (`src/tests/mocks/nextAuthReact.tsx`)
-- [x] 전체 테스트 통과 확인 (7 suites, 44 tests)
-
-### Phase 6: next-auth 5 ✅
-- [x] `src/auth.ts` 생성
-- [x] API route 변경
-- [x] `middleware.ts` 변경
-- [x] 환경변수 마이그레이션 (`NEXTAUTH_*` → `AUTH_*`)
-- [x] `next.config.js` 환경변수 업데이트
-- [x] 타입 선언 확인
-- [x] 인증 전체 플로우 테스트
-
----
-
-## 참고 사항
-
-### @toast-ui/react-editor 관련
-
-이 패키지는 3.2.3이 최종 버전이며 더 이상 유지보수되지 않습니다.
-React 19에서 정상 동작하지 않을 경우 아래 대안을 검토해야 합니다:
-
-| 대안 | 특징 |
-|---|---|
-| [BlockNote](https://github.com/TypeCellOS/BlockNote) | Notion 스타일, React-first, 활발한 개발 |
-| [TipTap](https://tiptap.dev/) | ProseMirror 기반, 확장성 우수 |
-| [Plate](https://platejs.org/) | Slate 기반, React 전용, 플러그인 아키텍처 |
-
-### 롤백 전략
-
-각 Phase를 별도 브랜치/PR로 진행하여, 문제 발생 시 개별 롤백이 가능하도록 합니다.
-`package-lock.json`은 각 Phase 완료 시점에 커밋하여 의존성 상태를 보존합니다.
+2026-03 ~ 2026-07에 걸쳐 완료된 메이저 의존성 마이그레이션의 이력과 핵심 결정을 기록한다. 원본은 Phase별 절차서였으나 전 Phase 완료 후 요약본으로 압축했다. 향후 업그레이드 판단(도입/보류)은 [library-decisions.md](./library-decisions.md)가 정본이다.
+
+## 현재 버전 현황 (2026-07-20, package.json 기준)
+
+| 패키지                             | 버전                                                         |
+| ---------------------------------- | ------------------------------------------------------------ |
+| next / eslint-config-next          | ^16.2.10                                                     |
+| react / react-dom                  | ^19.2.7                                                      |
+| typescript                         | ^6.0.3                                                       |
+| tailwindcss / @tailwindcss/postcss | ^4.3.2                                                       |
+| jest / jest-environment-jsdom      | ^30.4.2 / ^30.4.1                                            |
+| ts-jest                            | ^29.4.11 (29.4부터 Jest 30 지원 — 30 메이저는 존재하지 않음) |
+| @types/jest / @types/node          | ^30.0.0 / ^26.1.1                                            |
+| eslint                             | ^9.39.5 (flat config)                                        |
+| eslint-plugin-boundaries           | ^7.0.2                                                       |
+| next-auth                          | 5.0.0-beta.31 (stable 대기 — library-decisions.md 참조)      |
+| @tanstack/react-query              | ^5.101.2                                                     |
+| react-hook-form                    | ^7.81.0                                                      |
+| msw / express                      | ^2.15.0 / ^5.2.1                                             |
+
+## 완료된 마이그레이션 요약
+
+| 마이그레이션             | 이전 → 이후       | 핵심 결정 · 포인트                                                                                                                                          | PR   |
+| ------------------------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| eslint-config-prettier   | 9 → 10            | breaking change 없음                                                                                                                                        | #141 |
+| express                  | 4 → 5             | mock 서버(`src/shared/api/mocks/server.ts`) 전용, deprecated API 미사용이라 무변경 통과                                                                     | #141 |
+| Tailwind CSS             | 3.4 → 4           | CSS-first 전환: `@import "tailwindcss"` + `@plugin "@tailwindcss/forms"`, PostCSS 플러그인 `@tailwindcss/postcss`, `tailwind.config.js` 삭제 (v4 자동 스캔) | #141 |
+| React                    | 18 → 19           | breaking 패턴(forwardRef, class component 등) 전무 — 코드 무변경                                                                                            | #141 |
+| Next.js                  | 15.5 → 16         | `next.config.js` 호환 유지. 이전에 #127에서 DoS advisory 대응으로 15.5 정합 선행                                                                            | #141 |
+| ESLint                   | 8 → 9             | flat config 전환(`eslint.config.mjs`), `FlatCompat` 미사용, `.eslintrc.json`/`.eslintignore` 삭제                                                           | #141 |
+| Jest                     | 29 → 30           | `jest-fixed-jsdom` 호환 확인, transformIgnore 예외 추가, `next-auth/react` mock 도입                                                                        | #141 |
+| next-auth                | 4 → 5.0.0-beta    | 아키텍처 전면 변경 — 아래 상세. 현행 규칙은 [auth.md](../architecture/auth.md)                                                                              | #141 |
+| TypeScript               | 5 → 6             | ts-jest peer(`>=4.3 <7`) 범위 내라 무리 없음                                                                                                                | #143 |
+| @types/node              | 25 → 26           | 타입 전용, 영향 없음 (원 계획의 목표는 25였고 이후 26으로 재상향)                                                                                           | #155 |
+| eslint-plugin-boundaries | 6 → 7             | FSD 린트 강화와 함께 적용 — 강제 항목은 [fsd-architecture.md](../architecture/fsd-architecture.md) §9 참조                                                  | #155 |
+| 패키지 매니저            | 혼재 → npm 단일화 | `pnpm-lock.yaml` 삭제, `packageManager: npm@11.6.2` 명시                                                                                                    | #155 |
+
+이후 마이너/패치는 Dependabot이 담당한다 (예: next 16.2.3 → 16.2.6, #151).
+
+### next-auth 4 → 5 상세 (최대 규모 작업)
+
+- 설정을 루트 단일 파일로 집약 — 당시 `src/auth.ts`, FSD 이관 후 현행은 `src/app/auth/config.ts`
+- API route는 `handlers` re-export, `src/middleware.ts`는 `auth as middleware` 한 줄 re-export
+- 환경변수 prefix 변경: `NEXTAUTH_URL`/`NEXTAUTH_SECRET` → `AUTH_URL`/`AUTH_SECRET` (`next.config.js` env 동기화)
+- 세션 타입 선언 — 당시 `src/shared/types/declare/nextAuth.d.ts`, 현행은 `src/entities/auth/config/nextAuth.d.ts`
+- 클라이언트 API(`useSession`, `signIn`, `signOut`)는 `next-auth/react` 그대로 사용
+
+## 트러블슈팅 기록 (재발 방지)
+
+- **msw ≥2.15 ESM 중첩 의존성**: `@open-draft/deferred-promise`(ESM 전용)를 `node_modules/msw/node_modules` 아래로 끌고 온다. `jest.config.ts` transformIgnorePatterns 예외에 `msw`, `@open-draft` 두 홉 모두 필요. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
+- **ts-jest 버전 오해**: "Jest 30이니 ts-jest도 30" 이 아니다. ts-jest는 29.4부터 Jest 30을 지원하며 30 메이저가 없다. 원 계획서의 `ts-jest@^30` 목표는 오기였고, 실제는 `^29.4.x` 유지가 정답
+- **@toast-ui/react-editor**: 3.2.3이 최종 버전(유지보수 중단). `overrides`로 `react: "^19"` 강제 설치 중이며, 동작 이상 시 대체 에디터(BlockNote, TipTap, Plate) 전환 검토 — [library-decisions.md](./library-decisions.md) 참조
+- **next-auth/react 테스트 mock**: jsdom에서 세션 프로바이더 모킹용 — 당시 `src/tests/mocks/`, 현행은 `src/shared/lib/testing/nextAuthReact.tsx` (`jest.config.ts` moduleNameMapper로 매핑)
+
+## 보류 중인 메이저 (재검토 조건 포함)
+
+| 후보             | 보류 사유                                                          | 재검토 조건                         |
+| ---------------- | ------------------------------------------------------------------ | ----------------------------------- |
+| TypeScript 7     | ts-jest peer `>=4.3 <7`                                            | ts-jest가 TS7 지원 릴리스           |
+| ESLint 10        | eslint-config-next(16.2.10)에 번들된 eslint-plugin-react 호환 문제 | eslint-config-next가 ESLint 10 지원 |
+| next-auth stable | 5.0.0 stable 미출시 (beta.31이 최신)                               | stable 릴리스 시 즉시 업그레이드    |
+
+## 롤백 전략
+
+각 마이그레이션은 별도 브랜치/PR로 진행해 개별 롤백이 가능하도록 한다. `package-lock.json`은 각 단계 완료 시점에 함께 커밋해 의존성 상태를 보존한다.

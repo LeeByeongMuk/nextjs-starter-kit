@@ -38,7 +38,7 @@ paths:
 
 ## Jest → Vitest
 
-- **현황**: Jest 30 + ts-jest, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`). 테스트 파일 7개 (`src/app/**/*.spec.tsx`). 커버리지 60% 기준
+- **현황**: Jest 30 + ts-jest 29.4(29.4부터 Jest 30 지원), `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 테스트 파일 7개 (`src/app/**/*.spec.tsx`). 커버리지 60% 기준
 - **교체 찬**: Vitest가 ESM 네이티브 + SWC/esbuild 기반으로 빠름. `transformIgnorePatterns` 같은 수동 튜닝 불필요. Vite 생태계와 호환
 - **교체 반**:
   - Jest 30은 최신 메이저, 기능 결함 없음
@@ -78,7 +78,7 @@ paths:
 
 ## `classnames` → `clsx`
 
-- **현황**: `classnames` 2곳 사용 (`src/entities/post/ui/TypeSelect.tsx`, `src/entities/post/ui/Pagination.tsx`). 나머지는 Tailwind 유틸리티 리터럴
+- **현황**: `classnames` 2곳 사용 (`src/features/post-list/ui/PostListFilter/TypeSelect.tsx`, `src/entities/post/ui/Pagination.tsx`). 나머지는 Tailwind 유틸리티 리터럴
 - **교체 찬**: `clsx`는 더 가볍고(1.4KB vs 4.7KB) API 호환. cva는 컴포넌트 variants에 유용
 - **교체 반**: 2곳만 쓰는 라이브러리의 교체는 순수 기회비용. `classnames` 유지비가 0에 가까움. cva는 현재 디자인 시스템에 비하면 과투자
 - **비용**: Small (2파일)
@@ -100,7 +100,7 @@ paths:
 
 ## Toast UI Editor → TipTap/Lexical
 
-- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 사용처는 `src/entities/post/ui/Editor.tsx`(읽기 전용 뷰어) + `src/entities/post/ui/ContentsEditor.tsx`(입력). React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
+- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 사용처는 `src/entities/post/ui/Editor.tsx`(읽기 전용 뷰어) + `src/entities/post/ui/Form/ContentsEditor.tsx`(입력). React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
 - **교체 찬**:
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크
@@ -120,7 +120,7 @@ paths:
 
 ## Prettier + ESLint → Biome
 
-- **현황**: ESLint 9(flat config) + 3개 플러그인(`@tanstack/query`, `boundaries`, `prettier`) + Prettier 3. `eslint.config.mjs`는 FSD boundaries 규칙의 유일한 집행 지점
+- **현황**: ESLint 9(flat config) + 5개 플러그인(`@tanstack/query`, `boundaries`, `prettier`, `simple-import-sort`, `unused-imports`) + 로컬 커스텀 룰 2개(`comment-conventions`, `fsd-relative-imports`) + Prettier 3. `eslint.config.mjs`는 FSD boundaries 규칙의 유일한 집행 지점
 - **교체 찬**: Biome는 linter + formatter 통합 + Rust 기반 고속. 도구 수 감소
 - **교체 반**:
   - Biome가 `eslint-plugin-boundaries` 같은 생태계 플러그인을 대체 못 함 → FSD 경계 강제 불가
