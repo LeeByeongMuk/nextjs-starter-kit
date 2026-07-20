@@ -100,7 +100,7 @@ paths:
 
 ## Toast UI Editor → TipTap/Lexical
 
-- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 사용처는 `src/entities/post/ui/Editor.tsx`(읽기 전용 뷰어) + `src/entities/post/ui/ContentsEditor.tsx`(입력). React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
+- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 사용처는 `src/entities/post/ui/Editor.tsx`(읽기 전용 뷰어) + `src/entities/post/ui/Form/ContentsEditor.tsx`(입력). React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
 - **교체 찬**:
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크

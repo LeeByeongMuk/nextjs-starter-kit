@@ -32,7 +32,7 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 
 `dark:` prefix 사용. 예: `bg-white dark:bg-gray-700`.
 
-참고 파일: `src/entities/post/ui/PostDetail.tsx`.
+참고 파일: `src/features/post-detail/ui/PostDetail.tsx`.
 
 ---
 
