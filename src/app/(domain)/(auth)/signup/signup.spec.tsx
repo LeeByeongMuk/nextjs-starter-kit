@@ -189,7 +189,35 @@ describe('회원가입 테스트', () => {
       // then - 에러메세지가 표시됨
       const errorMessage = await screen.findByRole('password-error-message');
       expect(errorMessage).toHaveTextContent(
-        'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+      );
+    });
+
+    test('공백은 특수문자로 인정하지 않는다', async () => {
+      // when - 특수문자 대신 끝 공백만 포함
+      fireEvent.change(screen.getByLabelText('Password'), {
+        target: { value: 'Password123 ' },
+      });
+      fireEvent.submit(screen.getByTestId('submit-button'));
+
+      // then - 에러메세지가 표시됨
+      const errorMessage = await screen.findByRole('password-error-message');
+      expect(errorMessage).toHaveTextContent(
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+      );
+    });
+
+    test('비밀번호에 특수문자만 누락돼도 에러메세지가 표시된다', async () => {
+      // when - 대문자·소문자·숫자는 충족하고 특수문자만 없음
+      fireEvent.change(screen.getByLabelText('Password'), {
+        target: { value: 'Password123' },
+      });
+      fireEvent.submit(screen.getByTestId('submit-button'));
+
+      // then - 에러메세지가 표시됨
+      const errorMessage = await screen.findByRole('password-error-message');
+      expect(errorMessage).toHaveTextContent(
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
       );
     });
 
