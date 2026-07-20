@@ -1,7 +1,7 @@
 ---
 paths:
-  - "src/**/*.tsx"
-  - "src/styles/**"
+  - 'src/**/*.tsx'
+  - 'src/styles/**'
 ---
 
 # Styling Guide
@@ -15,7 +15,7 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 
 현존 `classnames` 사용처(2곳)는 유지하되 **신규 확산 금지**:
 
-- `src/entities/post/ui/TypeSelect.tsx`
+- `src/features/post-list/ui/PostListFilter/TypeSelect.tsx`
 - `src/entities/post/ui/Pagination.tsx`
 
 조건부 클래스는 템플릿 리터럴 + 삼항으로 처리:
@@ -38,22 +38,22 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 
 ## 3. 레이아웃 기본
 
-| 용도 | 클래스 |
-|---|---|
-| 루트 컨테이너 | `container mx-auto` — `src/app/(domain)/layout.tsx` |
-| 폼 카드 | `border-2 border-teal-600 px-6 py-12 lg:px-8` |
-| 폼 필드 | `block w-full rounded-md border-0 ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-600` |
+| 용도          | 클래스                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| 루트 컨테이너 | `container mx-auto` — `src/app/(domain)/layout.tsx`                                        |
+| 폼 카드       | `border-2 border-teal-600 px-6 py-12 lg:px-8`                                              |
+| 폼 필드       | `block w-full rounded-md border-0 ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-600` |
 
 ---
 
 ## 4. 색 팔레트 (디자인 토큰)
 
-| 용도 | 팔레트 |
-|---|---|
-| Primary | `teal-600` |
-| Form focus ring | `indigo-600` |
-| Neutral | `gray-300`, `gray-700`, `gray-900` |
-| Error | 미정 — 토스트 도입 시 정의 (`.agents/rules/code-style/code-conventions.md` §3) |
+| 용도            | 팔레트                                                                         |
+| --------------- | ------------------------------------------------------------------------------ |
+| Primary         | `teal-600`                                                                     |
+| Form focus ring | `indigo-600`                                                                   |
+| Neutral         | `gray-300`, `gray-700`, `gray-900`                                             |
+| Error           | 미정 — 토스트 도입 시 정의 (`.agents/rules/code-style/code-conventions.md` §3) |
 
 새 색상 도입 시 본 섹션을 먼저 업데이트.
 
