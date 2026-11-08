@@ -1,7 +1,7 @@
 # 제품 Brief: Next.js 스타터킷 현대화
 
 - Run ID: `starter-modernization`
-- Status: `VERIFIED`
+- Status: `COMPLETE`
 - Updated: `2026-11-08`
 
 ## 문제
@@ -38,7 +38,7 @@
 - [x] `AC-04` 진입 화면(`/` → `/post`)·인증·게시판의 시각적 일관성, 모바일 레이아웃, 키보드 접근성을 실제 브라우저로 확인한다.
 - [x] `AC-05` `npm run tsc`, `npm run lint`, `npm test`, `npm run build`를 통과한다.
 - [x] `AC-06` Astra ultra와 Sol 6.1 xhigh 독립 검토 후 3개 병렬 작업을 수행하고 결과를 통합한다.
-- [ ] `AC-07` 변경에 맞춘 현재 문서를 갱신하고 사용자 본인을 assignee로 한 PR을 생성한다.
+- [x] `AC-07` 변경에 맞춘 현재 문서를 갱신하고 사용자 본인을 assignee로 한 PR을 생성한다.
 
 ## 결정 기록
 
@@ -65,7 +65,7 @@
 - 기준 커밋: `origin/develop`의 `0efed81`. 구현 브랜치: `feat/starter-modernization`.
 - Astra ultra와 Sol 6.1 xhigh가 독립 검토한 뒤, stack·cleanup/auth·design 세 격리 작업 트리에서 병렬 구현하고 통합했다.
 - 통합 후 실제 production 브라우저에서 발견한 페이지 번호 이름, Toast UI sprite·대비·본문 역할·더보기 이름을 수정했다. 세션 누락·손상 시 로그아웃 정리도 별도 서버 액션으로 보완했다.
-- 최종 Sol 검토는 추가 blocker 없음. 타입·lint·테스트·빌드·브라우저 검증 완료. PR 생성이 남아 있다.
+- 최종 Sol 검토는 추가 blocker 없음. 타입·lint·테스트·빌드·브라우저 검증 완료. [PR #183](https://github.com/LeeByeongMuk/nextjs-starter-kit/pull/183)을 `develop` 대상으로 생성했고 assignee는 `LeeByeongMuk`이다. 원격 CI의 최종 상태는 PR 체크를 따른다.
 
 ## 검증 증거
 
