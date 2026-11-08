@@ -1,6 +1,7 @@
 import PostDetail from '@app/(domain)/post/[id]/(detail)/page';
 import { usePost } from '@features/post-detail';
 import { usePostDetail } from '@features/post-detail';
+import postData from '@shared/api/mocks/data/post.json';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';
@@ -27,6 +28,7 @@ describe('게시글 상세 페이지 테스트', () => {
   const mockBack = jest.fn();
 
   beforeEach(() => {
+    mockBack.mockClear();
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue({ value: 'test-token' }),
@@ -51,7 +53,9 @@ describe('게시글 상세 페이지 테스트', () => {
     await waitFor(() => {
       expect(result.current.post?.is_editable).toBeFalsy();
     });
-    expect(screen.queryByRole('post-edit-link')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: '수정' })
+    ).not.toBeInTheDocument();
   });
 
   test('게시글 수정 권한이 있으면 수정 버튼이 보인다', async () => {
@@ -90,21 +94,11 @@ describe('게시글 상세 페이지 테스트', () => {
     // then - 호출에 성공한다
     await waitFor(() => {
       expect(result.current.isSuccess).toBeTruthy();
-      expect(result.current.data.data).toMatchObject({
-        contents: 'contents',
-        created_at: '2021-09-01T00:00:00',
-        hit: 0,
-        id: 1,
-        is_editable: false,
-        title: 'title',
-        type: 'notice',
-        user_name: 'name',
-      });
+      expect(result.current.data.data).toMatchObject(postData.getById.data);
     });
   });
 
-  test('게시글 상세 API 호출에 실패하면 에러 처리를 진행한다', async () => {
-    queryClient.clear();
+  test('조회 실패 시 오류 화면을 유지하고 사용자가 복귀를 선택한다', async () => {
     server.use(
       http.get(getHandlerURI('/api/posts/:id'), () => {
         return new HttpResponse(null, {
@@ -112,6 +106,7 @@ describe('게시글 상세 페이지 테스트', () => {
         });
       })
     );
+    await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
 
     // when - 게시글 상세 API 호출한다
     const { result } = renderHook(() => usePost(), { wrapper });
@@ -120,7 +115,13 @@ describe('게시글 상세 페이지 테스트', () => {
     await waitFor(() => {
       expect(result.current.isError).toBeTruthy();
     });
-    expect(window.alert).toHaveBeenCalledWith('Failed to fetch post');
-    expect(mockBack).toHaveBeenCalled();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '글이 없거나 일시적인 오류가 발생했습니다.'
+    );
+    expect(
+      screen.getByRole('link', { name: '게시판으로 돌아가기' })
+    ).toHaveAttribute('href', '/post');
+    expect(window.alert).not.toHaveBeenCalled();
+    expect(mockBack).not.toHaveBeenCalled();
   });
 });

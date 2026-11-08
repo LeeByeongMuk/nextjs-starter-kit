@@ -13,22 +13,27 @@ interface SignUpFormProps {
   handleSignUp: (req: SignUpReq) => void;
 }
 
+/** 인증 정보를 검증한 뒤 제출한다. */
 export default function SignUpForm({ handleSignUp }: SignUpFormProps) {
   const { handleSubmit } = useFormContext<SignUpReq>();
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(handleSignUp)}>
+    <form
+      noValidate
+      className="space-y-6"
+      onSubmit={handleSubmit(handleSignUp)}
+    >
       <EmailInput />
 
       <NameInput />
 
       <NickNameInput />
 
-      <PasswordInput />
+      <PasswordInput autoComplete="new-password" />
 
       <PasswordConfirmInput />
 
-      <ButtonBox buttonText="Sign up" />
+      <ButtonBox buttonText="회원가입" />
     </form>
   );
 }

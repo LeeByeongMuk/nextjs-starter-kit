@@ -4,9 +4,7 @@ import {
   TitleInput,
   TypeSelect,
 } from '@entities/post';
-// ContentsEditor wraps TUI Editor which references DOM globals at module
-// load; it is excluded from the @entities/post barrel to keep SSR pages
-// safe, so consumers must deep-import it from a `'use client'` file.
+// DOM 의존 편집기는 SSR 안전성을 위해 Public API에서 제외한다.
 // eslint-disable-next-line boundaries/dependencies
 import ContentsEditor from '@entities/post/ui/Form/ContentsEditor';
 import React from 'react';
@@ -18,13 +16,14 @@ interface CreatePostFormProps {
   handleCreatePost: (req: CreatePostFormInput) => void;
 }
 
+/** 게시글 필드를 검증한 뒤 HTML 본문과 함께 제출한다. */
 export default function CreatePostForm({
   handleCreatePost,
 }: CreatePostFormProps) {
   const { handleSubmit } = useFormContext<CreatePostFormInput>();
 
   return (
-    <form onSubmit={handleSubmit(handleCreatePost)}>
+    <form noValidate onSubmit={handleSubmit(handleCreatePost)}>
       <TitleInput />
 
       <TypeSelect />

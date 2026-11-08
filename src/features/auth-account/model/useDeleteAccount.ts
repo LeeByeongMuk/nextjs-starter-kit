@@ -1,3 +1,4 @@
+import { deleteAccessToken } from '@shared/lib/api';
 import { useMutation } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 
@@ -8,6 +9,7 @@ export default function useDeleteAccount() {
     mutationFn: fetchDeleteAccount,
     onSuccess: async () => {
       alert('Account deleted successfully');
+      await deleteAccessToken();
       await signOut({
         callbackUrl: '/',
       });

@@ -13,10 +13,7 @@ paths:
 
 Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()` / `clsx` / `tailwind-variants` 같은 래퍼 **도입 금지**.
 
-현존 `classnames` 사용처(2곳)는 유지하되 **신규 확산 금지**:
-
-- `src/features/post-list/ui/PostListFilter/TypeSelect.tsx`
-- `src/entities/post/ui/Pagination.tsx`
+`classnames` 신규 사용은 금지한다. 조건부 스타일은 아래 템플릿 리터럴로 작성한다.
 
 조건부 클래스는 템플릿 리터럴 + 삼항으로 처리:
 
@@ -30,30 +27,40 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 
 ## 2. 다크 모드
 
-`dark:` prefix 사용. 예: `bg-white dark:bg-gray-700`.
-
-참고 파일: `src/features/post-detail/ui/PostDetail.tsx`.
+`src/styles/globals.css`의 의미별 토큰이 `prefers-color-scheme: dark`에 따라 전환된다. UI는 `bg-paper`, `text-ink`, `border-line` 등 동일한 유틸리티를 사용한다. 밝은 테마 고정 색상과 `dark:` 팔레트를 혼용하지 않는다.
 
 ---
 
 ## 3. 레이아웃 기본
 
-| 용도          | 클래스                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| 루트 컨테이너 | `container mx-auto` — `src/app/(domain)/layout.tsx`                                        |
-| 폼 카드       | `border-2 border-teal-600 px-6 py-12 lg:px-8`                                              |
-| 폼 필드       | `block w-full rounded-md border-0 ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-600` |
+| 용도           | 클래스                                                           |
+| -------------- | ---------------------------------------------------------------- |
+| 앱 컨테이너    | `mx-auto w-full max-w-[1120px] px-5 sm:px-8`                     |
+| 읽기·작성 영역 | `mx-auto w-full max-w-[760px]`                                   |
+| 인증 폼        | `mx-auto w-full max-w-md` — 테두리 카드 대신 제목·구분선·여백    |
+| 폼 필드        | `min-h-12 w-full rounded border border-line bg-surface text-ink` |
+
+기본 글꼴은 system-ui와 한국어 OS fallback이다. 한국어는 단어 단위로 줄바꿈하고 긴 URL·제목은 `overflow-wrap: anywhere`로 감싼다. 링크·버튼·선택 라벨의 터치 영역은 최소 44px, 주요 입력 높이는 48px이다. 본문은 16px(큰 화면 17px), 행간 1.9를 사용한다.
+
+화면은 한 `main`과 한 `h1`을 가진다. 공통 레이아웃에 본문 건너뛰기 링크를 두고 `focus-visible` 포커스를 유지한다. 로딩은 `status`, 오류는 `alert`로 알리며 필드 오류는 `aria-invalid`와 `aria-describedby`로 연결한다. OS 모션 감소 설정을 준수한다.
 
 ---
 
 ## 4. 색 팔레트 (디자인 토큰)
 
-| 용도            | 팔레트                                                                         |
-| --------------- | ------------------------------------------------------------------------------ |
-| Primary         | `teal-600`                                                                     |
-| Form focus ring | `indigo-600`                                                                   |
-| Neutral         | `gray-300`, `gray-700`, `gray-900`                                             |
-| Error           | 미정 — 토스트 도입 시 정의 (`.agents/rules/code-style/code-conventions.md` §3) |
+| 토큰 / 유틸리티   | 밝음      | OS 다크   |
+| ----------------- | --------- | --------- |
+| `paper`           | `#faf9f6` | `#151b1d` |
+| `surface`         | `#ffffff` | `#1c2528` |
+| `ink`             | `#202c2d` | `#edf2f0` |
+| `muted`           | `#596664` | `#b3c0bd` |
+| `line`            | `#ced7d2` | `#475854` |
+| `accent` / 포커스 | `#0f766e` | `#83d5c7` |
+| `accent-hover`    | `#115e59` | `#afe8dc` |
+| `accent-soft`     | `#e5f1ec` | `#233d37` |
+| `inverse`         | `#ffffff` | `#14231e` |
+| `danger`          | `#b42332` | `#ffb3bb` |
+| `skeleton`        | `#e1e7e2` | `#34443f` |
 
 새 색상 도입 시 본 섹션을 먼저 업데이트.
 
@@ -64,6 +71,7 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 - PostCSS: `@tailwindcss/postcss` — `postcss.config.*`
 - CSS import: `src/styles/globals.css`에서 `@import "tailwindcss"` (v4 방식)
 - `@tailwindcss/forms` 플러그인 활성 — form 기본 스타일 리셋
+- 공통 토큰은 `@theme inline`으로 Tailwind에 노출한다. 글로벌 CSS의 별도 선택자는 기본 접근성, 서버 HTML 본문(`.post-content`), ToastUI 내부 DOM(`.post-editor`)에 한정한다. 화면 레이아웃은 JSX 유틸리티로 작성한다.
 
 v3 방식(`tailwind.config.js`의 `content` 배열)은 쓰지 않는다 — v4 자동 스캔으로 전환됨.
 

@@ -3,11 +3,15 @@
 import { fetchUser } from '@entities/auth/api/userServices';
 // server-only — excluded from @features/auth-signin barrel to keep client bundle clean
 // eslint-disable-next-line boundaries/dependencies
-import { fetchSignIn } from '@features/auth-signin/api/signinService';
+import * as signInService from '@features/auth-signin/api/signinService';
+import { deleteAccessToken } from '@shared/lib/api';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  events: {
+    signOut: deleteAccessToken,
+  },
   providers: [
     Credentials({
       id: 'credentials',
@@ -32,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const {
           data: { id },
-        } = await fetchSignIn({
+        } = await signInService.fetchSignIn({
           email: credentials.email,
           password: credentials.password,
         });

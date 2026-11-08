@@ -27,7 +27,7 @@ paths:
 - `alert()` 신규 호출 → 작성 금지 (기존 호출은 교체 대상)
 - TS `enum` 사용 → as-const union으로 대체 — §1.4
 - `QueryClient` 새로 생성 → `src/shared/api/tanstack-query/client.ts`만 사용
-- `classnames` 신규 import → 금지 (기존 2곳 외 확산 방지) — [`styling.md`](./styling.md) §1
+- `classnames` 신규 import → 금지 (사용처가 없어 의존성 제거) — [`styling.md`](./styling.md) §1
 
 **라이브러리 추가**: 새 런타임 의존성을 제안하기 전에 [`library-decisions.md`](../infra/library-decisions.md) 결정 테이블을 확인한다. "유지" 결정이 박힌 후보의 역(교체)을 무단 제안하지 말 것. 재검토 조건이 충족됐다면 그 조건을 인용해 사용자에게 확인 요청. 예외: **Zod**는 "도입" 결정이므로 후속 PR에서 능동 적용 가능.
 

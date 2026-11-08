@@ -5,60 +5,38 @@ permissions:
 
 on:
   pull_request:
-    types: [ opened, synchronize, reopened, ready_for_review ]
-    branches:
-      - develop
-      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
     if: ${{ !github.event.pull_request.draft }}
-    # 스타일 자동 수정 커밋을 푸시하므로 이 잡만 쓰기 권한
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [ 20.x ]
-
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          ref: ${{ github.head_ref }}
-
-      - name: Install the project dependencies
-        run: npm ci
-
-      - name: Fix code style issues with prettier & eslint
-        run: npm run lint:fix && npm run prettier:fix
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: Fix styling
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run tsc
+      - run: npm run lint
+      - run: npm run prettier
 
   build:
     if: ${{ !github.event.pull_request.draft }}
     needs: lint
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [ 20.x ]
-
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          ref: ${{ github.head_ref }}
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install the project dependencies
-        run: npm ci
-
-      - name: Build the project
-        run: npm run build
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build

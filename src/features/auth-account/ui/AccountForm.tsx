@@ -12,19 +12,24 @@ interface AccountFormProps {
   handleUpdateAccount: (req: UpdateAccountReq) => void;
 }
 
+/** 인증 정보를 검증한 뒤 제출한다. */
 export default function AccountForm({ handleUpdateAccount }: AccountFormProps) {
   const { data: session } = useSession();
   const { handleSubmit } = useFormContext<UpdateAccountReq>();
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(handleUpdateAccount)}>
+    <form
+      noValidate
+      className="space-y-6"
+      onSubmit={handleSubmit(handleUpdateAccount)}
+    >
       <EmailInput defaultValue={session?.user?.email} />
 
       <NameInput defaultValue={session?.user?.name} />
 
       <NickNameInput defaultValue={session?.user?.nickname || undefined} />
 
-      <ButtonBox buttonText="Account Update" />
+      <ButtonBox buttonText="변경 사항 저장" />
     </form>
   );
 }

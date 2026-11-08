@@ -1,63 +1,40 @@
 import { LIST_TYPE_OPTIONS } from '@entities/post';
-import classNames from 'classnames';
 import { useFormContext } from 'react-hook-form';
 
 interface Props {
   onChange: () => void;
 }
 
+/** 현재 분류를 반영하는 접근 가능한 선택 필터다. */
 export default function TypeSelect({ onChange }: Props) {
-  const { register, watch, setValue } = useFormContext();
-
+  const { register } = useFormContext();
+  const field = register('type');
   return (
-    <div>
-      <div className="sm:hidden">
-        <label htmlFor="type" className="sr-only">
-          Type
-        </label>
-
-        <select
-          id="type"
-          className="w-full rounded-md border-gray-200"
-          defaultValue={''}
-          {...register('type')}
-          onChange={onChange}
-        >
-          {LIST_TYPE_OPTIONS.map(option => (
-            <option key={option.label} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="hidden sm:block">
-        <nav className="flex gap-6" aria-label="Tabs">
-          {LIST_TYPE_OPTIONS.map(option => (
-            <a
-              key={option.label}
-              href="#"
-              className={classNames(
-                'shrink-0 rounded-lg p-2 text-sm font-medium',
-                {
-                  'text-gray-500 hover:bg-gray-50 hover:text-gray-700':
-                    option.value !== watch('type'),
-                },
-                {
-                  'bg-sky-100 text-sky-600': option.value === watch('type'),
-                }
-              )}
-              onClick={e => {
-                e.preventDefault();
-                setValue('type', option.value);
-                onChange();
-              }}
-            >
-              {option.label}
-            </a>
-          ))}
-        </nav>
-      </div>
+    <div className="flex min-h-12 items-center gap-3">
+      <label htmlFor="filter-type" className="shrink-0 text-sm font-semibold">
+        분류
+      </label>
+      <select
+        id="filter-type"
+        className="min-h-12 w-full rounded border border-line bg-surface py-2 pr-9 pl-3 text-sm text-ink sm:w-40"
+        {...field}
+        onChange={event => {
+          void field.onChange(event);
+          onChange();
+        }}
+      >
+        {LIST_TYPE_OPTIONS.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.value === ''
+              ? '전체 글'
+              : option.value === 'notice'
+                ? '공지'
+                : option.value === 'faq'
+                  ? '자주 묻는 질문'
+                  : '자유'}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

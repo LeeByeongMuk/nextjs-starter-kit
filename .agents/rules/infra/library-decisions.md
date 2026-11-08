@@ -20,13 +20,33 @@ paths:
 
 ---
 
+## 버전 채택 정책
+
+- Node.js는 `.nvmrc`의 26.13.0 LTS, npm은 동봉된 11.20.0을 사용한다. `package.json`의 engines, CI, Docker가 같은 계열을 따른다.
+- 설치는 `npm ci`로 재현한다. 정확한 패키지 버전은 `package-lock.json`이 정본이다. `npm run setup`도 `npm ci`를 실행하며 AI 스킬은 `--skills`로 선택 설치한다.
+- Next/React, Tailwind/PostCSS 플러그인, TanStack Query/devtools/ESLint 플러그인은 각 peer 범위에 맞춰 함께 갱신한다. 같은 메이저라도 타입·lint·테스트·production build를 통과해야 한다.
+- React 19는 Toast UI wrapper의 공식 peer(`^17.0.1`) 밖이다. 기존 override를 유지하며 에디터 작성·수정·저장 흐름을 실제 브라우저에서 확인한다.
+
+| 보류 대상          | 현재 선택과 근거                                                      | 재검토 조건                        |
+| ------------------ | --------------------------------------------------------------------- | ---------------------------------- |
+| TypeScript 7       | 6.0.3 유지. typescript-eslint의 지원 범위는 `>=4.8.4 <6.1.0`          | parser와 Next 도구 체인이 7 지원   |
+| ESLint 10          | 9.39.5 유지. eslint-plugin-react 7.37.5 peer는 `^9.7`까지 지원        | React 플러그인 및 커스텀 규칙 호환 |
+| jest-dom 6.10 / 7  | 6.9.1 고정. 6.10.0은 잘못된 minor 릴리스로 폐기되었고 7은 별도 메이저 | 안정 메이저 전환 검토              |
+| MSW 3              | 2.15.0 유지. 테스트와 Express mock은 아래 MSW 2 유지 결정 적용        | 별도 마이그레이션 필요성 검토      |
+| NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음                  | v5 안정판 출시                     |
+| npm 12             | Node LTS에 동봉된 npm 11.20.0으로 설치 정책 통일                      | 별도 메이저 전환 검증              |
+
+근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.0), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest), [jest-dom 6.10 폐기 메타데이터](https://registry.npmjs.org/@testing-library/jest-dom/6.10.0).
+
+---
+
 ## 결정 요약
 
 | 후보                                                                                | 결정                       | 재검토 조건                                    |
 | ----------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------- |
 | [Jest → Vitest](#jest--vitest)                                                      | **유지 (Jest 30)**         | 테스트 파일 > 30 또는 CI 테스트 시간 > 3분     |
 | [폼/API 런타임 검증: Zod](#zod-도입)                                                | **도입 (별도 PR)**         | 즉시 유효 — 후속 `feat/zod-validation`         |
-| [`classnames` → `clsx`](#classnames--clsx)                                          | **유지**                   | 사용처 5개 이상 또는 번들 최적화 패스          |
+| [`classnames` → `clsx`](#classnames--clsx)                                          | **제거 (사용처 없음)**     | 복잡한 조건부 스타일·variants가 필요할 때      |
 | [MSW 2](#msw-2)                                                                     | **유지**                   | —                                              |
 | [Toast UI Editor → TipTap/Lexical](#toast-ui-editor--tiptaplexical)                 | **유지 (보류)**            | Editor 성능·SSR 이슈 재발 또는 협업 기능 요구  |
 | [Prettier + ESLint → Biome](#prettier--eslint--biome)                               | **유지**                   | ESLint 플러그인 호환 대란 또는 lint 시간 > 30s |
@@ -38,14 +58,14 @@ paths:
 
 ## Jest → Vitest
 
-- **현황**: Jest 30 + ts-jest 29.4(29.4부터 Jest 30 지원), `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 테스트 파일 7개 (`src/app/**/*.spec.tsx`). 커버리지 60% 기준
+- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 테스트 파일 8개 (`src/app/**/*.spec.tsx`, 인증 쿠키 회귀 테스트). 커버리지 60% 기준
 - **교체 찬**: Vitest가 ESM 네이티브 + SWC/esbuild 기반으로 빠름. `transformIgnorePatterns` 같은 수동 튜닝 불필요. Vite 생태계와 호환
 - **교체 반**:
   - Jest 30은 최신 메이저, 기능 결함 없음
-  - 현재 테스트 7개 — 속도 gain 체감 미미 (초 단위)
+  - 현재 테스트 파일 8개 — 속도 gain 체감 미미 (초 단위)
   - NextAuth/Auth.js의 ESM 이슈가 Vitest로 옮긴다고 자동 해결되지 않음 (Vitest도 `deps.inline`/`server.deps` 튜닝 필요)
   - `next/jest` preset을 버려야 하므로 Next.js 공식 경로에서 벗어남
-- **비용**: Medium — 설정 포팅 + 7개 테스트 검증 + CI 파이프라인 조정
+- **비용**: Medium — 설정 포팅 + 8개 테스트 파일 검증 + CI 파이프라인 조정
 - **결정**: **유지**
 - **재검토 조건**: 테스트 파일 수가 30개를 초과하거나 CI에서 `npm test` 소요 시간이 3분을 넘을 때. Vitest v4 이상이 `next/jest` 수준의 공식 preset을 제공할 때
 
@@ -72,24 +92,21 @@ paths:
 3. `src/features/*/model/use<Slice>Form.ts`에 `zodResolver(schema)` 연결
 4. `src/shared/lib/api.ts`의 `fetchApi<T>()`에 optional `schema?: ZodSchema<T>` 파라미터 추가 → 있으면 `schema.parse(json)`
 5. `src/shared/api/types.ts`에 `ApiErrorSchema` 정의 → 중앙 에러 핸들러 기반 확보
-6. 테스트: 기존 7개 `*.spec.tsx` 통과 + 신규 스키마 단위 테스트(`*.schema.spec.ts`)
+6. 테스트: 기존 `*.spec.tsx` 통과 + 신규 스키마 단위 테스트(`*.schema.spec.ts`)
 
 ---
 
 ## `classnames` → `clsx`
 
-- **현황**: `classnames` 2곳 사용 (`src/features/post-list/ui/PostListFilter/TypeSelect.tsx`, `src/entities/post/ui/Pagination.tsx`). 나머지는 Tailwind 유틸리티 리터럴
-- **교체 찬**: `clsx`는 더 가볍고(1.4KB vs 4.7KB) API 호환. cva는 컴포넌트 variants에 유용
-- **교체 반**: 2곳만 쓰는 라이브러리의 교체는 순수 기회비용. `classnames` 유지비가 0에 가까움. cva는 현재 디자인 시스템에 비하면 과투자
-- **비용**: Small (2파일)
-- **결정**: **유지**
-- **재검토 조건**: `classnames` 사용처가 5개 이상으로 늘거나, 번들 사이즈 최적화 패스를 할 때 함께 정리
+- **현황**: 조건부 스타일을 템플릿 리터럴로 표현하며 `classnames` 사용처가 없다.
+- **결정**: **제거**. 사용하지 않는 직접 의존성을 제거하고 `clsx`나 cva를 새로 도입하지 않는다.
+- **재검토 조건**: 반복되는 복잡한 클래스 조합이나 컴포넌트 variants가 생겨 템플릿 리터럴만으로 관리하기 어려울 때 검토한다.
 
 ---
 
 ## MSW 2
 
-- **현황**: 테스트/개발 모두에서 핵심 인프라. `src/shared/api/mocks/testServer.ts`(Jest), `src/shared/api/mocks/server.ts`(Express dev 서버), 6개 핸들러 파일, 7개 테스트에서 12회 import
+- **현황**: 테스트/개발 모두에서 핵심 인프라. `src/shared/api/mocks/testServer.ts`(Jest), `src/shared/api/mocks/server.ts`(Express dev 서버), 공통 user/post 핸들러와 페이지 통합 테스트
 - **교체 찬**: 없음 — 대안(Mirage, nock)은 모두 기능/유지보수에서 MSW에 뒤짐
 - **교체 반**: N/A
 - **비용**: N/A
@@ -100,8 +117,9 @@ paths:
 
 ## Toast UI Editor → TipTap/Lexical
 
-- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 사용처는 `src/entities/post/ui/Editor.tsx`(읽기 전용 뷰어) + `src/entities/post/ui/Form/ContentsEditor.tsx`(입력). React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
+- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정 입력은 `src/entities/post/ui/Editor.tsx`와 `src/entities/post/ui/Form/ContentsEditor.tsx`를 사용한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
 - **교체 찬**:
+  - DOMPurify에 [GHSA-mrv2-3pqr-j5jr](https://github.com/advisories/GHSA-mrv2-3pqr-j5jr) high advisory가 남아 있다. 수정판은 3.4.17이며 선언 범위 내 설치 버전은 2.5.9다. Toast UI의 ESM·UMD 배포물에는 2.3.3 구현이 직접 포함되어 외부 패키지 override만으로 실행 코드를 고칠 수 없다. 앱에서 해당 advisory의 `IN_PLACE`·hook 발동 조건 사용은 확인되지 않았지만, 이를 취약점 해결로 간주하지 않는다. 배포물 수정·재빌드 또는 에디터 교체 시 정제와 HTML 왕복 보존을 함께 검증해야 한다.
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크
   - 현대적 대안: **TipTap**(Prosemirror, headless, 생태계 풍부), **Lexical**(Meta, 확장성 높음)
@@ -137,7 +155,7 @@ paths:
 
 ## NextAuth v5 beta → stable
 
-- **현황**: `next-auth: 5.0.0-beta.31`. 수 개월째 beta. 설정은 `src/app/auth/config.ts` (FSD app 레이어)
+- **현황**: `next-auth: 5.0.0-beta.32`. v5 stable 미출시. 설정은 `src/app/auth/config.ts` (FSD app 레이어)
 - **교체 찬**: beta 탈출 시 API 안정성 보장, 메이저 변경 위험 감소
 - **교체 반**: 없음 — 현재 beta가 이미 메인 패키지
 - **비용**: 릴리스 내용에 따라 다르나 통상 Small
