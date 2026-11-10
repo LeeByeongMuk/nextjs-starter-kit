@@ -76,10 +76,6 @@ npm run build
 
 Jest는 branches·functions·lines·statements 각각 **60%** 커버리지를 요구합니다. FSD 경계 규칙을 포함한 ESLint 검사는 CI를 차단합니다. 빌드한 앱은 `npm start`로 실행합니다.
 
-GitHub Actions의 `build.yml`은 단일 `check` 작업에서 `npm ci`를 한 번 실행한 뒤 타입·ESLint·Prettier·테스트(커버리지 60%)·production build를 검증합니다. 문서만 변경한 PR은 앱 검사를 생략합니다. `pr-policy.yml`은 브랜치 이름과 PR 제목을 검사하며, CodeQL은 GitHub default setup으로 유지합니다.
-
-Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶고, 메이저 업데이트는 개별 검토합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
-
 릴리스 전에는 실제 브라우저에서 가입·로그인·보호 경로 복귀·계정 변경·로그아웃, 게시글 CRUD·검색·필터·페이지 이동을 확인합니다. 모바일·데스크톱, 라이트·다크, 키보드 포커스와 가로 넘침도 확인합니다. Jest의 Auth.js 모킹과 데모 API 통과가 실제 백엔드 및 배포 환경의 인증 검증을 대신하지 않습니다.
 
 프로젝트 규칙의 원본은 [`.agents/rules/`](.agents/rules)이며 에이전트 진입점은 [`AGENTS.md`](AGENTS.md)입니다. `CLAUDE.md`·`GEMINI.md`는 이 파일을 가리킵니다.

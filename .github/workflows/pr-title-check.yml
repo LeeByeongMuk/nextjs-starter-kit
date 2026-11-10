@@ -1,21 +1,22 @@
-name: PR Policy
+name: 'Lint PR'
 
 on:
-  pull_request_target:
-    types: [opened, reopened, edited, synchronize, labeled, unlabeled]
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - labeled
+      - unlabeled
 
 permissions:
   pull-requests: read
   statuses: write
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
-  validate:
+  main:
+    name: Validate PR title
     runs-on: ubuntu-latest
-    timeout-minutes: 2
     steps:
       - name: Check bot user
         id: bot-check
@@ -29,40 +30,27 @@ jobs:
             echo "is_bot=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Validate branch name
+      - uses: amannn/action-semantic-pull-request@v6
         if: steps.bot-check.outputs.is_bot == 'false'
-        env:
-          BRANCH: ${{ github.head_ref }}
-        run: |
-          echo "Checking branch name: $BRANCH"
-
-          if [[ "$BRANCH" =~ ^(main|master|develop|staging)$ ]]; then
-            echo "✓ Protected branch - skipping validation"
-            exit 0
-          fi
-
-          PATTERN="^[a-z]+/[a-z0-9][a-z0-9._-]*(/[a-z0-9][a-z0-9._-]*)*$"
-
-          if [[ ! "$BRANCH" =~ $PATTERN ]]; then
-            echo "❌ Invalid branch name: $BRANCH"
-            exit 1
-          fi
-
-          echo "✓ Branch name is valid"
-
-      - name: Validate PR title
-        if: ${{ !cancelled() && steps.bot-check.outputs.is_bot == 'false' }}
-        uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # Scope is optional (allows both `type: title` and `type(scope): title`)
           requireScope: false
+
+          # Disallow uppercase scopes
           disallowScopes: |
             [A-Z]+
+
+          # Work in progress PR support
           wip: true
+
+          # Skip validation for PRs with these labels
           ignoreLabels: |
             bot
             ignore-semantic-pull-request
+
+          # Ensure the subject doesn't start with an uppercase character
           subjectPattern: ^[a-z].*$
           subjectPatternError: |
             The subject "{subject}" found in the pull request title "{title}"

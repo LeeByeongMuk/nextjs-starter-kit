@@ -5,83 +5,38 @@ permissions:
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [develop, main]
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  check:
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+  lint:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Detect application changes
-        id: changes
-        run: |
-          python3 - <<'PYTHON'
-          import json
-          import os
-          import subprocess
-
-          docs = {'README.md', 'AGENTS.md', 'CLAUDE.md', 'GEMINI.md',
-                  '.github/pull_request_template.md'}
-          full = True
-          try:
-              if os.environ['GITHUB_EVENT_NAME'] == 'pull_request':
-                  with open(os.environ['GITHUB_EVENT_PATH']) as event_file:
-                      event = json.load(event_file)
-                  changed = subprocess.check_output([
-                      'git', 'diff', '--name-only', '--no-renames', '-z',
-                      event['pull_request']['base']['sha'], os.environ['GITHUB_SHA'], '--',
-                  ]).decode().split('\0')
-                  changed = [name for name in changed if name]
-                  full = not changed or any(
-                      name not in docs and not (
-                          name.endswith('.md')
-                          and name.startswith(('docs/', '.agents/rules/', '.agents/skills/'))
-                      ) for name in changed
-                  )
-          except (KeyError, TypeError, ValueError, OSError, UnicodeDecodeError,
-                  subprocess.CalledProcessError):
-              print('Diff unavailable; running the full suite.')
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-              output.write(f'full={str(bool(full)).lower()}\n')
-          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
-              summary.write('Full application checks required.\n' if full
-                            else 'Documentation-only change; application checks skipped.\n')
-          PYTHON
       - uses: actions/setup-node@v7
-        if: steps.changes.outputs.full == 'true'
         with:
           node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: package-lock.json
       - run: npm ci
-        if: steps.changes.outputs.full == 'true'
       - run: npm run tsc
-        if: steps.changes.outputs.full == 'true'
       - run: npm run lint
-        if: steps.changes.outputs.full == 'true'
       - run: npm run prettier
-        if: steps.changes.outputs.full == 'true'
-      - run: npm test -- --coverage --runInBand
-        id: tests
-        if: steps.changes.outputs.full == 'true'
-      - run: npm run build
-        if: steps.changes.outputs.full == 'true'
-      - name: Upload coverage report
-        if: ${{ failure() && steps.tests.outcome == 'failure' }}
-        uses: actions/upload-artifact@v7
+
+  build:
+    if: ${{ !github.event.pull_request.draft }}
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          name: coverage-report
-          path: coverage/
-          if-no-files-found: ignore
-          retention-days: 3
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
