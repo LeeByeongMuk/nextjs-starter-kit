@@ -35,3 +35,11 @@ npm install
 cp .env.example .env
 docker compose up -d
 ```
+
+## CI 계약
+
+GitHub Actions의 `build.yml`은 Node.js 22에서 단일 `check` 작업으로 `npm ci`를 한 번 실행한 뒤 타입·ESLint·Prettier·테스트(커버리지 60%)·production build를 검증합니다. 문서만 변경한 PR은 앱 검사를 생략합니다.
+
+`pr-policy.yml`은 브랜치 이름과 PR 제목을 검사합니다. CodeQL은 GitHub default setup으로 유지합니다.
+
+Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
