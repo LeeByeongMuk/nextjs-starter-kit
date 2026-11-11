@@ -28,6 +28,19 @@ if (process.argv.includes('--skills')) {
     ...skills.flatMap(skill => ['--skill', skill]),
     '--yes',
   ]);
+  const impeccableRef = 'f2baa414a87d9acf1e21ccf776bfaec0262ad6df';
+  run('npx', [
+    '-y',
+    'skills@1.8.1',
+    'add',
+    `https://github.com/pbakaus/impeccable/tree/${impeccableRef}/.agents/skills/impeccable`,
+    '--skill',
+    'impeccable',
+    '--agent',
+    'codex',
+    'claude-code',
+    '--yes',
+  ]);
 }
 
 console.log('설정 완료. npm run mock과 npm run dev를 각각 실행하세요.');

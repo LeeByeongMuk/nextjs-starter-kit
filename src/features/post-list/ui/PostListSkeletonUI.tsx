@@ -1,17 +1,23 @@
-/** 목록을 불러오는 동안 상태와 시각적 자리표시자를 표시한다. */
+import { DUMMY_DATA } from '@entities/post';
+import React from 'react';
+
+/** 목록 행의 높이를 유지하는 로딩 표시 */
 export default function PostListSkeletonUI() {
-  return (
-    <div role="status" className="border-t border-line">
-      <span className="sr-only">게시글을 불러오는 중입니다.</span>
-      <div aria-hidden="true">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="space-y-4 border-b border-line py-8">
-            <div className="h-3 w-12 rounded bg-skeleton" />
-            <div className="h-6 w-4/5 rounded bg-skeleton" />
-            <div className="h-3 w-40 rounded bg-skeleton" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return DUMMY_DATA.map(post => (
+    <tr key={post.id} aria-hidden="true" className="motion-safe:animate-pulse">
+      <td className="px-1 py-6 md:px-4">
+        <div className="h-4 w-3/4 rounded bg-skeleton" />
+        <div className="mt-4 h-3 w-1/2 rounded bg-skeleton md:hidden" />
+      </td>
+      <td className="hidden px-3 py-6 md:table-cell">
+        <div className="h-4 w-full rounded bg-skeleton" />
+      </td>
+      <td className="hidden px-4 py-6 md:table-cell">
+        <div className="h-4 w-2/3 rounded bg-skeleton" />
+      </td>
+      <td className="hidden px-4 py-6 md:table-cell">
+        <div className="ml-auto h-4 w-3/4 rounded bg-skeleton" />
+      </td>
+    </tr>
+  ));
 }

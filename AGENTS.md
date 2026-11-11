@@ -63,7 +63,8 @@ npm run build    # next production build
 ## 에이전트 자산
 
 - `.agents/rules/**` — 규칙 SSOT (이 문서가 가리키는 모든 규칙)
-- `.agents/skills/` — 스킬. `fsd-refactor`(자작, 커밋됨) + vercel 벤더링 스킬(gitignore, `npm run setup -- --skills`로 선택 설치)
+- `.agents/skills/` — 스킬. `fsd-refactor`(자작, 커밋됨) + Vercel·Impeccable 벤더링 스킬(gitignore, `npm run setup -- --skills`로 선택 설치)
+- UI 디자인·개선에는 `impeccable`, UI 검토에는 `web-design-guidelines`를 사용한다. 프로젝트 FSD·스타일링 규칙이 우선하며 사용법은 `README.md`의 디자인 스킬 절을 따른다.
 - `.claude/rules`, `.claude/skills` — `.agents/*`로 향하는 심볼릭 링크
 - `.claude/agents/` — 서브에이전트 정의 (fsd-architect, feature-dev, test-writer, code-reviewer)
 - `CLAUDE.md` / `GEMINI.md` — 이 파일로 향하는 심볼릭 링크

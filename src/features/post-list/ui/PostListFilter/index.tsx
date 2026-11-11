@@ -12,7 +12,7 @@ interface Props {
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;
 }
 
-/** 분류와 검색, 로그인 사용자의 글쓰기 진입을 제공한다. */
+/** 게시글 분류와 검색, 인증된 사용자의 글쓰기 진입점 */
 export default function ListFilter({ setSearchFilters }: Props) {
   const { status } = useSession();
   const { methods, handleFormSubmit, updateTypeTrigger } = usePostListForm({
@@ -24,23 +24,34 @@ export default function ListFilter({ setSearchFilters }: Props) {
   return (
     <FormProvider {...methods}>
       <form
-        aria-label="게시글 필터"
-        noValidate
+        role="search"
+        aria-label="게시글 검색 및 분류"
         onSubmit={handleSubmit(handleFormSubmit)}
       >
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-line pb-5 lg:flex-row lg:items-start lg:justify-between">
           <TypeSelect onChange={updateTypeTrigger} />
 
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-start">
+          <div className="flex w-full flex-wrap items-start gap-3 lg:w-auto lg:flex-nowrap">
+            <SearchInput />
             {status === 'authenticated' && (
               <Link
                 href="/post/create"
-                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded bg-accent px-5 text-sm font-semibold text-inverse hover:bg-accent-hover"
+                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-inverse transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:bg-accent-hover motion-reduce:transition-none"
+                passHref={false}
               >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="size-4"
+                >
+                  <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+                </svg>
                 글쓰기
               </Link>
             )}
-            <SearchInput />
           </div>
         </div>
       </form>
