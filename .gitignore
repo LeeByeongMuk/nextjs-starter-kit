@@ -49,6 +49,8 @@ next-env.d.ts
 # AI agent assets — .agents/가 원본(SSOT), 아래는 벤더링/세션 산출물
 .agents/skills/vercel-*/
 .agents/skills/web-design-guidelines/
+.agents/skills/impeccable/
+.impeccable/runtime/
 .agents/sessions/
 skills-lock.json
 .claude/settings.local.json

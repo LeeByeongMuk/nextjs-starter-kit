@@ -14,6 +14,7 @@ const config = [
       '.next/**',
       '.build/**',
       'build/**',
+      '.agents/skills/impeccable/**',
       'next-env.d.ts',
       'yarn.lock',
       'public/**',
