@@ -1,2 +1,294 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/forms";
+@plugin '@tailwindcss/forms';
+
+:root {
+  color-scheme: light;
+  --paper: #faf9f6;
+  --surface: #ffffff;
+  --ink: #202c2d;
+  --muted: #596664;
+  --line: #ced7d2;
+  --accent: #0f766e;
+  --accent-hover: #115e59;
+  --accent-soft: #e5f1ec;
+  --inverse: #ffffff;
+  --danger: #b42332;
+  --skeleton: #e1e7e2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --paper: #151b1d;
+    --surface: #1c2528;
+    --ink: #edf2f0;
+    --muted: #b3c0bd;
+    --line: #475854;
+    --accent: #83d5c7;
+    --accent-hover: #afe8dc;
+    --accent-soft: #233d37;
+    --inverse: #14231e;
+    --danger: #ffb3bb;
+    --skeleton: #34443f;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-inverse: var(--inverse);
+  --color-danger: var(--danger);
+  --color-skeleton: var(--skeleton);
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    'Malgun Gothic', sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-padding-top: 2rem;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    -webkit-font-smoothing: antialiased;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+  button:not(:disabled),
+  select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: wait;
+  }
+  a,
+  button {
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--accent);
+    --tw-ring-color: var(--accent);
+  }
+  [aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--inverse);
+  }
+}
+
+.post-content {
+  font-size: 1rem;
+  line-height: 1.9;
+}
+.post-content > * + * {
+  margin-top: 1.5em;
+}
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  margin-top: 2em;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.post-content h1,
+.post-content h2 {
+  font-size: 1.65em;
+}
+.post-content h3 {
+  font-size: 1.3em;
+}
+.post-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.post-content ul,
+.post-content ol {
+  padding-left: 1.5em;
+}
+.post-content ul {
+  list-style: disc;
+}
+.post-content ol {
+  list-style: decimal;
+}
+.post-content li + li {
+  margin-top: 0.4em;
+}
+.post-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 1em 1.25em;
+  background: var(--accent-soft);
+}
+.post-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1.25em;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.post-content code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.875em;
+}
+.post-content :not(pre) > code {
+  background: var(--accent-soft);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+.post-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  word-break: normal;
+}
+.post-content th,
+.post-content td {
+  border: 1px solid var(--line);
+  padding: 0.75em 1em;
+  min-width: 7em;
+}
+.post-content th {
+  background: var(--accent-soft);
+}
+.post-content img,
+.post-content video,
+.post-content iframe {
+  max-width: 100%;
+}
+.post-content img,
+.post-content video {
+  height: auto;
+}
+.post-content iframe {
+  width: 100%;
+}
+.post-content hr {
+  border-color: var(--line);
+}
+.post-content input[type='checkbox'] {
+  accent-color: var(--accent);
+}
+
+.post-editor {
+  min-width: 0;
+  color: var(--ink);
+  word-break: normal;
+}
+.post-editor .toastui-editor-defaultUI {
+  border-color: var(--line);
+  background: var(--surface);
+  font-family: var(--font-sans);
+}
+.post-editor .toastui-editor-defaultUI-toolbar,
+.post-editor .toastui-editor-md-tab-container,
+.post-editor .toastui-editor-mode-switch,
+.post-editor .toastui-editor-tabs {
+  background: var(--paper);
+  border-color: var(--line);
+}
+.post-editor .toastui-editor-main,
+.post-editor .toastui-editor-ww-container,
+.post-editor .toastui-editor-md-container,
+.post-editor .toastui-editor-md-preview {
+  background: var(--surface);
+  color: var(--ink);
+}
+.post-editor .toastui-editor-contents,
+.post-editor .toastui-editor-contents p,
+.post-editor .toastui-editor-contents h1,
+.post-editor .toastui-editor-contents h2,
+.post-editor .toastui-editor-contents h3,
+.post-editor .ProseMirror,
+.post-editor .toastui-editor-md-container .CodeMirror {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+}
+.post-editor .toastui-editor-contents h1,
+.post-editor .toastui-editor-contents h2 {
+  border-color: var(--line);
+}
+.post-editor .toastui-editor-toolbar-group {
+  margin-right: 0;
+}
+.post-editor .toastui-editor-toolbar-icons {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 6px;
+  background-origin: content-box;
+  background-clip: content-box;
+}
+.post-editor .toastui-editor-defaultUI-toolbar {
+  height: auto;
+  min-height: 60px;
+  flex-wrap: wrap;
+  padding: 8px;
+}
+.post-editor .toastui-editor-tabs .tab-item,
+.post-editor .toastui-editor-defaultUI .toastui-editor-mode-switch .tab-item {
+  color: var(--muted);
+  background: var(--paper);
+  border-color: var(--line);
+}
+.post-editor .toastui-editor-tabs .tab-item.active,
+.post-editor
+  .toastui-editor-defaultUI
+  .toastui-editor-mode-switch
+  .tab-item.active {
+  color: var(--ink);
+  background: var(--surface);
+}
+.post-editor .toastui-editor-popup {
+  max-width: calc(100vw - 48px);
+}
+.post-editor .toastui-editor-contents img {
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .post-content {
+    font-size: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -3,25 +3,40 @@ services:
     build:
       dockerfile: docker/next/Dockerfile
       context: .
+    environment:
+      APP_API_URL: http://mock-api:9090
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before starting Docker}
     volumes:
-      - '.:/var/www'
-      - '/var/www/node_modules'
+      - .:/var/www
+      - /var/www/node_modules
+      - /var/www/build
     ports:
       - '${APP_PORT:-3000}:3000'
-    networks:
-      - next-js-kit
+    depends_on:
+      mock-api:
+        condition: service_healthy
 
   mock-api:
     build:
       dockerfile: docker/mock-api/Dockerfile
       context: .
+    environment:
+      APP_API_PORT: '9090'
     volumes:
-      - '.:/var/www'
+      - .:/var/www
+      - /var/www/node_modules
     ports:
       - '${APP_API_PORT:-9090}:9090'
-    networks:
-      - next-js-kit
-
-networks:
-  next-js-kit:
-    driver: bridge
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:9090/api/posts').then(response => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s

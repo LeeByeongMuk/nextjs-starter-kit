@@ -1,54 +1,46 @@
 import ValidationError from '@shared/ui/error/ValidationError';
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+/** 공개 범위를 라디오 그룹과 설명으로 제공한다. */
 export default function IsOpenCheckbox() {
   const {
     register,
     formState: { errors },
   } = useFormContext();
-
   return (
-    <div className="mt-5">
-      <label className="block text-xs font-medium text-gray-700">Is Open</label>
-
-      <div className="mt-2 flex gap-5">
-        <div className="flex items-center">
-          <input
-            type="radio"
-            id="isOpen1"
-            className="rounded-md border-gray-200 shadow-sm sm:text-sm"
-            value="1"
-            {...register('isOpen', {
-              required: 'Is Open is required',
-            })}
-          />
-          <label htmlFor="isOpen1" className="ml-2">
-            Yes
+    <fieldset
+      className="mt-8"
+      aria-invalid={!!errors.isOpen}
+      aria-describedby={errors.isOpen ? 'isOpen-error' : undefined}
+    >
+      <legend className="text-sm font-semibold">공개 범위</legend>
+      <div className="mt-2 flex flex-wrap gap-6">
+        {[
+          { value: '1', label: '공개' },
+          { value: '0', label: '비공개' },
+        ].map(option => (
+          <label
+            key={option.value}
+            className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-sm"
+          >
+            <input
+              type="radio"
+              value={option.value}
+              aria-describedby={errors.isOpen ? 'isOpen-error' : undefined}
+              className="size-4 border-line bg-surface text-accent focus:ring-accent"
+              {...register('isOpen', {
+                required: '공개 범위를 선택해 주세요.',
+              })}
+            />
+            {option.label}
           </label>
-        </div>
-
-        <div className="flex items-center">
-          <input
-            type="radio"
-            id="isOpen2"
-            className="rounded-md border-gray-200 shadow-sm sm:text-sm"
-            value="0"
-            {...register('isOpen', {
-              required: 'Is Open is required',
-            })}
-          />
-          <label htmlFor="isOpen2" className="ml-2">
-            No
-          </label>
-        </div>
+        ))}
       </div>
-
       <ValidationError
-        role="isOpen-error-message"
+        id="isOpen-error"
         isError={!!errors.isOpen}
         message={errors.isOpen?.message?.toString()}
       />
-    </div>
+    </fieldset>
   );
 }

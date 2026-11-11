@@ -3,6 +3,12 @@
 import { TOKEN_KEY } from '@shared/config/auth';
 import { cookies } from 'next/headers';
 
+/** Auth.js 세션의 존재 여부와 관계없이 API 토큰 쿠키를 삭제한다. */
+export const deleteAccessToken = async () => {
+  const cookieStore = await cookies();
+  cookieStore.delete(TOKEN_KEY);
+};
+
 export const fetchApi = async <Response>(
   url: string,
   options: RequestInit = {}

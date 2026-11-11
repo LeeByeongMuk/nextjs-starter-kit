@@ -3,6 +3,7 @@ import { useDeleteAccount } from '@features/auth-account';
 import { useUpdateAccount } from '@features/auth-account';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { TOKEN_KEY } from '@shared/config/auth';
 import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -15,7 +16,7 @@ import {
 } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -30,11 +31,15 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('마이페이지 페이지 테스트', () => {
   const useSessionMock = useSession as jest.Mock;
+  const deleteCookie = jest.fn();
 
   beforeEach(() => {
+    deleteCookie.mockClear();
+    (signOut as jest.Mock).mockClear();
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue({ value: 'test-token' }),
+      delete: deleteCookie,
     });
 
     useSessionMock.mockReturnValue({
@@ -56,17 +61,17 @@ describe('마이페이지 페이지 테스트', () => {
   describe('회원 정보 수정 테스트', () => {
     test('회원 정보 수정 성공 시 성공 메세지가 표시된다.', async () => {
       // when - 회원 정보 수정 버튼 클릭
-      fireEvent.change(screen.getByLabelText('Email address'), {
+      fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
       });
-      fireEvent.change(screen.getByLabelText('Name'), {
+      fireEvent.change(screen.getByLabelText('이름'), {
         target: { value: 'name' },
       });
-      fireEvent.change(screen.getByLabelText('NickName'), {
+      fireEvent.change(screen.getByLabelText('닉네임'), {
         target: { value: 'nickname' },
       });
 
-      fireEvent.click(screen.getByText('Account Update'));
+      fireEvent.click(screen.getByRole('button', { name: '변경 사항 저장' }));
 
       // then - 성공 메세지가 표시된다.
       const { result } = renderHook(() => useUpdateAccount(), { wrapper });
@@ -91,17 +96,17 @@ describe('마이페이지 페이지 테스트', () => {
         })
       );
       // when - 회원 정보 수정 버튼 클릭
-      fireEvent.change(screen.getByLabelText('Email address'), {
+      fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
       });
-      fireEvent.change(screen.getByLabelText('Name'), {
+      fireEvent.change(screen.getByLabelText('이름'), {
         target: { value: 'name' },
       });
-      fireEvent.change(screen.getByLabelText('NickName'), {
+      fireEvent.change(screen.getByLabelText('닉네임'), {
         target: { value: 'nickname' },
       });
 
-      fireEvent.click(screen.getByText('Account Update'));
+      fireEvent.click(screen.getByRole('button', { name: '변경 사항 저장' }));
 
       // then - 에러 메세지가 표시된다.
       const { result } = renderHook(() => useUpdateAccount(), { wrapper });
@@ -122,7 +127,7 @@ describe('마이페이지 페이지 테스트', () => {
   describe('회원 탈퇴 테스트', () => {
     test('회원 탈퇴 버튼 클릭 시 탈퇴 사유 입력 모달이 뜬다', async () => {
       // when - 회원 탈퇴 버튼 클릭
-      fireEvent.click(screen.getByText('Delete Account'));
+      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
 
       // then - 탈퇴 사유 입력 모달이 뜬다
       expect(window.prompt).toHaveBeenCalledWith(
@@ -132,7 +137,7 @@ describe('마이페이지 페이지 테스트', () => {
 
     test('회원 탈퇴 성공 시 로그아웃 처리된다.', async () => {
       // when - 회원 탈퇴 버튼 클릭
-      fireEvent.click(screen.getByText('Delete Account'));
+      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
 
       // then - 로그아웃 처리된다
       const { result } = renderHook(() => useDeleteAccount(), { wrapper });
@@ -145,6 +150,11 @@ describe('마이페이지 페이지 테스트', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(window.alert).toHaveBeenCalledWith('Account deleted successfully');
+      expect(deleteCookie).toHaveBeenCalledWith(TOKEN_KEY);
+      expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' });
+      expect(deleteCookie.mock.invocationCallOrder[0]).toBeLessThan(
+        (signOut as jest.Mock).mock.invocationCallOrder[0]
+      );
     });
 
     test('회원 탈퇴 실패 시 에러 메세지가 표시된다.', async () => {
@@ -155,7 +165,7 @@ describe('마이페이지 페이지 테스트', () => {
         })
       );
       // when - 회원 탈퇴 버튼 클릭
-      fireEvent.click(screen.getByText('Delete Account'));
+      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
 
       // then - 에러 메세지가 표시된다
       const { result } = renderHook(() => useDeleteAccount(), { wrapper });

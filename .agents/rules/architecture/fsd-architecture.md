@@ -14,7 +14,7 @@ paths:
 3. 사용자 행동 플로우 (sign-in form, post-create mutation, list filter) → `src/features/<domain>-<action>/<segment>/...`
 4. 여러 features/entities를 한 UI 블록으로 조합 → `src/widgets/<widget-name>/<segment>/...`
 5. 한 라우트의 전체 화면 조합 → `src/views/<route-name>/`
-6. Next.js 라우팅/라이프사이클 산물 (`src/app/**`의 `page/layout/loading/error/route`, `src/middleware.ts`) → 얇게 유지, `views`/`widgets`만 import
+6. Next.js 라우팅/라이프사이클 산물 (`src/app/**`의 `page/layout/loading/error/route`, `src/proxy.ts`) → 얇게 유지, `views`/`widgets`만 import
 
 **워크플로 규칙.**
 
@@ -47,14 +47,14 @@ Feature-Sliced Design은 프런트엔드 코드를 **계층(layer) → 슬라이
 
 상위 레이어는 하위 레이어만 import 할 수 있다. 동일 레이어의 다른 슬라이스끼리도 직접 import 금지(공유물은 한 단계 아래로 끌어내림).
 
-| 레이어     | 디렉터리                        | 책임                                                                                        | 비고                                                                                           |
-| ---------- | ------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `app`      | `src/app/`, `src/middleware.ts` | Next.js 라우팅·생명주기 아티팩트(`page`/`layout`/`loading`/`error`/`route`/`middleware` 등) | **얇게** 유지. 실제 합성은 `views`/`widgets`로 위임. 위치는 Next.js가 강제하므로 옮기지 않는다 |
-| `views`    | `src/views/`                    | 화면 단위 합성 (FSD 표준의 `pages`)                                                         | App Router `page.tsx`가 import                                                                 |
-| `widgets`  | `src/widgets/`                  | 여러 features/entities를 묶는 독립 UI 블록                                                  | 단일 features만 사용한다면 widget 불필요                                                       |
-| `features` | `src/features/`                 | 사용자 인터랙션 단위 (signin form, post-create flow)                                        | 슬라이스명: `<도메인>-<액션>` (e.g. `auth-signin`)                                             |
-| `entities` | `src/entities/`                 | 도메인 모델 + 도메인 공용 UI/타입                                                           | User, Post 등 비즈니스 엔티티                                                                  |
-| `shared`   | `src/shared/`                   | 도메인 무관 재사용 자산                                                                     | UI 프리미티브, 유틸, 설정                                                                      |
+| 레이어     | 디렉터리                   | 책임                                                                                   | 비고                                                                                           |
+| ---------- | -------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `app`      | `src/app/`, `src/proxy.ts` | Next.js 라우팅·생명주기 아티팩트(`page`/`layout`/`loading`/`error`/`route`/`proxy` 등) | **얇게** 유지. 실제 합성은 `views`/`widgets`로 위임. 위치는 Next.js가 강제하므로 옮기지 않는다 |
+| `views`    | `src/views/`               | 화면 단위 합성 (FSD 표준의 `pages`)                                                    | App Router `page.tsx`가 import                                                                 |
+| `widgets`  | `src/widgets/`             | 여러 features/entities를 묶는 독립 UI 블록                                             | 단일 features만 사용한다면 widget 불필요                                                       |
+| `features` | `src/features/`            | 사용자 인터랙션 단위 (signin form, post-create flow)                                   | 슬라이스명: `<도메인>-<액션>` (e.g. `auth-signin`)                                             |
+| `entities` | `src/entities/`            | 도메인 모델 + 도메인 공용 UI/타입                                                      | User, Post 등 비즈니스 엔티티                                                                  |
+| `shared`   | `src/shared/`              | 도메인 무관 재사용 자산                                                                | UI 프리미티브, 유틸, 설정                                                                      |
 
 ### Import 방향 (요약)
 
@@ -144,13 +144,13 @@ ESLint `boundaries/dependencies`(Public API policy) + `fsd/relative-imports`가 
 - 메타데이터(`export const metadata`, `generateMetadata`)는 `page.tsx` 또는 `layout.tsx`에 둔다(Next.js가 이 두 파일에서만 인식).
 - `layout.tsx`도 `page.tsx`와 동일 원칙: 얇게 유지, 합성 로직이 자라면 view 또는 widget으로 추출하고 import만 한다.
 - 클라이언트/서버 컴포넌트 분기(`'use client'`)는 view 또는 widget에서 결정.
-- `src/middleware.ts`는 Next.js가 위치를 `src/` 루트로 강제하므로 옮기지 않는다(`src/app/` 안에 두지 못함). app 레이어 멤버이며, 다른 routing 파일과 동일하게 얇게 유지한다.
+- `src/proxy.ts`는 Next.js 16의 Node.js 런타임 인증 경계다. Next.js가 위치를 `src/` 루트로 강제하므로 옮기지 않는다(`src/app/` 안에 두지 못함). app 레이어 멤버이며, 다른 routing 파일과 동일하게 얇게 유지한다.
 - `src/app/api/**/route.ts`는 라우트 핸들러로서 app 레이어 멤버. 비즈니스 로직은 features/entities/shared로 위임한다.
 - Route Group(`(domain)`, `(auth)` 등) 네이밍은 라우팅 표현이며 FSD 슬라이스와 1:1 매핑하지 않는다.
 
 ### NextAuth 설정 위치
 
-NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 본 프로젝트는 NextAuth 설정을 **app 레이어 (`src/app/auth/config.ts`)에 둔다**. 이유: 이 파일은 인증 플로우(`fetchSignIn`, `fetchUser`)를 오케스트레이션하므로 features/entities를 호출할 권한이 필요하고, 이는 app 레이어에서만 허용되기 때문. middleware와 route handler는 `@app/auth/config`로 import.
+NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 본 프로젝트는 NextAuth 설정을 **app 레이어 (`src/app/auth/config.ts`)에 둔다**. 이유: 이 파일은 인증 플로우(`fetchSignIn`, `fetchUser`)를 오케스트레이션하므로 features/entities를 호출할 권한이 필요하고, 이는 app 레이어에서만 허용되기 때문. proxy와 route handler는 `@app/auth/config`로 import.
 
 ---
 
@@ -163,7 +163,7 @@ NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 본 프로젝트�
 3. **사용자 인터랙션/플로우인가?** (폼 제출, 리스트 필터링, 뮤테이션) → `features/<도메인>-<액션>/<segment>/`
 4. **여러 features/entities를 묶는 독립 UI 블록인가?** → `widgets/<widget-name>/<segment>/`
 5. **하나의 라우트 화면 전체 합성인가?** → `views/<route-name>/`
-6. **Next.js 라우팅·생명주기 아티팩트인가?** (`page`/`layout`/`loading`/`error`/`route` under `src/app/**`, `src/middleware.ts`) → `app` 레이어. 위치는 Next.js가 강제하므로 옮기지 않고, 합성은 `views`/`widgets`에서 import만 한다
+6. **Next.js 라우팅·생명주기 아티팩트인가?** (`page`/`layout`/`loading`/`error`/`route` under `src/app/**`, `src/proxy.ts`) → `app` 레이어. 위치는 Next.js가 강제하므로 옮기지 않고, 합성은 `views`/`widgets`에서 import만 한다
 
 같은 코드가 여러 features에서 쓰이면 하단 레이어로 끌어내려 공유한다(entities 또는 shared).
 
@@ -201,7 +201,7 @@ NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 본 프로젝트�
 | `src/auth.ts`                                           | `src/app/auth/config.ts` (NextAuth orchestration belongs to app layer)   |
 | `src/app/(domain)/.../page.tsx` 합성 로직               | `src/views/<route>/` (page.tsx는 view import만)                          |
 | `src/app/(domain)/.../layout.tsx` 합성 로직             | `src/views/<route>/` 또는 `src/widgets/<name>/` (layout.tsx는 import만)  |
-| `src/middleware.ts`                                     | (이동 없음) — Next.js 강제. 내부 로직은 entities/shared로 추출 후 import |
+| `src/proxy.ts`                                          | (이동 없음) — Next.js 강제. 내부 로직은 entities/shared로 추출 후 import |
 
 widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/post-list-container/` (Phase C-5에서 결정).
 
@@ -225,3 +225,4 @@ widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/pos
 - 공식 문서: https://feature-sliced.design
 - Next.js 통합 가이드: https://feature-sliced.design/docs/guides/tech/with-nextjs
 - `eslint-plugin-boundaries`: https://github.com/javierbrea/eslint-plugin-boundaries
+- Next.js Proxy: https://nextjs.org/docs/app/api-reference/file-conventions/proxy

@@ -1,6 +1,6 @@
-import { auth as middleware } from '@app/auth/config';
+import { auth as proxy } from '@app/auth/config';
 
-export default middleware;
+export default proxy;
 
 export const config = {
   matcher: ['/post/create', '/post/:path*/update', '/account'],

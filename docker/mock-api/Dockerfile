@@ -1,12 +1,8 @@
-FROM node:20-alpine
-
-LABEL maintainer="ByeongMuk Lee <mansogod@gmail.com>"
-LABEL version="0.1"
-LABEL description="mock api image for app"
-LABEL build_date="2025-01-14"
+FROM node:26.13.0-alpine
 
 WORKDIR /var/www
+COPY package.json package-lock.json ./
+RUN HUSKY=0 npm ci
 COPY . .
-RUN npm install
 
 CMD ["npm", "run", "mock"]

@@ -1,31 +1,24 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
 
+/** 편집 폼의 기존 취소·제출 동작을 제공한다. */
 export default function ButtonBox() {
   const router = useRouter();
-
-  const redirectBack = () => {
-    router.back();
-  };
-
   return (
-    <div className="mt-5 flex justify-center gap-2.5">
+    <div className="mt-10 flex flex-wrap justify-end gap-3 border-t border-line pt-6">
       <button
         type="button"
-        className="inline-block rounded border border-teal-600 bg-teal-600 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-teal-600 focus:ring focus:outline-none active:text-teal-500"
-        onClick={redirectBack}
+        onClick={() => router.back()}
+        className="min-h-12 rounded border border-line px-6 py-3 text-sm font-semibold hover:border-accent hover:text-accent"
       >
-        back
+        취소
       </button>
-
       <button
         type="submit"
-        role="submit"
-        className="inline-block rounded border border-teal-600 px-12 py-3 text-sm font-medium text-teal-600 hover:bg-teal-600 hover:text-white focus:ring focus:outline-none active:bg-teal-500"
+        className="min-h-12 rounded bg-accent px-7 py-3 text-sm font-semibold text-inverse hover:bg-accent-hover"
       >
-        submit
+        저장
       </button>
     </div>
   );

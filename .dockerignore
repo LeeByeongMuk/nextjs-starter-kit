@@ -1,3 +1,15 @@
 node_modules
 .next
 build
+coverage
+.git
+.git/**
+.env
+.env.*
+!.env.example
+.agents
+.claude
+.codex
+multi-agent-setup
+docs/workflows
+npm-debug.log*

@@ -12,7 +12,8 @@
 | 인증          | NextAuth v5 (beta)                       |
 | 스타일        | Tailwind CSS v4                          |
 | 언어/테스트   | TypeScript 6 · Jest 30 + RTL + MSW       |
-| 패키지 매니저 | npm (단일 lockfile: `package-lock.json`) |
+| 실행 환경     | Node.js 26 LTS (`.nvmrc`)                |
+| 패키지 매니저 | npm 11.20 (단일 `package-lock.json`)     |
 
 ## 아키텍처 — Feature-Sliced Design
 
@@ -62,9 +63,9 @@ npm run build    # next production build
 ## 에이전트 자산
 
 - `.agents/rules/**` — 규칙 SSOT (이 문서가 가리키는 모든 규칙)
-- `.agents/skills/` — 스킬. `fsd-refactor`(자작, 커밋됨) + vercel 벤더링 스킬(gitignore, `npm run setup`으로 설치)
+- `.agents/skills/` — 스킬. `fsd-refactor`(자작, 커밋됨) + vercel 벤더링 스킬(gitignore, `npm run setup -- --skills`로 선택 설치)
 - `.claude/rules`, `.claude/skills` — `.agents/*`로 향하는 심볼릭 링크
 - `.claude/agents/` — 서브에이전트 정의 (fsd-architect, feature-dev, test-writer, code-reviewer)
 - `CLAUDE.md` / `GEMINI.md` — 이 파일로 향하는 심볼릭 링크
 
-처음 클론했다면 `npm run setup`으로 의존성과 벤더링 스킬을 설치한다.
+처음 클론했다면 `nvm install && nvm use` 후 `npm ci` 또는 `npm run setup`으로 잠금 파일의 의존성을 설치한다. AI 스킬은 앱 실행에 필요하지 않으며 `npm run setup -- --skills`로 선택 설치한다. 실행 방법은 `README.md`, 버전 보류 근거는 `.agents/rules/infra/library-decisions.md`를 따른다.
