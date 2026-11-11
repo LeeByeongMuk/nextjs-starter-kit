@@ -65,6 +65,14 @@ mock의 계정·토큰·게시글은 모두 **데모 데이터**입니다. 핸�
 
 한국어 가독성·여백·의미별 색상·키보드 접근성 원칙을 적용합니다. teal 강조색과 제한된 본문 폭, 반응형 여백, 긴 제목·URL 줄바꿈을 사용합니다. 라이트·다크 대비, 본문 건너뛰기, 보이는 포커스, 오류·로딩·빈 결과 구분을 확인합니다. 구체적인 토큰과 화면 규칙은 [스타일 규칙](.agents/rules/code-style/styling.md)이 기준입니다.
 
+## CI 계약
+
+GitHub Actions의 `build.yml`은 `.nvmrc`에 지정된 Node.js에서 단일 `check` 작업으로 `npm ci`를 한 번 실행한 뒤 타입·ESLint·Prettier·테스트(커버리지 60%)·production build를 검증합니다. 문서만 변경한 PR은 앱 검사를 생략합니다.
+
+`pr-policy.yml`은 브랜치 이름과 PR 제목을 검사합니다. CodeQL은 GitHub default setup으로 유지합니다.
+
+Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
+
 ## 검증
 
 ```bash
