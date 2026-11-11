@@ -76,6 +76,14 @@ mock의 계정·토큰·게시글은 모두 **데모 데이터**입니다. 핸�
 
 벤더링 파일은 Git에서 제외하며 `npm run setup -- --skills`로 복원합니다. 첫 실행 시 런처가 체크섬으로 검증한 플랫폼 엔진을 사용자 캐시에 내려받을 수 있습니다. 설치는 자동 실행 훅을 활성화하지 않습니다.
 
+## CI 계약
+
+GitHub Actions의 `build.yml`은 `.nvmrc`에 지정된 Node.js에서 단일 `check` 작업으로 `npm ci`를 한 번 실행한 뒤 타입·ESLint·Prettier·테스트(커버리지 60%)·production build를 검증합니다. 문서만 변경한 PR은 앱 검사를 생략합니다.
+
+`pr-policy.yml`은 브랜치 이름과 PR 제목을 검사합니다. CodeQL은 GitHub default setup으로 유지합니다.
+
+Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
+
 ## 검증
 
 ```bash
