@@ -28,7 +28,7 @@ export default function PostListView() {
               ? '게시글을 불러오는 중…'
               : isError
                 ? '목록을 불러오지 못했습니다.'
-                : `현재 ${posts.length}개 표시`}
+                : `현재 ${posts.length}개 표시${meta.total > 0 ? ` · ${meta.current_page} / ${meta.last_page} 페이지` : ''}`}
           </p>
         </div>
         <p className="mt-3 max-w-prose text-sm leading-6 text-muted sm:text-base">
