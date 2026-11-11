@@ -51,13 +51,13 @@ describe('로그인 테스트', () => {
       (signIn as jest.Mock).mockResolvedValue({ ok: true });
 
       // when - 이메일, 비밀번호 값이 입력하고 로그인 버튼 클릭
-      fireEvent.change(screen.getByLabelText('Email address'), {
+      fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
       });
-      fireEvent.change(screen.getByLabelText('Password'), {
+      fireEvent.change(screen.getByLabelText('비밀번호'), {
         target: { value: 'Password11!!' },
       });
-      fireEvent.submit(screen.getByTestId('submit-button'));
+      fireEvent.submit(screen.getByRole('button', { name: '로그인' }));
 
       // then - 회원가입 성공
       await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/'));
@@ -68,13 +68,13 @@ describe('로그인 테스트', () => {
       mockSearchParams.set('callbackUrl', '/account');
 
       // when - 로그인 성공
-      fireEvent.change(screen.getByLabelText('Email address'), {
+      fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
       });
-      fireEvent.change(screen.getByLabelText('Password'), {
+      fireEvent.change(screen.getByLabelText('비밀번호'), {
         target: { value: 'Password11!!' },
       });
-      fireEvent.submit(screen.getByTestId('submit-button'));
+      fireEvent.submit(screen.getByRole('button', { name: '로그인' }));
 
       // then - callbackUrl 경로로 복귀
       await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/account'));
@@ -85,13 +85,13 @@ describe('로그인 테스트', () => {
       mockSearchParams.set('callbackUrl', 'https://evil.example.com/x');
 
       // when - 로그인 성공
-      fireEvent.change(screen.getByLabelText('Email address'), {
+      fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
       });
-      fireEvent.change(screen.getByLabelText('Password'), {
+      fireEvent.change(screen.getByLabelText('비밀번호'), {
         target: { value: 'Password11!!' },
       });
-      fireEvent.submit(screen.getByTestId('submit-button'));
+      fireEvent.submit(screen.getByRole('button', { name: '로그인' }));
 
       // then - open redirect 차단
       await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/'));
@@ -107,13 +107,13 @@ describe('로그인 테스트', () => {
       );
 
       // when - 이메일, 비밀번호 값이 입력하고 로그인 버튼 클릭
-      fireEvent.change(screen.getByLabelText('Email address'), {
+      fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
       });
-      fireEvent.change(screen.getByLabelText('Password'), {
+      fireEvent.change(screen.getByLabelText('비밀번호'), {
         target: { value: 'Password11!!' },
       });
-      fireEvent.submit(screen.getByTestId('submit-button'));
+      fireEvent.submit(screen.getByRole('button', { name: '로그인' }));
 
       // then - 회원가입 실패
       await waitFor(() =>

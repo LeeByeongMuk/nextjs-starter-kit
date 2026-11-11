@@ -10,10 +10,8 @@ const createJestConfig = nextJest({
 const config: Config = {
   coverageProvider: 'v8',
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
     '^next-auth/react$': '<rootDir>/src/shared/lib/testing/nextAuthReact.tsx',
   },
-  preset: 'ts-jest',
   rootDir: './',
   testEnvironment: 'jest-fixed-jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
@@ -33,14 +31,12 @@ const config: Config = {
   coverageDirectory: 'coverage',
 };
 
-// Packages that ship ESM and need Jest transformation
 const extraTransformPkgs = [
   'rettime',
   'until-async',
   'next-auth',
   '@auth',
-  // msw ≥2.15 nests an ESM-only @open-draft/deferred-promise under
-  // node_modules/msw/node_modules — both hops must be transformable
+  // MSW의 중첩 ESM 의존성도 변환하도록 두 경로를 함께 허용한다.
   'msw',
   '@open-draft',
 ];

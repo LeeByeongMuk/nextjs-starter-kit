@@ -1,7 +1,7 @@
 ---
 paths:
-  - "src/**/model/**"
-  - "src/**/ui/**"
+  - 'src/**/model/**'
+  - 'src/**/ui/**'
 ---
 
 # Forms Guide
@@ -13,11 +13,11 @@ paths:
 
 하나의 폼은 아래 3파일로 나눈다 (전부 슬라이스 내부).
 
-| 파일 | 내용 | 예시 |
-|---|---|---|
-| `model/form.ts` | 폼 입력 타입, 기본값 상수 | `CreatePostFormInput`, `defaultValues` |
-| `model/use<Slice>Form.ts` | `useForm<...>()` 래퍼 훅 | `useCreatePostForm` |
-| `ui/<Slice>Form.tsx` | `FormProvider` 소비 컴포넌트 | `CreatePostForm` |
+| 파일                      | 내용                         | 예시                                   |
+| ------------------------- | ---------------------------- | -------------------------------------- |
+| `model/form.ts`           | 폼 입력 타입, 기본값 상수    | `CreatePostFormInput`, `defaultValues` |
+| `model/use<Slice>Form.ts` | `useForm<...>()` 래퍼 훅     | `useCreatePostForm`                    |
+| `ui/<Slice>Form.tsx`      | `FormProvider` 소비 컴포넌트 | `CreatePostForm`                       |
 
 근거: `src/features/post-create/`, `src/features/auth-signup/` 구조.
 
@@ -40,7 +40,7 @@ export const useSignupForm = () =>
 - 초기값이 `undefined`일 때 RHF 내부 state 불일치 차단
 - 리셋 동작(`reset()`) 예측 가능
 
-현행에서 `useSignInForm`이 이 규칙을 누락 — 별도 리팩터 PR에서 교정 예정.
+로그인·가입·게시글 작성·수정 폼 훅은 각 입력 필드의 `defaultValues`를 명시한다. 서버에서 받은 기존 값은 폼의 `reset()`으로 반영한다.
 
 ---
 
@@ -60,7 +60,11 @@ return (
 
 ```tsx
 // features/post-create/ui/CreatePostForm.tsx
-const { register, handleSubmit, formState: { errors } } = useFormContext<CreatePostFormInput>();
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useFormContext<CreatePostFormInput>();
 ```
 
 ---
@@ -75,7 +79,10 @@ const { register, handleSubmit, formState: { errors } } = useFormContext<CreateP
 <input
   {...register('email', {
     required: '이메일을 입력하세요',
-    pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: '이메일 형식 오류' },
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: '이메일 형식 오류',
+    },
   })}
 />
 ```
@@ -98,7 +105,12 @@ view에서 mutation 호출을 래핑할 때만 `handle<Action>` 이름 사용. �
 const { mutate } = useCreatePost();
 
 const handleCreatePost = (data: CreatePostFormInput) => {
-  mutate({ title: data.title, type: data.type, is_open: data.isOpen === '1', contents: data.contents });
+  mutate({
+    title: data.title,
+    type: data.type,
+    is_open: data.isOpen === '1',
+    contents: data.contents,
+  });
 };
 
 return <CreatePostForm handleCreatePost={handleCreatePost} />;

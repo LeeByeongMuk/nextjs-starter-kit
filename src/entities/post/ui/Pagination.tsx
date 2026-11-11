@@ -1,6 +1,4 @@
 import { PaginationMeta } from '@shared/api/pagination';
-import classNames from 'classnames';
-import React from 'react';
 
 import { PAGE_GROUP_NUMBER } from '../config/post';
 
@@ -9,87 +7,53 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
+/** 페이지 이동을 상세 URL과 혼동하지 않는 버튼으로 제공한다. */
 export default function Pagination({ meta, onPageChange }: Props) {
-  const getPageGroup = () => {
-    const pageGroupNum = Math.ceil(meta.current_page / PAGE_GROUP_NUMBER);
-    const firstPageNum = (pageGroupNum - 1) * PAGE_GROUP_NUMBER + 1;
-    const lastPageNum = Math.min(
-      firstPageNum + PAGE_GROUP_NUMBER - 1,
-      meta.last_page
-    );
-
-    return Array.from(
-      { length: Math.max(lastPageNum - firstPageNum + 1, 1) },
-      (_, i) => firstPageNum + i
-    );
-  };
-
-  const onUpdatePage = (page: number) => {
-    onPageChange(page);
-  };
-
-  const onPrevPage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    e.preventDefault();
-    onPageChange(meta.current_page - 1);
-  };
-
-  const onNextPage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    e.preventDefault();
-    onPageChange(meta.current_page + 1);
-  };
-
-  const pageGroup = getPageGroup();
+  const firstPage =
+    (Math.ceil(meta.current_page / PAGE_GROUP_NUMBER) - 1) * PAGE_GROUP_NUMBER +
+    1;
+  const lastPage = Math.min(firstPage + PAGE_GROUP_NUMBER - 1, meta.last_page);
+  const pages = Array.from(
+    { length: Math.max(lastPage - firstPage + 1, 1) },
+    (_, i) => firstPage + i
+  );
 
   return (
-    <nav className="mt-4 flex justify-center">
-      <ul className="inline-flex -space-x-px text-sm">
+    <nav aria-label="게시글 페이지" className="mt-10 border-t border-line pt-6">
+      <ul className="flex flex-wrap items-center justify-center gap-1 text-sm">
         {meta.current_page > 1 && (
           <li>
-            <a
-              href="#"
-              className="ms-0 flex h-8 items-center justify-center rounded-s-lg border border-e-0 border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              onClick={onPrevPage}
+            <button
+              type="button"
+              onClick={() => onPageChange(meta.current_page - 1)}
+              className="min-h-11 min-w-11 rounded px-3 text-muted hover:bg-accent-soft hover:text-accent"
             >
-              Previous
-            </a>
+              이전
+            </button>
           </li>
         )}
-
-        {pageGroup.map(d => (
-          <li key={d}>
-            <a
-              role={`pagination-${d}`}
-              href={`/post/${d}`}
-              className={classNames(
-                'flex h-8 items-center justify-center border px-3 leading-tight',
-                {
-                  'border-gray-300 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white':
-                    meta.current_page !== d,
-                },
-                {
-                  'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white':
-                    meta.current_page === d,
-                }
-              )}
-              onClick={e => {
-                e.preventDefault();
-                onUpdatePage(d);
-              }}
+        {pages.map(page => (
+          <li key={page}>
+            <button
+              type="button"
+              aria-label={`${page} 페이지`}
+              aria-current={page === meta.current_page ? 'page' : undefined}
+              onClick={() => onPageChange(page)}
+              className={`min-h-11 min-w-11 rounded px-3 font-medium ${page === meta.current_page ? 'bg-accent text-inverse' : 'text-muted hover:bg-accent-soft hover:text-accent'}`}
             >
-              {d}
-            </a>
+              {page}
+            </button>
           </li>
         ))}
-
-        {meta.last_page > 1 && meta.last_page !== meta.current_page && (
+        {meta.current_page < meta.last_page && (
           <li>
-            <a
-              href="#"
-              className="flex h-8 items-center justify-center rounded-e-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              onClick={onNextPage}
+            <button
+              type="button"
+              onClick={() => onPageChange(meta.current_page + 1)}
+              className="min-h-11 min-w-11 rounded px-3 text-muted hover:bg-accent-soft hover:text-accent"
             >
-              Next
-            </a>
+              다음
+            </button>
           </li>
         )}
       </ul>

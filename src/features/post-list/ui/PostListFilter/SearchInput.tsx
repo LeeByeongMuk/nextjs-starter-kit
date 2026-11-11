@@ -1,44 +1,43 @@
 import { useFormContext } from 'react-hook-form';
 
+/** 검색어 입력과 제출, 최소 길이 오류를 함께 제공한다. */
 export default function SearchInput() {
-  const { register } = useFormContext();
-
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
   return (
-    <div className="relative">
+    <div className="w-full sm:max-w-sm">
       <label htmlFor="q" className="sr-only">
-        Search
+        게시글 검색
       </label>
-
-      <input
-        type="text"
-        id="q"
-        placeholder="Search for title, contents"
-        className="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm"
-        {...register('q', {
-          minLength: 2,
-        })}
-      />
-
-      <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-        <button type="submit" className="text-gray-600 hover:text-gray-700">
-          <span className="sr-only">Search</span>
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-            />
-          </svg>
+      <div className="flex rounded border border-line bg-surface">
+        <input
+          id="q"
+          type="search"
+          placeholder="제목과 본문 검색"
+          aria-invalid={!!errors.q}
+          aria-describedby={errors.q ? 'search-error' : undefined}
+          className="min-h-12 w-full min-w-0 flex-1 border-0 bg-transparent px-3 text-ink placeholder:text-muted"
+          {...register('q', {
+            minLength: {
+              value: 2,
+              message: '검색어를 2자 이상 입력해 주세요.',
+            },
+          })}
+        />
+        <button
+          type="submit"
+          className="min-h-12 min-w-14 px-3 text-sm font-semibold text-accent hover:bg-accent-soft"
+        >
+          검색
         </button>
-      </span>
+      </div>
+      {errors.q && (
+        <p id="search-error" role="alert" className="mt-2 text-sm text-danger">
+          {errors.q.message?.toString()}
+        </p>
+      )}
     </div>
   );
 }

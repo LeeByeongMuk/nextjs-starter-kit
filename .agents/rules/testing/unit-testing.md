@@ -16,7 +16,8 @@ paths:
 - 러너: Jest 30 — `jest.config.ts`
 - DOM: `jest-fixed-jsdom` (MSW 2 호환 fork)
 - Setup: `jest.setup.ts` — MSW `testServer` 부트, TanStack Query `QueryClient` 리셋, `next-auth/react` 모킹
-- Preset: `next/jest` 기반 → SWC 트랜스폼
+- 변환: `next/jest`의 SWC만 사용. 별도 ts-jest preset은 두지 않는다.
+- TypeScript 설정 로더: `ts-node` (`jest.config.ts` 로딩용)
 
 ---
 
@@ -90,7 +91,7 @@ server.use(
 
 ### 5.3 개발 서버용 MSW
 
-`src/shared/api/mocks/server.ts`는 Express 기반 독립 mock 서버 (`npm run mock`). 테스트와 별개 — 혼동 주의.
+`src/shared/api/mocks/server.ts`는 Express 기반 독립 mock 서버다. `npm run mock`은 잠금 파일에 포함된 `tsx`로 실행하며 테스트의 `setupServer`와 분리된다. 브라우저 Service Worker는 사용하지 않는다.
 
 ---
 

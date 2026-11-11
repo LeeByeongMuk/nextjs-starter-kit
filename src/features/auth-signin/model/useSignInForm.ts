@@ -24,12 +24,18 @@ const resolveCallbackUrl = (callbackUrl: string | null) => {
   }
 };
 
+/** 로그인 입력과 같은 출처의 복귀 경로를 관리한다. */
 export function useSignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const methods = useForm<SignInReq>();
+  const methods = useForm<SignInReq>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
   const handleSignIn = async (data: SignInReq) => {
     setIsLoading(true);

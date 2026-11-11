@@ -1,14 +1,13 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useParams } from 'next/navigation';
 
 import { fetchUpdatePostResource } from '../api/postUpdateServices';
 import { UpdatePostResourceRes } from '../api/types';
 
+/** 편집용 데이터와 조회 상태를 화면에 제공한다. */
 export default function useUpdatePostResource() {
-  const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
 
@@ -24,15 +23,6 @@ export default function useUpdatePostResource() {
       },
     } as unknown as UpdatePostResourceRes,
   });
-
-  const { isError } = updatePostResource;
-
-  useEffect(() => {
-    if (isError) {
-      alert('Failed to fetch post');
-      router.push('/post');
-    }
-  }, [isError, router]);
 
   return updatePostResource;
 }

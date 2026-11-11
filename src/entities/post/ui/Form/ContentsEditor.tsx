@@ -1,45 +1,45 @@
 import ValidationError from '@shared/ui/error/ValidationError';
 import dynamic from 'next/dynamic';
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-const Editor = dynamic(() => import('../Editor'), {
-  ssr: false,
-});
+const Editor = dynamic(() => import('../Editor'), { ssr: false });
 
+/** HTML 편집기의 입력과 오류 설명을 연결한다. */
 export default function ContentsEditor() {
   const {
     setValue,
     register,
     formState: { errors },
   } = useFormContext();
-
   register('contents', {
-    required: 'Contents is required',
+    required: '본문을 입력해 주세요.',
     validate: (value: string) => {
-      const ele = document.createElement('div');
-      ele.innerHTML = value;
-      const text = ele.innerText || '';
-      return text.length > 0 ? true : 'Contents is required';
+      const element = document.createElement('div');
+      element.innerHTML = value;
+      return (
+        !!(
+          (element.textContent || '').trim() ||
+          element.querySelector('img, video, iframe, audio, hr')
+        ) || '본문을 입력해 주세요.'
+      );
     },
   });
-
-  const onEditorChange = (contents: string) => {
-    setValue('contents', contents);
-  };
-
   return (
-    <div className="mt-5">
-      <label
-        htmlFor="contents"
-        className="block text-xs font-medium text-gray-700"
-      >
-        Contents
-      </label>
-
-      <Editor onChange={onEditorChange} />
+    <div className="mt-6">
+      <p id="contents-label" className="mb-2 text-sm font-semibold">
+        본문
+      </p>
+      <Editor
+        onChange={contents =>
+          setValue('contents', contents, {
+            shouldDirty: true,
+            shouldValidate: !!errors.contents,
+          })
+        }
+        isInvalid={!!errors.contents}
+      />
       <ValidationError
-        role="contents-error-message"
+        id="contents-error"
         isError={!!errors.contents}
         message={errors.contents?.message?.toString()}
       />

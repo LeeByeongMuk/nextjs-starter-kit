@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { PostListData } from '../api/types';
 import PostListEmptyUI from './PostListEmptyUI';
 import ListItem from './PostListItem';
@@ -10,46 +8,15 @@ interface Props {
   isLoading: boolean;
 }
 
+/** 제목 중심 목록과 빈 결과·로딩 상태를 구분한다. */
 export default function PostList({ posts, isLoading }: Props) {
-  const renderPostList = () => {
-    if (isLoading) {
-      return <PostListSkeletonUI />;
-    }
-
-    if (!posts.length) {
-      return <PostListEmptyUI />;
-    }
-
-    return posts.map(post => {
-      return <ListItem key={post.id} post={post} />;
-    });
-  };
-
+  if (isLoading) return <PostListSkeletonUI />;
+  if (!posts.length) return <PostListEmptyUI />;
   return (
-    <div className="mt-3 overflow-x-auto">
-      <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-        <thead className="ltr:text-left">
-          <tr>
-            <th className="w-10/12 px-4 py-2 font-medium whitespace-nowrap text-gray-900">
-              Title
-            </th>
-
-            <th className="px-4 py-2 font-medium whitespace-nowrap text-gray-900">
-              Type
-            </th>
-
-            <th className="px-4 py-2 font-medium whitespace-nowrap text-gray-900">
-              Writer
-            </th>
-
-            <th className="px-4 py-2 font-medium whitespace-nowrap text-gray-900">
-              Time
-            </th>
-          </tr>
-        </thead>
-
-        <tbody className="divide-y divide-gray-200">{renderPostList()}</tbody>
-      </table>
-    </div>
+    <ul aria-label="게시글 목록" className="border-t border-line">
+      {posts.map(post => (
+        <ListItem key={post.id} post={post} />
+      ))}
+    </ul>
   );
 }

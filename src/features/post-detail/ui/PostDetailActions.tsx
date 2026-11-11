@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import React from 'react';
 
 interface PostDetailActionsProps {
   id: number;
@@ -8,6 +7,7 @@ interface PostDetailActionsProps {
   handleDeletePost: () => void;
 }
 
+/** 기존 돌아가기·수정·삭제 동작을 제공한다. */
 export default function PostDetailActions({
   id,
   isEditable,
@@ -15,34 +15,30 @@ export default function PostDetailActions({
   handleDeletePost,
 }: PostDetailActionsProps) {
   return (
-    <div className="mt-5 flex justify-center gap-2.5">
+    <div className="flex flex-wrap items-center gap-3 border-t border-line pt-6">
       <button
         type="button"
-        className="inline-block rounded border border-teal-600 bg-teal-600 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-teal-600 focus:ring focus:outline-none active:text-teal-500"
         onClick={handleRedirectBack}
+        className="min-h-11 rounded border border-line px-5 py-2 text-sm font-semibold hover:border-accent hover:text-accent"
       >
-        back
+        돌아가기
       </button>
-
       {isEditable && (
-        <Link
-          href={`/post/${id}/update`}
-          role="post-edit-link"
-          className="inline-block rounded border border-teal-600 px-12 py-3 text-sm font-medium text-teal-600 hover:bg-teal-600 hover:text-white focus:ring focus:outline-none active:bg-teal-500"
-          passHref={false}
-        >
-          update
-        </Link>
-      )}
-
-      {isEditable && (
-        <button
-          type="button"
-          className="inline-block rounded border border-red-600 px-12 py-3 text-sm font-medium text-red-600 hover:bg-red-600 hover:text-white focus:ring focus:outline-none active:bg-teal-500"
-          onClick={handleDeletePost}
-        >
-          delete
-        </button>
+        <>
+          <Link
+            href={`/post/${id}/update`}
+            className="inline-flex min-h-11 items-center rounded bg-accent px-5 py-2 text-sm font-semibold text-inverse hover:bg-accent-hover"
+          >
+            수정
+          </Link>
+          <button
+            type="button"
+            onClick={handleDeletePost}
+            className="ml-auto min-h-11 rounded px-4 py-2 text-sm text-danger hover:underline"
+          >
+            삭제
+          </button>
+        </>
       )}
     </div>
   );

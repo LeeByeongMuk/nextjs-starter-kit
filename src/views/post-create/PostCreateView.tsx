@@ -9,6 +9,7 @@ import {
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import { FormProvider } from 'react-hook-form';
 
+/** 게시글 편집 폼과 진행 상태를 조합한다. */
 export default function PostCreateView() {
   const methods = useCreatePostForm();
   const { mutate, isPending } = useCreatePost();
@@ -24,7 +25,15 @@ export default function PostCreateView() {
 
   return (
     <FormProvider {...methods}>
-      <section className="mt-5 flex min-h-full flex-col justify-center border-2 border-teal-600 px-6 py-12 lg:px-8">
+      <section className="mx-auto w-full max-w-[760px]">
+        <header className="mb-8 border-b border-line pb-7">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            글쓰기
+          </h1>
+          <p className="mt-4 text-muted">
+            제목과 본문을 작성하고 공개 범위를 선택해 주세요.
+          </p>
+        </header>
         <CreatePostForm handleCreatePost={handleCreatePost} />
       </section>
 

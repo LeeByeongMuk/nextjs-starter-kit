@@ -1,49 +1,41 @@
 import ValidationError from '@shared/ui/error/ValidationError';
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+/** 비밀번호 확인 값의 일치 여부를 알린다. */
 export default function PasswordConfirmInput() {
   const {
     register,
     getValues,
     formState: { errors },
   } = useFormContext();
-
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <label
-          htmlFor="passwordConfirmation"
-          form="passwordConfirmation"
-          className="block text-sm leading-6 font-medium text-gray-900"
-        >
-          Password Confirmation
-        </label>
-      </div>
-      <div className="mt-2">
-        <input
-          id="passwordConfirmation"
-          type="password"
-          autoComplete="new-password"
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6"
-          {...register('passwordConfirmation', {
-            required: {
-              value: true,
-              message: 'Password Confirmation is required',
-            },
-            validate: value => {
-              const { password } = getValues();
-              return password === value || 'Passwords do not match';
-            },
-          })}
-        />
-
-        <ValidationError
-          role="pw-confirm-error-message"
-          isError={!!errors.passwordConfirmation}
-          message={errors.passwordConfirmation?.message?.toString()}
-        />
-      </div>
+      <label
+        htmlFor="passwordConfirmation"
+        className="block text-sm font-semibold"
+      >
+        비밀번호 확인
+      </label>
+      <input
+        id="passwordConfirmation"
+        type="password"
+        autoComplete="new-password"
+        aria-invalid={!!errors.passwordConfirmation}
+        aria-describedby={
+          errors.passwordConfirmation ? 'passwordConfirmation-error' : undefined
+        }
+        className="mt-2 block min-h-12 w-full rounded border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted"
+        {...register('passwordConfirmation', {
+          required: '비밀번호 확인을 입력해 주세요.',
+          validate: value =>
+            getValues('password') === value || '비밀번호가 일치하지 않습니다.',
+        })}
+      />
+      <ValidationError
+        id="passwordConfirmation-error"
+        isError={!!errors.passwordConfirmation}
+        message={errors.passwordConfirmation?.message?.toString()}
+      />
     </div>
   );
 }

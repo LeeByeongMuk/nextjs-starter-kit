@@ -4,7 +4,7 @@
       {
         "id": 1,
         "type": "notice",
-        "title": "Title 1",
+        "title": "게시판을 둘러보세요",
         "hit": 0,
         "created_at": "2021-09-01T00:00:00",
         "user": {
@@ -16,7 +16,7 @@
       {
         "id": 2,
         "type": "notice",
-        "title": "Title 2",
+        "title": "계정과 로그인 흐름 확인하기",
         "hit": 0,
         "created_at": "2021-09-01T00:00:00",
         "user": {
@@ -28,7 +28,7 @@
       {
         "id": 3,
         "type": "notice",
-        "title": "Title 3",
+        "title": "첫 게시글을 작성해 보세요",
         "hit": 0,
         "created_at": "2021-09-01T00:00:00",
         "user": {
@@ -40,7 +40,7 @@
       {
         "id": 4,
         "type": "notice",
-        "title": "Title 4",
+        "title": "검색과 분류 살펴보기",
         "hit": 0,
         "created_at": "2021-09-01T00:00:00",
         "user": {
@@ -52,7 +52,7 @@
       {
         "id": 5,
         "type": "notice",
-        "title": "Title 5",
+        "title": "데모에서 실제 서비스로",
         "hit": 0,
         "created_at": "2021-09-01T00:00:00",
         "user": {
@@ -65,7 +65,7 @@
     "meta": {
       "current_page": 1,
       "last_page": 1,
-      "total": 1
+      "total": 5
     }
   },
   "create": {
@@ -87,8 +87,8 @@
     "message": "success",
     "data": {
       "id": 1,
-      "title": "title",
-      "contents": "contents",
+      "title": "게시판을 둘러보세요",
+      "contents": "<p>로그인부터 글 작성까지, 게시판의 기본 흐름을 확인할 수 있는 예제 글입니다.</p><h2>어디서 시작할까요?</h2><p>목록에서 글을 찾아보고 로그인한 뒤 새 글을 작성하거나 기존 글을 수정해 보세요.</p><h2>데모 데이터 안내</h2><p>현재 화면은 미리 준비된 예제 데이터를 사용합니다. 작성·수정·삭제한 내용은 저장되지 않으며, 검색과 분류도 같은 예제 목록을 반환합니다.</p>",
       "type": "notice",
       "is_open": true
     }
@@ -97,12 +97,12 @@
     "ok": true,
     "message": "success",
     "data": {
-      "contents": "contents",
+      "contents": "<p>로그인부터 글 작성까지, 게시판의 기본 흐름을 확인할 수 있는 예제 글입니다.</p><h2>어디서 시작할까요?</h2><p>목록에서 글을 찾아보고 로그인한 뒤 새 글을 작성하거나 기존 글을 수정해 보세요.</p><h2>데모 데이터 안내</h2><p>현재 화면은 미리 준비된 예제 데이터를 사용합니다. 작성·수정·삭제한 내용은 저장되지 않으며, 검색과 분류도 같은 예제 목록을 반환합니다.</p>",
       "created_at": "2021-09-01T00:00:00",
       "hit": 0,
       "id": 1,
       "is_editable": false,
-      "title": "title",
+      "title": "게시판을 둘러보세요",
       "type": "notice",
       "user_name": "name"
     }

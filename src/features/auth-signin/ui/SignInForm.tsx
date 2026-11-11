@@ -10,16 +10,21 @@ interface SignInFormProps {
   handleSignIn: (req: SignInReq) => void;
 }
 
+/** 인증 정보를 검증한 뒤 제출한다. */
 export default function SignInForm({ handleSignIn }: SignInFormProps) {
   const { handleSubmit } = useFormContext<SignInReq>();
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(handleSignIn)}>
+    <form
+      noValidate
+      className="space-y-6"
+      onSubmit={handleSubmit(handleSignIn)}
+    >
       <EmailInput />
 
       <PasswordInput />
 
-      <ButtonBox buttonText="Sign in" />
+      <ButtonBox buttonText="로그인" />
     </form>
   );
 }

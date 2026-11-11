@@ -25,7 +25,25 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 jest.mock('next-auth/react');
-jest.mock('@toast-ui/react-editor');
+jest.mock('next/dynamic', () => () => {
+  function MockEditor({
+    onChange,
+    isInvalid,
+  }: {
+    onChange: (value: string) => void;
+    isInvalid: boolean;
+  }) {
+    return (
+      <textarea
+        aria-label="본문"
+        aria-invalid={isInvalid}
+        aria-describedby={isInvalid ? 'contents-error' : undefined}
+        onChange={event => onChange(event.target.value)}
+      />
+    );
+  }
+  return MockEditor;
+});
 
 const queryClient = getQueryClient();
 
@@ -70,70 +88,82 @@ describe('게시글 생성 테스트', () => {
   describe('제목 형식을 확인한다', () => {
     test('제목이 입력되지 않으면 에러 메시지를 출력한다', async () => {
       // when - 제목을 입력하지 않고 제출 버튼을 클릭한다
-      fireEvent.submit(screen.getByText('submit'));
+      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
 
       // then - 에러 메시지가 출력된다
-      const errorMessage = await screen.findByRole('title-error-message');
-      expect(errorMessage).toHaveTextContent('Title is required');
+      await waitFor(() =>
+        expect(screen.getByLabelText('제목')).toHaveAccessibleDescription(
+          '제목을 입력해 주세요.'
+        )
+      );
     });
     test('제목을 입력하면 에러 메시지를 출력하지 않는다', () => {
       // when - 제목을 입력하고 제출 버튼을 클릭한다
-      fireEvent.input(screen.getByLabelText('Title'), {
+      fireEvent.input(screen.getByLabelText('제목'), {
         target: {
           value: '제목',
         },
       });
-      fireEvent.submit(screen.getByText('submit'));
+      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
 
       // then - 에러 메시지가 출력되지 않는다
-      expect(screen.queryByRole('title-error-message')).not.toBeInTheDocument();
+      expect(screen.getByLabelText('제목')).toHaveAttribute(
+        'aria-invalid',
+        'false'
+      );
     });
   });
 
   describe('내용 형식을 확인한다', () => {
     test('내용이 입력되지 않으면 에러 메시지를 출력한다', async () => {
       // when - 내용을 입력하지 않고 제출 버튼을 클릭한다
-      fireEvent.submit(screen.getByText('submit'));
+      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
 
       // then - 에러 메시지가 출력된다
-      expect(
-        await screen.findByRole('contents-error-message')
-      ).toHaveTextContent('Contents is required');
+      await waitFor(() =>
+        expect(screen.getByLabelText('본문')).toHaveAccessibleDescription(
+          '본문을 입력해 주세요.'
+        )
+      );
     });
     test('내용을 입력하면 에러 메시지를 출력하지 않는다', () => {
       // when - 내용을 입력하고 제출 버튼을 클릭한다
-      fireEvent.input(screen.getByRole('textbox'), {
+      fireEvent.change(screen.getByRole('textbox', { name: '본문' }), {
         target: {
           value: '내용',
         },
       });
-      fireEvent.submit(screen.getByText('submit'));
+      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
       // then - 에러 메시지가 출력되지 않는다
-      expect(
-        screen.queryByRole('contents-error-message')
-      ).not.toBeInTheDocument();
+      expect(screen.getByLabelText('본문')).toHaveAttribute(
+        'aria-invalid',
+        'false'
+      );
     });
   });
 
   describe('게시글 공개 여부 라디오박스 형식을 확인한다', () => {
     test('태그가 입력되지 않으면 에러 메시지를 출력한다', async () => {
       // when - 제출 버튼을 클릭한다
-      fireEvent.submit(screen.getByText('submit'));
+      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
 
       // then - 에러 메시지가 출력된다
-      expect(await screen.findByRole('isOpen-error-message')).toHaveTextContent(
-        'Is Open is required'
+      await waitFor(() =>
+        expect(
+          screen.getByRole('group', { name: '공개 범위' })
+        ).toHaveAccessibleDescription('공개 범위를 선택해 주세요.')
       );
     });
     test('태그를 입력하면 에러 메시지를 출력하지 않는다', () => {
       // when - 라디오박스를 선택하고 제출 버튼을 클릭한다
-      fireEvent.click(screen.getByLabelText('Yes'));
-      fireEvent.submit(screen.getByText('submit'));
+      fireEvent.click(screen.getByLabelText('공개'));
+      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
 
       // then - 에러 메시지가 출력되지 않는다
-      expect(
-        screen.queryByRole('isOpen-error-message')
-      ).not.toBeInTheDocument();
+      expect(screen.getByRole('group', { name: '공개 범위' })).toHaveAttribute(
+        'aria-invalid',
+        'false'
+      );
     });
   });
 

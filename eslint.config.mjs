@@ -90,10 +90,8 @@ const config = [
         { type: 'shared', pattern: 'src/shared/**' },
         { type: 'styles', pattern: 'src/styles/**' },
       ],
-      // 단일 파일은 v7에서 file descriptor로 분류 (middleware는 app 레이어 취급)
-      'boundaries/files': [
-        { pattern: 'src/middleware.ts', category: 'app-file' },
-      ],
+      // 단일 파일은 v7에서 file descriptor로 분류 (proxy는 app 레이어 취급)
+      'boundaries/files': [{ pattern: 'src/proxy.ts', category: 'app-file' }],
       'import/resolver': {
         typescript: { project: './tsconfig.json' },
         node: true,
@@ -155,7 +153,7 @@ const config = [
                 },
               },
             },
-            // middleware(app-file)에도 동일한 Public API 규칙 적용
+            // proxy(app-file)에도 동일한 Public API 규칙 적용
             {
               from: { file: { categories: 'app-file' } },
               disallow: {
