@@ -22,7 +22,7 @@ paths:
 
 ## 버전 채택 정책
 
-- Node.js는 `.nvmrc`의 26.13.0 LTS, npm은 동봉된 11.20.0을 사용한다. `package.json`의 engines, CI, Docker가 같은 계열을 따른다.
+- Node.js는 `.nvmrc`의 26.13.1 LTS, npm은 동봉된 11.20.0을 사용한다. `package.json`의 engines, CI, Docker가 같은 계열을 따른다.
 - 설치는 `npm ci`로 재현한다. 정확한 패키지 버전은 `package-lock.json`이 정본이다. `npm run setup`도 `npm ci`를 실행하며 AI 스킬은 `--skills`로 선택 설치한다.
 - Next/React, Tailwind/PostCSS 플러그인, TanStack Query/devtools/ESLint 플러그인은 각 peer 범위에 맞춰 함께 갱신한다. 같은 메이저라도 타입·lint·테스트·production build를 통과해야 한다.
 - React 19는 Toast UI wrapper의 공식 peer(`^17.0.1`) 밖이다. 기존 override를 유지하며 에디터 작성·수정·저장 흐름을 실제 브라우저에서 확인한다.
@@ -35,7 +35,7 @@ paths:
 | NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음           | v5 안정판 출시                     |
 | npm 12             | Node LTS에 동봉된 npm 11.20.0으로 설치 정책 통일               | 별도 메이저 전환 검증              |
 
-근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.0), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest).
+근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.1), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest).
 
 ---
 

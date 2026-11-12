@@ -4,7 +4,7 @@
 
 ## 실행 환경과 설치
 
-- Node.js **26.13.0 LTS** (`.nvmrc`), npm **11.20.0**
+- Node.js **26.13.1 LTS** (`.nvmrc`), npm **11.20.0**
 - 패키지 매니저는 npm, 재설치 기준은 `package-lock.json`입니다.
 
 ```bash
