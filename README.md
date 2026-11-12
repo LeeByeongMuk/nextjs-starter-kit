@@ -74,7 +74,7 @@ mock의 계정·토큰·게시글은 모두 **데모 데이터**입니다. 핸�
 - Claude Code: 같은 요청을 `/impeccable critique src/views/post-list/PostListView.tsx` 또는 `/impeccable polish src/views/post-list/PostListView.tsx`로 실행합니다.
 - 실제 UI 변경에는 프로젝트의 FSD·Tailwind 규칙을 우선하고 데스크톱·모바일 렌더링을 확인합니다. 접근성·인터랙션 검토에는 기존 `web-design-guidelines`를 함께 사용합니다.
 
-벤더링 파일은 Git에서 제외하며 `npm run setup -- --skills`로 복원합니다. 첫 실행 시 런처가 체크섬으로 검증한 플랫폼 엔진을 사용자 캐시에 내려받을 수 있습니다. 설치는 자동 실행 훅을 활성화하지 않습니다.
+모든 벤더링 스킬은 Codex·Claude Code를 대상으로 `.agents/skills`에 설치합니다. 벤더링 파일은 Git에서 제외하며 `npm run setup -- --skills`로 복원합니다. 첫 실행 시 런처가 체크섬으로 검증한 플랫폼 엔진을 사용자 캐시에 내려받을 수 있습니다. 설치는 자동 실행 훅을 활성화하지 않습니다.
 
 ## CI 계약
 

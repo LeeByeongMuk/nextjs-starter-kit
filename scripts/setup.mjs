@@ -27,6 +27,9 @@ if (process.argv.includes('--skills')) {
     'add',
     `https://github.com/vercel-labs/agent-skills/tree/${vercelSkillsRef}`,
     ...skills.flatMap(skill => ['--skill', skill]),
+    '--agent',
+    'codex',
+    'claude-code',
     '--yes',
   ]);
   const impeccableRef = 'f2baa414a87d9acf1e21ccf776bfaec0262ad6df';
