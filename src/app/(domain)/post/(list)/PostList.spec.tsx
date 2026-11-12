@@ -4,6 +4,7 @@ import { server } from '@shared/api/mocks/testServer';
 import { getHandlerURI } from '@shared/lib/url';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
+  act,
   createEvent,
   fireEvent,
   render,
@@ -46,13 +47,36 @@ const posts: PostListData[] = (
   }))
 );
 
+interface ListFilters {
+  type: string;
+  q: string;
+  page: number;
+}
+
 describe('게시글 리스트 페이지 테스트', () => {
-  const router = { push: jest.fn(), replace: jest.fn() };
+  // App Router처럼 검색 조건만 바뀌는 이동은 리마운트 없이 같은 화면에 새 URL을 전달한다
+  const searchListeners = new Set<() => void>();
+  let currentSearch = '';
+  const navigate = (href: string) => {
+    currentSearch = new URL(href, 'http://localhost/post').search;
+    searchListeners.forEach(listener => listener());
+  };
+  const subscribeSearch = (listener: () => void) => {
+    searchListeners.add(listener);
+    return () => {
+      searchListeners.delete(listener);
+    };
+  };
+  const useMockSearchParams = () =>
+    new URLSearchParams(
+      React.useSyncExternalStore(subscribeSearch, () => currentSearch)
+    );
+  const router = { push: jest.fn(), replace: jest.fn(navigate) };
   const postRequests = jest.fn();
   let queryClient: QueryClient;
 
   const renderPostList = (search = 'type=notice&q=React&page=1') => {
-    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(search));
+    navigate(`/post?${search}`);
     return render(
       <QueryClientProvider client={queryClient}>
         <PostList />
@@ -60,10 +84,7 @@ describe('게시글 리스트 페이지 테스트', () => {
     );
   };
 
-  const expectFilters = async (
-    filters: { type: string; q: string; page: number },
-    title: string
-  ) => {
+  const expectList = async (filters: ListFilters, title: string) => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: title })).toBeVisible();
       expect(postRequests).toHaveBeenLastCalledWith({
@@ -71,14 +92,18 @@ describe('게시글 리스트 페이지 테스트', () => {
         q: filters.q,
         page: String(filters.page),
       });
-      expect(router.replace).toHaveBeenLastCalledWith(
-        `?${new URLSearchParams({
-          type: filters.type,
-          q: filters.q,
-          page: String(filters.page),
-        })}`
-      );
     });
+  };
+
+  const expectFilters = async (filters: ListFilters, title: string) => {
+    await expectList(filters, title);
+    expect(router.replace).toHaveBeenLastCalledWith(
+      `?${new URLSearchParams({
+        type: filters.type,
+        q: filters.q,
+        page: String(filters.page),
+      })}`
+    );
   };
 
   beforeEach(() => {
@@ -93,6 +118,7 @@ describe('게시글 리스트 페이지 테스트', () => {
       get: jest.fn(),
     });
     (useRouter as jest.Mock).mockReturnValue(router);
+    (useSearchParams as jest.Mock).mockImplementation(useMockSearchParams);
     (useSession as jest.Mock).mockReturnValue({
       data: null,
       status: 'unauthenticated',
@@ -130,10 +156,11 @@ describe('게시글 리스트 페이지 테스트', () => {
     renderPostList('type=notice&q=React&page=2');
     expect(screen.getByLabelText('검색')).toHaveValue('React');
     expect(screen.getByLabelText('분류')).toHaveValue('notice');
-    await expectFilters(
+    await expectList(
       { type: 'notice', q: 'React', page: 2 },
       'React 업데이트 공지'
     );
+    expect(router.replace).not.toHaveBeenCalled();
     expect(screen.getByRole('link', { name: '2 페이지' })).toHaveAttribute(
       'aria-current',
       'page'
@@ -141,6 +168,80 @@ describe('게시글 리스트 페이지 테스트', () => {
     expect(
       screen.queryByRole('link', { name: 'React 설치 공지' })
     ).not.toBeInTheDocument();
+  });
+
+  test('검색 조건 없이 처음 열면 기본 필터로 요청하고 URL을 바꾸지 않는다', async () => {
+    renderPostList('');
+    await expectList({ type: '', q: '', page: 1 }, 'React 설치 공지');
+    expect(screen.getByLabelText('검색')).toHaveValue('');
+    expect(screen.getByLabelText('분류')).toHaveValue('');
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    'type=bogus&q=&page=abc',
+    'type=bogus&q=&page=0',
+    'type=bogus&q=&page=-2',
+    'type=bogus&q=&page=1.5',
+    'type=bogus&q=&page=',
+  ])('잘못된 URL 값(%s)은 전체 분류의 1페이지로 요청한다', async search => {
+    renderPostList(search);
+    await expectList({ type: '', q: '', page: 1 }, 'React 설치 공지');
+    expect(screen.getByLabelText('분류')).toHaveValue('');
+    expect(screen.getByRole('button', { name: '전체' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByRole('link', { name: '1 페이지' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByRole('link', { name: '2 페이지' })).toHaveAttribute(
+      'href',
+      '/post?type=&q=&page=2'
+    );
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  test('목록을 연 채 검색 조건 없는 /post로 이동하면 필터, 입력, 요청을 URL에 맞춘다', async () => {
+    renderPostList('type=notice&q=React&page=2');
+    await screen.findByRole('link', { name: 'React 업데이트 공지' });
+    const searchInput = screen.getByLabelText('검색');
+    const replaceCount = router.replace.mock.calls.length;
+    fireEvent.change(searchInput, { target: { value: '설치' } });
+
+    act(() => navigate('/post'));
+
+    await expectList({ type: '', q: '', page: 1 }, 'React 설치 공지');
+    expect(screen.getByLabelText('검색')).toBe(searchInput);
+    expect(searchInput).toHaveValue('');
+    expect(screen.getByLabelText('분류')).toHaveValue('');
+    expect(screen.getByRole('button', { name: '전체' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByRole('button', { name: '공지' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+    expect(router.replace).toHaveBeenCalledTimes(replaceCount);
+
+    fireEvent.click(screen.getByRole('button', { name: 'FAQ' }));
+    await expectFilters({ type: 'faq', q: '', page: 1 }, 'React 설치 질문');
+  });
+
+  test('페이지 이동은 제출하지 않은 검색어를 요청에 섞지 않고 입력에 남긴다', async () => {
+    renderPostList();
+    await screen.findByRole('link', { name: 'React 설치 공지' });
+    fireEvent.change(screen.getByLabelText('검색'), {
+      target: { value: '설치' },
+    });
+    fireEvent.click(screen.getByRole('link', { name: '2 페이지' }));
+    await expectFilters(
+      { type: 'notice', q: 'React', page: 2 },
+      'React 업데이트 공지'
+    );
+    expect(screen.getByLabelText('검색')).toHaveValue('설치');
   });
 
   test('검색 제출은 분류를 보존하고 첫 페이지의 URL, 요청, 결과를 갱신한다', async () => {
@@ -191,6 +292,7 @@ describe('게시글 리스트 페이지 테스트', () => {
     expect(screen.getByLabelText('검색')).toHaveAccessibleDescription(
       '검색어를 2자 이상 입력하거나 비워 주세요.'
     );
+    expect(screen.getByLabelText('검색')).toHaveValue('R');
     expect(postRequests).toHaveBeenCalledTimes(requestCount);
     expect(router.replace).toHaveBeenCalledTimes(replaceCount);
     expect(screen.getByRole('link', { name: 'React 설치 공지' })).toBeVisible();
