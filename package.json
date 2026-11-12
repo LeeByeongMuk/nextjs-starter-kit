@@ -78,7 +78,7 @@
   },
   "allowScripts": {
     "@parcel/watcher": false,
-    "esbuild": false,
+    "esbuild": true,
     "fsevents": false,
     "msw": false
   }
