@@ -244,6 +244,46 @@ describe('게시글 리스트 페이지 테스트', () => {
     expect(screen.getByLabelText('검색')).toHaveValue('설치');
   });
 
+  test('입력만 한 검색어는 분류를 바꿔도 입력에 남는다', async () => {
+    renderPostList('type=notice&q=React&page=1');
+    await screen.findByRole('link', { name: 'React 설치 공지' });
+    fireEvent.change(screen.getByLabelText('검색'), {
+      target: { value: '설치' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'FAQ' }));
+    await expectFilters(
+      { type: 'faq', q: 'React', page: 1 },
+      'React 설치 질문'
+    );
+    expect(screen.getByLabelText('검색')).toHaveValue('설치');
+  });
+
+  test('URL 반영 전에 이어진 변경은 앞선 변경을 포함해 요청한다', async () => {
+    renderPostList('type=notice&q=React&page=1');
+    await screen.findByRole('link', { name: 'React 설치 공지' });
+    const pendingUrls: string[] = [];
+    router.replace.mockImplementation(href => {
+      pendingUrls.push(href);
+    });
+    try {
+      fireEvent.click(screen.getByRole('button', { name: 'FAQ' }));
+      fireEvent.click(screen.getByRole('link', { name: '2 페이지' }));
+      expect(pendingUrls).toEqual([
+        '?type=faq&q=React&page=1',
+        '?type=faq&q=React&page=2',
+      ]);
+      act(() => navigate(pendingUrls[pendingUrls.length - 1]));
+    } finally {
+      router.replace.mockImplementation(navigate);
+    }
+    await expectList({ type: 'faq', q: 'React', page: 2 }, 'React 사용 질문');
+    expect(screen.getByRole('button', { name: 'FAQ' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByLabelText('분류')).toHaveValue('faq');
+  });
+
   test('검색 제출은 분류를 보존하고 첫 페이지의 URL, 요청, 결과를 갱신한다', async () => {
     renderPostList('type=notice&q=React&page=3');
     await screen.findByRole('link', { name: 'React 운영 공지' });

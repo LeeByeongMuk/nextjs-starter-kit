@@ -21,11 +21,15 @@ export function usePostListForm({ setSearchFilters }: UsePostListFormProps) {
     },
   });
 
-  const { getValues, reset } = methods;
+  const { getValues, resetField } = methods;
 
   useEffect(() => {
-    reset({ type: searchFilters.type, q: searchFilters.q });
-  }, [reset, searchFilters.type, searchFilters.q]);
+    resetField('type', { defaultValue: searchFilters.type });
+  }, [resetField, searchFilters.type]);
+
+  useEffect(() => {
+    resetField('q', { defaultValue: searchFilters.q });
+  }, [resetField, searchFilters.q]);
 
   const handleFormSubmit = (data: PostListSearch) => {
     setSearchFilters({
