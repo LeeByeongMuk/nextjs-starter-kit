@@ -75,5 +75,11 @@
   "engines": {
     "node": "26.x",
     "npm": "11.20.x"
+  },
+  "allowScripts": {
+    "@parcel/watcher": false,
+    "esbuild": false,
+    "fsevents": false,
+    "msw": false
   }
 }
