@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 import { fetchPosts } from '../api/postsServices';
 import { PostsReq, PostsRes } from '../api/types';
@@ -10,6 +9,7 @@ interface Props {
   searchFilters: PostsReq;
 }
 
+/** 검색 조건에 맞는 목록 데이터와 조회 상태를 화면에 제공한다. */
 export default function usePostList({ searchFilters }: Props) {
   const postListQuery = useQuery({
     queryKey: ['posts', searchFilters],
@@ -24,13 +24,6 @@ export default function usePostList({ searchFilters }: Props) {
       links: {},
     } as unknown as PostsRes,
   });
-  const { isError } = postListQuery;
-
-  useEffect(() => {
-    if (isError) {
-      alert('Failed to fetch posts');
-    }
-  }, [isError]);
 
   return postListQuery;
 }
