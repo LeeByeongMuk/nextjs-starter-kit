@@ -15,7 +15,6 @@ export {
   getPostTypeLabel,
   LIST_TYPE_OPTIONS,
   PAGE_GROUP_NUMBER,
-  POST_TYPE_LABELS,
   TYPE_OPTIONS,
 } from './config/post';
 export type { PostType } from './model/types';
