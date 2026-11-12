@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 import { fetchDeletePost } from '../api/postDeleteServices';
 
+/** 현재 경로의 게시글을 삭제하고 성공하면 홈으로 이동한다. */
 export default function useDeletePost() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -13,11 +14,11 @@ export default function useDeletePost() {
   return useMutation({
     mutationFn: () => fetchDeletePost({ id }),
     onSuccess: () => {
-      alert('Post deleted successfully');
+      alert('게시글을 삭제했습니다.');
       router.push('/');
     },
     onError: () => {
-      alert('Failed to delete post');
+      alert('게시글을 삭제하지 못했습니다.');
     },
   });
 }

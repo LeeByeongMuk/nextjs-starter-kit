@@ -6,6 +6,7 @@ import { UpdateAccountReq } from '../api/types';
 import useDeleteAccount from './useDeleteAccount';
 import useUpdateAccount from './useUpdateAccount';
 
+/** 세션 회원 정보로 채운 폼과 수정·탈퇴 동작을 화면에 제공한다. */
 export function useAccountManager() {
   const { data: session } = useSession();
   const methods = useForm<UpdateAccountReq>({
@@ -36,7 +37,7 @@ export function useAccountManager() {
 
   const handleDeleteAccount = () => {
     const deletedReason = prompt(
-      'Are you sure you want to delete your account? Please enter a reason'
+      '회원 탈퇴를 진행하려면 탈퇴 사유를 입력해 주세요.'
     );
     if (!deletedReason) return;
 

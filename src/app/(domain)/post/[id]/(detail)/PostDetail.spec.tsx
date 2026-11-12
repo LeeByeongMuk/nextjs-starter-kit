@@ -6,7 +6,13 @@ import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
 import { useParams, useRouter } from 'next/navigation';
@@ -26,15 +32,17 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('게시글 상세 페이지 테스트', () => {
   const mockBack = jest.fn();
+  const mockPush = jest.fn();
 
   beforeEach(() => {
     mockBack.mockClear();
+    mockPush.mockClear();
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue({ value: 'test-token' }),
     });
     (useRouter as jest.Mock).mockReturnValue({
-      push: jest.fn(),
+      push: mockPush,
       back: mockBack,
     });
     (useParams as jest.Mock).mockReturnValue({
@@ -85,6 +93,72 @@ describe('게시글 상세 페이지 테스트', () => {
       expect(result.current.post?.is_editable).toBeTruthy();
     });
     // expect(await screen.findByRole('post-edit-link')).toBeInTheDocument();
+  });
+
+  describe('게시글 삭제', () => {
+    const deleteRequest = jest.fn();
+
+    beforeEach(async () => {
+      deleteRequest.mockClear();
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id'), () =>
+          HttpResponse.json({
+            ...postData.getById,
+            data: { ...postData.getById.data, is_editable: true },
+          })
+        ),
+        http.delete(getHandlerURI('/api/posts/:id'), ({ params }) => {
+          deleteRequest(params.id);
+          return HttpResponse.json(postData.delete);
+        })
+      );
+      await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+    });
+
+    // 전역 alert mock은 파일 안의 테스트끼리 호출 기록을 공유하므로 다음 테스트로 넘기지 않는다
+    afterEach(() => {
+      (window.alert as jest.Mock).mockClear();
+    });
+
+    test('삭제 확인을 취소하면 삭제를 요청하지 않는다', async () => {
+      const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+
+      expect(confirm).toHaveBeenCalledWith('이 게시글을 삭제할까요?');
+      expect(queryClient.isMutating()).toBe(0);
+    });
+
+    test('삭제를 확인하면 완료를 알리고 홈으로 이동한다', async () => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+
+      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+
+      await waitFor(() =>
+        expect(window.alert).toHaveBeenCalledWith('게시글을 삭제했습니다.')
+      );
+      expect(deleteRequest).toHaveBeenCalledWith('1');
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
+
+    test('삭제에 실패하면 실패를 알리고 화면을 유지한다', async () => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      server.use(
+        http.delete(
+          getHandlerURI('/api/posts/:id'),
+          () => new HttpResponse(null, { status: 500 })
+        )
+      );
+
+      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+
+      await waitFor(() =>
+        expect(window.alert).toHaveBeenCalledWith(
+          '게시글을 삭제하지 못했습니다.'
+        )
+      );
+      expect(mockPush).not.toHaveBeenCalled();
+    });
   });
 
   test('게시글 상세 API 호출에 성공한다', async () => {
