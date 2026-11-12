@@ -12,7 +12,7 @@ interface Props {
 /** 제목을 우선하고 작은 화면에서는 메타데이터를 함께 표시하는 행 */
 export default function ListItem({ post }: Props) {
   const typeLabel = getPostTypeLabel(post.type);
-  const writer = post.user?.name || '알 수 없음';
+  const writer = post.user?.name || '작성자 미상';
   const date = getFormattedDate(post.created_at);
 
   return (
