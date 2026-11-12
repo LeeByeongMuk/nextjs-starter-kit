@@ -11,7 +11,7 @@ export default function useDeleteAccount() {
       alert('Account deleted successfully');
       await deleteAccessToken();
       await signOut({
-        callbackUrl: '/',
+        redirectTo: '/',
       });
     },
     onError: () => {
