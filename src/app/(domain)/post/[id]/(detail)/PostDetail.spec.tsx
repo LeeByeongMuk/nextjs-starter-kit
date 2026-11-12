@@ -115,11 +115,6 @@ describe('게시글 상세 페이지 테스트', () => {
       await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
     });
 
-    // 전역 alert mock은 파일 안의 테스트끼리 호출 기록을 공유하므로 다음 테스트로 넘기지 않는다
-    afterEach(() => {
-      (window.alert as jest.Mock).mockClear();
-    });
-
     test('삭제 확인을 취소하면 삭제를 요청하지 않는다', async () => {
       const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
 

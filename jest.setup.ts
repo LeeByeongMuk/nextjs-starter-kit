@@ -4,15 +4,13 @@ import { QueryCache } from '@tanstack/react-query';
 
 const queryCache = new QueryCache();
 
-global.alert = jest.fn();
-global.prompt = jest.fn();
-
 beforeAll(() => {
   server.listen();
 });
 
 beforeEach(() => {
   jest.spyOn(window, 'alert').mockImplementation(() => {});
+  jest.spyOn(window, 'prompt').mockImplementation(() => null);
   jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 

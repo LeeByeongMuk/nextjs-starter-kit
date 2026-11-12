@@ -16,6 +16,9 @@ paths:
 - 러너: Jest 30 — `jest.config.ts`
 - DOM: `jest-fixed-jsdom` (MSW 2 호환 fork)
 - Setup: `jest.setup.ts` — MSW `testServer` 부트, TanStack Query `QueryClient` 리셋, `next-auth/react` 모킹
+- 대화상자 mock: `jest.setup.ts`가 테스트마다 `window.alert`(빈 구현)와 `window.prompt`(`null` 반환) spy를 새로 만들고 `afterEach`의 `jest.restoreAllMocks()`로 되돌린다. 호출 기록과 반환값은 다음 테스트로 넘어가지 않는다.
+  - 다른 반환값은 테스트 본문이나 그 블록의 `beforeEach`에서 `jest.spyOn(window, 'prompt').mockReturnValue('사유')`처럼 지정한다. `confirm`은 기본 mock이 없으므로 쓰는 테스트에서 직접 spy한다.
+  - `global.alert = jest.fn()`처럼 전역 함수를 직접 바꿔 끼우지 않는다. `restoreAllMocks`는 `jest.spyOn`이 만든 spy만 되돌리므로 호출 기록과 반환값이 테스트 사이에 남는다.
 - 변환: `next/jest`의 SWC만 사용. 별도 ts-jest preset은 두지 않는다.
 - TypeScript 설정 로더: `ts-node` (`jest.config.ts` 로딩용)
 
@@ -116,7 +119,7 @@ const createTestQueryClient = () =>
 2. `QueryClientProvider`로 감쌌는가 (TanStack Query 사용 시)
 3. MSW 핸들러가 요청 경로와 일치하는가 (오타 방지)
 4. `waitFor(...)` 또는 `findBy*` 로 비동기 상태 대기했는가
-5. `alert` / `router.push` 등 side effect는 mock 했는가 (`jest.spyOn`)
+5. `confirm` / `router.push` 등 side effect는 mock 했는가 (`jest.spyOn`) — `alert`·`prompt`는 `jest.setup.ts`가 테스트마다 새 spy로 준비한다 (§1)
 
 ---
 
