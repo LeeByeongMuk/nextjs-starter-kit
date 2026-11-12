@@ -98,6 +98,24 @@ describe('게시글 상세 페이지 테스트', () => {
     });
   });
 
+  test.each([
+    ['분류가 없는 글', '미분류', null],
+    ['FAQ 글', 'FAQ', 'faq'],
+    ['알 수 없는 분류의 글', '미분류', 'constructor'],
+  ])('%s은 분류를 %s로 표시한다', async (_, label, type) => {
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id'), () =>
+        HttpResponse.json({
+          ...postData.getById,
+          data: { ...postData.getById.data, type },
+        })
+      )
+    );
+    await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+
+    expect(await screen.findByText(label)).toBeVisible();
+  });
+
   test('조회 실패 시 오류 화면을 유지하고 사용자가 복귀를 선택한다', async () => {
     server.use(
       http.get(getHandlerURI('/api/posts/:id'), () => {

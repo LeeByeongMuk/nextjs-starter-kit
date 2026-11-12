@@ -1,9 +1,9 @@
+import { getPostTypeLabel } from '@entities/post';
 import { getFormattedDate } from '@shared/lib/date';
 import Link from 'next/link';
 import React from 'react';
 
 import { PostListData } from '../api/types';
-import { POST_TYPE_LABELS } from '../config/postList';
 
 interface Props {
   post: PostListData;
@@ -11,7 +11,7 @@ interface Props {
 
 /** 제목을 우선하고 작은 화면에서는 메타데이터를 함께 표시하는 행 */
 export default function ListItem({ post }: Props) {
-  const typeLabel = (post.type && POST_TYPE_LABELS[post.type]) || '미분류';
+  const typeLabel = getPostTypeLabel(post.type);
   const writer = post.user?.name || '알 수 없음';
   const date = getFormattedDate(post.created_at);
 
