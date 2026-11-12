@@ -59,7 +59,7 @@ paths:
 
 ## 트러블슈팅 기록 (재발 방지)
 
-- **msw ≥2.15 ESM 중첩 의존성**: `@open-draft/deferred-promise`(ESM 전용)를 `node_modules/msw/node_modules` 아래로 끌고 온다. `jest.config.ts` transformIgnorePatterns 예외에 `msw`, `@open-draft` 두 홉 모두 필요. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
+- **msw ESM 의존성 호이스팅**: msw는 2.13.4부터 ESM 전용 `@open-draft/deferred-promise` 3.x를 쓰고 `@mswjs/interceptors`는 2.x를 쓴다. 어느 버전이 최상위로 호이스팅되는지는 잠금 파일에 따라 바뀐다. 2026-11-12 의존성 갱신 전에는 3.x가 `node_modules/msw/node_modules` 아래에 있어 `msw`와 `@open-draft` 중 하나만 빠져도 테스트가 실패했다. 갱신 후에는 3.x가 최상위에 있어 `msw`를 빼도 통과하지만 `@open-draft`를 빼면 전체 suite가 `Must use import to load ES Module`로 실패한다. 다시 중첩될 수 있으므로 `jest.config.ts` transformIgnorePatterns 예외에 둘 다 유지한다. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
 - **ts-jest 버전 오해**: "Jest 30이니 ts-jest도 30" 이 아니다. ts-jest는 29.4부터 Jest 30을 지원하며 30 메이저가 없다. 원 계획서의 `ts-jest@^30` 목표는 오기였고, 당시에는 `^29.4.x`를 사용했다. 현재는 `next/jest` SWC로 단일화해 ts-jest를 제거했다
 - **@toast-ui/react-editor**: 3.2.3이 최종 버전(유지보수 중단). `overrides`로 `react: "^19"` 강제 설치 중이며, 동작 이상 시 대체 에디터(BlockNote, TipTap, Plate) 전환 검토 — [library-decisions.md](./library-decisions.md) 참조
 - **next-auth/react 테스트 mock**: jsdom에서 세션 프로바이더 모킹용 — 당시 `src/tests/mocks/`, 현행은 `src/shared/lib/testing/nextAuthReact.tsx` (`jest.config.ts` moduleNameMapper로 매핑)
