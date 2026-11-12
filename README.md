@@ -82,7 +82,7 @@ GitHub Actions의 `build.yml`은 `.nvmrc`에 지정된 Node.js에서 단일 `che
 
 `pr-policy.yml`은 브랜치 이름과 PR 제목을 검사합니다. CodeQL은 GitHub default setup으로 유지합니다.
 
-Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. [라이브러리 결정](.agents/rules/infra/library-decisions.md)에서 보류한 TypeScript·ESLint·MSW 메이저와 Node 런타임 메이저를 따르는 `@types/node` 메이저는 제외합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
+Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. [라이브러리 결정](.agents/rules/infra/library-decisions.md)에서 보류한 TypeScript·ESLint·MSW 메이저와 Node 런타임 메이저를 따르는 `@types/node` 메이저는 버전 업데이트에서 제외합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
 
 ## 검증
 

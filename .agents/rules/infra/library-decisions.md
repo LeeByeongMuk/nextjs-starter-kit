@@ -23,20 +23,21 @@ paths:
 ## 버전 채택 정책
 
 - Node.js는 `.nvmrc`의 26.13.1 LTS, npm은 동봉된 11.20.0을 사용한다. `package.json`의 engines, CI, Docker가 같은 계열을 따른다.
+- `@types/node`는 Node 런타임 메이저(26)에 맞춰 올린다. 그래서 Dependabot 버전 업데이트에서 `@types/node` 메이저를 제외한다.
 - 설치는 `npm ci`로 재현한다. 정확한 패키지 버전은 `package-lock.json`이 정본이다. `npm run setup`도 `npm ci`를 실행하며 AI 스킬은 `--skills`로 선택 설치한다.
 - npm 11.20은 `allowScripts`에 기록되지 않은 의존성 install script도 실행하지만 설치할 때마다 경고한다. `package.json`의 `allowScripts`에 실행 여부를 기록한다. `esbuild`는 플랫폼 바이너리를 확인해 CLI에 연결하므로 승인한다. `fsevents`는 실행할 스크립트가 없고, `@parcel/watcher`는 `npm_config_build_from_source`일 때만 빌드하며, `msw`는 `msw.workerDirectory` 설정이 없으면 아무 작업도 하지 않으므로 거부한다. install script가 있는 의존성이 새로 생기면 `npm install-scripts ls`로 확인한 뒤 승인 또는 거부를 기록한다.
 - Next/React, Tailwind/PostCSS 플러그인, TanStack Query/devtools/ESLint 플러그인은 각 peer 범위에 맞춰 함께 갱신한다. 같은 메이저라도 타입·lint·테스트·production build를 통과해야 한다.
 - React 19는 Toast UI wrapper의 공식 peer(`^17.0.1`) 밖이다. 기존 override를 유지하며 에디터 작성·수정·저장 흐름을 실제 브라우저에서 확인한다.
 
-| 보류 대상          | 현재 선택과 근거                                                                                                                               | 재검토 조건                                    |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| TypeScript 7       | 6.0.3 유지. typescript-eslint 8.72.2의 TypeScript 지원 범위는 `>=4.8.4 <6.1.0`                                                                 | parser와 Next 도구 체인이 7 지원               |
-| ESLint 10          | 9.39.5 유지. eslint-config-next 16.4.6이 쓰는 eslint-plugin-react 7.37.5 peer는 `^9.7`까지 지원                                                | React 플러그인 및 커스텀 규칙 호환             |
-| MSW 3              | 2.15.0 유지. Express mock의 `@mswjs/http-middleware` 0.10.3(최신)이 MSW 3에서 제거된 `handleRequest()`를 호출해 `npm run mock`이 동작하지 않음 | 미들웨어의 MSW 3 지원 또는 mock 서버 구성 교체 |
-| NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음                                                                                           | v5 안정판 출시                                 |
-| npm 12             | Node LTS에 동봉된 npm 11.20.0으로 설치 정책 통일                                                                                               | 별도 메이저 전환 검증                          |
+| 보류 대상          | 현재 선택과 근거                                                                                                                                                           | 재검토 조건                                     |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| TypeScript 7       | 6.0.3 유지. typescript-eslint 8.72.2의 TypeScript 지원 범위는 `>=4.8.4 <6.1.0`                                                                                             | parser와 Next 도구 체인이 7 지원                |
+| ESLint 10          | 9.39.5 유지. ESLint 9는 지원이 끝났지만 eslint-config-next 16.4.6이 쓰는 eslint-plugin-react 7.37.5 peer가 `^9.7`까지만 지원                                               | React 플러그인 및 커스텀 규칙 호환              |
+| MSW 3              | 2.15.0 유지. Express mock의 `@mswjs/http-middleware` 0.10.3은 `@msw/serve`로 대체되며 폐기됐고, MSW 3에서 제거된 `handleRequest()`를 호출해 `npm run mock`이 동작하지 않음 | Express mock을 `@msw/serve`로 옮길 때 함께 전환 |
+| NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음                                                                                                                       | v5 안정판 출시                                  |
+| npm 12             | Node LTS에 동봉된 npm 11.20.0으로 설치 정책 통일                                                                                                                           | 별도 메이저 전환 검증                           |
 
-근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.1), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest), [MSW 3 변경점](https://github.com/mswjs/msw/releases/tag/v3.0.0), [http-middleware 배포 버전](https://registry.npmjs.org/@mswjs/http-middleware/latest).
+근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.1), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest), [MSW 3 변경점](https://github.com/mswjs/msw/releases/tag/v3.0.0), [http-middleware 폐기 안내](https://registry.npmjs.org/@mswjs/http-middleware/latest), [ESLint 지원 정책](https://eslint.org/version-support).
 
 ---
 

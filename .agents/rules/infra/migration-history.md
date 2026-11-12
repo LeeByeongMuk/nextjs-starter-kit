@@ -28,7 +28,7 @@ paths:
 - next·eslint-config-next 16.4.6, react-hook-form 7.92.0, prettier 3.10.0으로 올리고 범위 안의 하위 의존성을 갱신했다. mock 미들웨어의 qs가 6.16.2가 되어 qs 보안 권고가 해소됐다.
 - eslint-plugin-simple-import-sort 14와 @testing-library/jest-dom 7로 올렸다. 두 메이저 모두 코드 수정 없이 lint와 테스트를 통과했다.
 - 의존성 install script 4개의 실행 여부를 `allowScripts`에 기록했다. esbuild는 승인하고 기본 설치에서 할 일이 없는 나머지 3개는 거부했다.
-- Dependabot은 보류 중인 TypeScript·ESLint·MSW 메이저와 `@types/node` 메이저를 제외한다.
+- Dependabot 버전 업데이트에서 보류 중인 TypeScript·ESLint·MSW 메이저와 `@types/node` 메이저를 제외한다.
 
 ## 완료된 마이그레이션 요약
 
