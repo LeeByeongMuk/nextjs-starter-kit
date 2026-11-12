@@ -5,7 +5,7 @@ paths:
 
 # Major Dependency Migration History
 
-> 작성일: 2026-03-12 · 최종 갱신: 2026-11-08
+> 작성일: 2026-03-12 · 최종 갱신: 2026-11-12
 > 대상 브랜치: `develop` · 현재 실행 환경과 보류 근거: [library-decisions.md](./library-decisions.md)
 
 ## 개요
@@ -20,7 +20,15 @@ paths:
 - `tsx`를 직접 개발 의존성으로 고정해 mock 실행 중 임의 패키지를 받지 않게 했다.
 - `src/middleware.ts`를 `src/proxy.ts`로 옮기고 인증 matcher·authorized 콜백 및 FSD 분류를 유지했다.
 - 서버 환경변수의 `next.config.js` 강제 주입과 MSW webpack 분기를 제거했다. 브라우저 MSW 설정은 제거하고 테스트·Express mock 경로를 유지한다.
-- CI의 자동 수정·커밋을 없애고 동일 SHA를 검사한다. `build`·`coverage` job ID는 유지한다.
+- CI의 자동 수정·커밋을 없애고 동일 SHA를 검사한다. 이후 #184에서 lint·build·coverage 작업을 단일 `check` 작업으로 합쳤다.
+
+## 의존성 갱신 (2026-11-12)
+
+- Node 26.13.1(26 LTS 보안 릴리스)로 올렸다. 동봉 npm은 11.20.0 그대로다.
+- next·eslint-config-next 16.4.6, react-hook-form 7.92.0, prettier 3.10.0으로 올리고 범위 안의 하위 의존성을 갱신했다. mock 미들웨어의 qs가 6.16.2가 되어 qs 보안 권고가 해소됐다.
+- eslint-plugin-simple-import-sort 14와 @testing-library/jest-dom 7로 올렸다. 두 메이저 모두 코드 수정 없이 lint와 테스트를 통과했다.
+- npm 11.20이 실행하지 않는 의존성 install script 4개를 `allowScripts`에 거부로 기록했다.
+- Dependabot은 보류 중인 TypeScript·ESLint·MSW 메이저와 `@types/node` 메이저를 제외한다.
 
 ## 완료된 마이그레이션 요약
 
