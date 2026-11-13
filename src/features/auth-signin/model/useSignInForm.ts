@@ -48,7 +48,7 @@ export function useSignInForm() {
     if (res?.ok) {
       router.push(resolveCallbackUrl(searchParams.get('callbackUrl')));
     } else {
-      alert('Failed to sign in');
+      alert('로그인하지 못했습니다. 이메일과 비밀번호를 확인해 주세요.');
       setIsLoading(false);
     }
   };
