@@ -5,7 +5,7 @@ paths:
 
 # Major Dependency Migration History
 
-> 작성일: 2026-03-12 · 최종 갱신: 2026-11-08
+> 작성일: 2026-03-12 · 최종 갱신: 2026-11-12
 > 대상 브랜치: `develop` · 현재 실행 환경과 보류 근거: [library-decisions.md](./library-decisions.md)
 
 ## 개요
@@ -20,7 +20,15 @@ paths:
 - `tsx`를 직접 개발 의존성으로 고정해 mock 실행 중 임의 패키지를 받지 않게 했다.
 - `src/middleware.ts`를 `src/proxy.ts`로 옮기고 인증 matcher·authorized 콜백 및 FSD 분류를 유지했다.
 - 서버 환경변수의 `next.config.js` 강제 주입과 MSW webpack 분기를 제거했다. 브라우저 MSW 설정은 제거하고 테스트·Express mock 경로를 유지한다.
-- CI의 자동 수정·커밋을 없애고 동일 SHA를 검사한다. `build`·`coverage` job ID는 유지한다.
+- CI의 자동 수정·커밋을 없애고 동일 SHA를 검사한다. 이후 #184에서 lint·build·coverage 작업을 단일 `check` 작업으로 합쳤다.
+
+## 의존성 갱신 (2026-11-12)
+
+- Node 26.13.1(26 LTS 보안 릴리스)로 올렸다. 동봉 npm은 11.20.0 그대로다.
+- next·eslint-config-next 16.4.6, react-hook-form 7.92.0, prettier 3.10.0으로 올리고 범위 안의 하위 의존성을 갱신했다. mock 미들웨어의 qs가 6.16.2가 되어 qs 보안 권고가 해소됐다.
+- eslint-plugin-simple-import-sort 14와 @testing-library/jest-dom 7로 올렸다. 두 메이저 모두 코드 수정 없이 lint와 테스트를 통과했다.
+- 의존성 install script 4개의 실행 여부를 `allowScripts`에 기록했다. esbuild는 승인하고 기본 설치에서 할 일이 없는 나머지 3개는 거부했다.
+- Dependabot 버전 업데이트에서 보류 중인 TypeScript·ESLint·MSW 메이저와 `@types/node` 메이저를 제외한다.
 
 ## 완료된 마이그레이션 요약
 
@@ -51,7 +59,7 @@ paths:
 
 ## 트러블슈팅 기록 (재발 방지)
 
-- **msw ≥2.15 ESM 중첩 의존성**: `@open-draft/deferred-promise`(ESM 전용)를 `node_modules/msw/node_modules` 아래로 끌고 온다. `jest.config.ts` transformIgnorePatterns 예외에 `msw`, `@open-draft` 두 홉 모두 필요. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
+- **msw ESM 의존성 호이스팅**: msw는 2.13.4부터 ESM 전용 `@open-draft/deferred-promise` 3.x를 쓰고 `@mswjs/interceptors`는 2.x를 쓴다. 어느 버전이 최상위로 호이스팅되는지는 잠금 파일에 따라 바뀐다. 2026-11-12 의존성 갱신 전에는 3.x가 `node_modules/msw/node_modules` 아래에 있어 `msw`와 `@open-draft` 중 하나만 빠져도 테스트가 실패했다. 갱신 후에는 3.x가 최상위에 있어 `msw`를 빼도 통과하지만 `@open-draft`를 빼면 전체 suite가 `Must use import to load ES Module`로 실패한다. 다시 중첩될 수 있으므로 `jest.config.ts` transformIgnorePatterns 예외에 둘 다 유지한다. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
 - **ts-jest 버전 오해**: "Jest 30이니 ts-jest도 30" 이 아니다. ts-jest는 29.4부터 Jest 30을 지원하며 30 메이저가 없다. 원 계획서의 `ts-jest@^30` 목표는 오기였고, 당시에는 `^29.4.x`를 사용했다. 현재는 `next/jest` SWC로 단일화해 ts-jest를 제거했다
 - **@toast-ui/react-editor**: 3.2.3이 최종 버전(유지보수 중단). `overrides`로 `react: "^19"` 강제 설치 중이며, 동작 이상 시 대체 에디터(BlockNote, TipTap, Plate) 전환 검토 — [library-decisions.md](./library-decisions.md) 참조
 - **next-auth/react 테스트 mock**: jsdom에서 세션 프로바이더 모킹용 — 당시 `src/tests/mocks/`, 현행은 `src/shared/lib/testing/nextAuthReact.tsx` (`jest.config.ts` moduleNameMapper로 매핑)
