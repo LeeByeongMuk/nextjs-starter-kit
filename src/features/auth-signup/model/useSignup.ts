@@ -12,7 +12,7 @@ export default function useSignup() {
       await signIn('credentials', {
         email: data.email,
         password: data.password,
-        callbackUrl: '/',
+        redirectTo: '/',
       });
     },
     onError: () => {

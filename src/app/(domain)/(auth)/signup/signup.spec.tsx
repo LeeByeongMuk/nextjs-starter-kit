@@ -16,6 +16,7 @@ import {
 } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
+import { signIn } from 'next-auth/react';
 import React from 'react';
 
 jest.mock('next/headers', () => ({
@@ -303,6 +304,11 @@ describe('회원가입 테스트', () => {
         data: {
           access_token: 'mockaccesstoken0000',
         },
+      });
+      expect(signIn).toHaveBeenCalledWith('credentials', {
+        email: 'test@email.com',
+        password: 'wrongPassword',
+        redirectTo: '/',
       });
     });
 

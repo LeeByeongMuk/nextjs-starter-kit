@@ -151,7 +151,7 @@ describe('마이페이지 페이지 테스트', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(window.alert).toHaveBeenCalledWith('Account deleted successfully');
       expect(deleteCookie).toHaveBeenCalledWith(TOKEN_KEY);
-      expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' });
+      expect(signOut).toHaveBeenCalledWith({ redirectTo: '/' });
       expect(deleteCookie.mock.invocationCallOrder[0]).toBeLessThan(
         (signOut as jest.Mock).mock.invocationCallOrder[0]
       );
