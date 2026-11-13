@@ -20,12 +20,16 @@ if (process.argv.includes('--skills')) {
     'vercel-composition-patterns',
     'web-design-guidelines',
   ];
+  const vercelSkillsRef = '1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62';
   run('npx', [
     '-y',
-    'skills',
+    'skills@1.8.1',
     'add',
-    'vercel-labs/agent-skills',
+    `https://github.com/vercel-labs/agent-skills/tree/${vercelSkillsRef}`,
     ...skills.flatMap(skill => ['--skill', skill]),
+    '--agent',
+    'codex',
+    'claude-code',
     '--yes',
   ]);
   const impeccableRef = 'f2baa414a87d9acf1e21ccf776bfaec0262ad6df';
