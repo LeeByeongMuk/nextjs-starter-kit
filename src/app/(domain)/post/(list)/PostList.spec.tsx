@@ -233,6 +233,44 @@ describe('게시글 리스트 페이지 테스트', () => {
     }
   );
 
+  test('목록 행은 분류와 작성자를 상세 화면과 같은 이름으로 표시한다', async () => {
+    server.use(
+      http.get(getHandlerURI('/api/posts'), () =>
+        HttpResponse.json({
+          ok: true,
+          message: '',
+          data: [
+            { ...posts[6], id: 101, title: '질문 행' },
+            {
+              ...posts[0],
+              id: 102,
+              title: '분류 없는 행',
+              type: null,
+              user: { id: 2, name: '', nickname: '' },
+            },
+          ],
+          meta: { current_page: 1, last_page: 1, total: 2 },
+        } satisfies PostsRes)
+      )
+    );
+    renderPostList('type=&q=&page=1');
+    const faqRow = (
+      await screen.findByRole('link', { name: '질문 행' })
+    ).closest('tr');
+    const untypedRow = screen
+      .getByRole('link', { name: '분류 없는 행' })
+      .closest('tr');
+    expect(faqRow).toHaveTextContent('FAQ');
+    expect(untypedRow).toHaveTextContent('미분류');
+    expect(untypedRow).toHaveTextContent('작성자 미상');
+    expect(
+      Array.from(
+        (screen.getByLabelText('분류') as HTMLSelectElement).options,
+        option => option.textContent
+      )
+    ).toEqual(['전체', '자유', '공지', 'FAQ']);
+  });
+
   test('2 페이지, 다음, 이전 이동은 필터가 보존된 링크와 요청을 사용한다', async () => {
     renderPostList();
     await screen.findByRole('link', { name: 'React 설치 공지' });
