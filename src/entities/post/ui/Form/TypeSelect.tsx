@@ -21,15 +21,9 @@ export default function TypeSelect() {
         className="mt-2 min-h-12 w-full rounded border border-line bg-surface py-2 pr-9 pl-3 text-ink"
         {...register('type', { required: '분류를 선택해 주세요.' })}
       >
-        {TYPE_OPTIONS.map(({ value }) => (
+        {TYPE_OPTIONS.map(({ value, label }) => (
           <option key={value} value={value}>
-            {value === ''
-              ? '분류 선택'
-              : value === 'notice'
-                ? '공지'
-                : value === 'faq'
-                  ? '자주 묻는 질문'
-                  : '자유'}
+            {label}
           </option>
         ))}
       </select>

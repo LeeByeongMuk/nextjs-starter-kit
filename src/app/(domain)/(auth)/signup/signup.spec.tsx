@@ -297,7 +297,7 @@ describe('회원가입 테스트', () => {
         });
       });
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Signed up successfully!');
+      expect(window.alert).toHaveBeenCalledWith('회원가입이 완료되었습니다.');
       expect(result.current.data).toMatchObject({
         ok: true,
         message: 'success',
@@ -350,7 +350,9 @@ describe('회원가입 테스트', () => {
         });
       });
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Failed to sign up');
+      expect(window.alert).toHaveBeenCalledWith(
+        '회원가입을 완료하지 못했습니다.'
+      );
       expect(result.current.data).toBeUndefined();
     });
   });

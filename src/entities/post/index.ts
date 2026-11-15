@@ -12,6 +12,7 @@ export { default as Pagination } from './ui/Pagination';
 export type { DeletePostReq, DeletePostRes } from './api/types';
 export {
   DUMMY_DATA,
+  getPostTypeLabel,
   LIST_TYPE_OPTIONS,
   PAGE_GROUP_NUMBER,
   TYPE_OPTIONS,

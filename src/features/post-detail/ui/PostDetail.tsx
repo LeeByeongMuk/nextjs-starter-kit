@@ -1,3 +1,4 @@
+import { getPostTypeLabel } from '@entities/post';
 import { getFormattedDate } from '@shared/lib/date';
 import { useEffect, useRef } from 'react';
 
@@ -44,11 +45,7 @@ export default function PostDetail({ isLoading, post }: PostDetailProps) {
     <article aria-labelledby="post-title">
       <header className="border-b border-line pb-8">
         <p className="mb-4 text-sm font-semibold text-accent">
-          {post.type === 'notice'
-            ? '공지'
-            : post.type === 'faq'
-              ? '자주 묻는 질문'
-              : '자유'}
+          {getPostTypeLabel(post.type)}
         </p>
         <h1
           id="post-title"
