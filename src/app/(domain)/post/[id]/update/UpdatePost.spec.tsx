@@ -126,6 +126,37 @@ describe('게시글 수정 테스트', () => {
     });
   });
 
+  describe('분류 선택지를 확인한다', () => {
+    test('FAQ 글을 불러오면 FAQ를 선택하고 분류 선택, 자유, 공지, FAQ 순서로 표시한다', async () => {
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+          HttpResponse.json({
+            ...postData.getEdit,
+            data: { ...postData.getEdit.data, type: 'faq' },
+          })
+        )
+      );
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+
+      await waitFor(() =>
+        expect(
+          screen.getByRole('combobox', { name: '분류' })
+        ).toHaveDisplayValue('FAQ')
+      );
+      const select = screen.getByRole<HTMLSelectElement>('combobox', {
+        name: '분류',
+      });
+      expect(
+        Array.from(select.options, option => [option.text, option.value])
+      ).toEqual([
+        ['분류 선택', ''],
+        ['자유', 'free'],
+        ['공지', 'notice'],
+        ['FAQ', 'faq'],
+      ]);
+    });
+  });
+
   describe('게시글 수정 API 호출', () => {
     test('게시글 수정에 성공하면 성공 메시지를 출력하고 상세페이지로 이동한다', async () => {
       // when - 제목, 내용, 타입, 라디오박스를 입력하고 제출 버튼을 클릭한다

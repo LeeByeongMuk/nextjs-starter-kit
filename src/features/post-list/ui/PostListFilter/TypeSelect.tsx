@@ -1,8 +1,6 @@
 import { LIST_TYPE_OPTIONS } from '@entities/post';
 import { useFormContext } from 'react-hook-form';
 
-import { POST_TYPE_LABELS } from '../../config/postList';
-
 interface Props {
   onChange: () => void;
 }
@@ -28,13 +26,8 @@ export default function TypeSelect({ onChange }: Props) {
           {...register('type', { onChange })}
         >
           {LIST_TYPE_OPTIONS.map(option => (
-            <option
-              key={
-                POST_TYPE_LABELS[option.value as keyof typeof POST_TYPE_LABELS]
-              }
-              value={option.value}
-            >
-              {POST_TYPE_LABELS[option.value as keyof typeof POST_TYPE_LABELS]}
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -44,9 +37,7 @@ export default function TypeSelect({ onChange }: Props) {
         <div className="flex gap-1" role="group" aria-label="게시글 분류">
           {LIST_TYPE_OPTIONS.map(option => (
             <button
-              key={
-                POST_TYPE_LABELS[option.value as keyof typeof POST_TYPE_LABELS]
-              }
+              key={option.value}
               type="button"
               aria-pressed={option.value === selectedType}
               aria-controls="post-list"
@@ -60,7 +51,7 @@ export default function TypeSelect({ onChange }: Props) {
                 onChange();
               }}
             >
-              {POST_TYPE_LABELS[option.value as keyof typeof POST_TYPE_LABELS]}
+              {option.label}
             </button>
           ))}
         </div>

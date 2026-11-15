@@ -114,6 +114,23 @@ describe('게시글 생성 테스트', () => {
     });
   });
 
+  describe('분류 선택지를 확인한다', () => {
+    test('분류 선택, 자유, 공지, FAQ 순서로 표시한다', () => {
+      const select = screen.getByRole<HTMLSelectElement>('combobox', {
+        name: '분류',
+      });
+
+      expect(
+        Array.from(select.options, option => [option.text, option.value])
+      ).toEqual([
+        ['분류 선택', ''],
+        ['자유', 'free'],
+        ['공지', 'notice'],
+        ['FAQ', 'faq'],
+      ]);
+    });
+  });
+
   describe('내용 형식을 확인한다', () => {
     test('내용이 입력되지 않으면 에러 메시지를 출력한다', async () => {
       // when - 내용을 입력하지 않고 제출 버튼을 클릭한다
