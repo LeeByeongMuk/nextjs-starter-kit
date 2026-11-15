@@ -156,7 +156,7 @@ describe('게시글 수정 테스트', () => {
 
       // then - 성공 메시지가 출력되고 상세페이지로 이동한다
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Post updated successfully');
+      expect(window.alert).toHaveBeenCalledWith('게시글을 수정했습니다.');
       expect(mockPush).toHaveBeenCalledWith(`/post/1`);
     });
 
@@ -182,7 +182,9 @@ describe('게시글 수정 테스트', () => {
 
       // then - 실패 메시지가 출력된다
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Failed to update post');
+      expect(window.alert).toHaveBeenCalledWith(
+        '게시글을 수정하지 못했습니다.'
+      );
     });
   });
 });

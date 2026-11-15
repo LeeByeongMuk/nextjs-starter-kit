@@ -117,7 +117,9 @@ describe('로그인 테스트', () => {
 
       // then - 회원가입 실패
       await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith('Failed to sign in')
+        expect(window.alert).toHaveBeenCalledWith(
+          '로그인하지 못했습니다. 이메일과 비밀번호를 확인해 주세요.'
+        )
       );
     });
   });
