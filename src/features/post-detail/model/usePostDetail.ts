@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 
 import usePost from './usePost';
 
+/** 상세 데이터와 돌아가기, 확인 후 삭제 동작을 화면에 제공한다. */
 export default function usePostDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -19,9 +20,7 @@ export default function usePostDetail() {
   }, [router]);
 
   const handleDeletePost = useCallback(() => {
-    const confirm = window.confirm(
-      'Are you sure you want to delete this post?'
-    );
+    const confirm = window.confirm('이 게시글을 삭제할까요?');
     if (confirm) {
       mutate();
     }

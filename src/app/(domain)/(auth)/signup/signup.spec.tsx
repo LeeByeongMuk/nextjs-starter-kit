@@ -16,6 +16,7 @@ import {
 } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
+import { signIn } from 'next-auth/react';
 import React from 'react';
 
 jest.mock('next/headers', () => ({
@@ -296,13 +297,18 @@ describe('회원가입 테스트', () => {
         });
       });
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Signed up successfully!');
+      expect(window.alert).toHaveBeenCalledWith('회원가입이 완료되었습니다.');
       expect(result.current.data).toMatchObject({
         ok: true,
         message: 'success',
         data: {
           access_token: 'mockaccesstoken0000',
         },
+      });
+      expect(signIn).toHaveBeenCalledWith('credentials', {
+        email: 'test@email.com',
+        password: 'wrongPassword',
+        redirectTo: '/',
       });
     });
 
@@ -344,7 +350,9 @@ describe('회원가입 테스트', () => {
         });
       });
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Failed to sign up');
+      expect(window.alert).toHaveBeenCalledWith(
+        '회원가입을 완료하지 못했습니다.'
+      );
       expect(result.current.data).toBeUndefined();
     });
   });

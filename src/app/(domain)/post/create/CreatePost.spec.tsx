@@ -114,6 +114,23 @@ describe('게시글 생성 테스트', () => {
     });
   });
 
+  describe('분류 선택지를 확인한다', () => {
+    test('분류 선택, 자유, 공지, FAQ 순서로 표시한다', () => {
+      const select = screen.getByRole<HTMLSelectElement>('combobox', {
+        name: '분류',
+      });
+
+      expect(
+        Array.from(select.options, option => [option.text, option.value])
+      ).toEqual([
+        ['분류 선택', ''],
+        ['자유', 'free'],
+        ['공지', 'notice'],
+        ['FAQ', 'faq'],
+      ]);
+    });
+  });
+
   describe('내용 형식을 확인한다', () => {
     test('내용이 입력되지 않으면 에러 메시지를 출력한다', async () => {
       // when - 내용을 입력하지 않고 제출 버튼을 클릭한다
@@ -182,7 +199,7 @@ describe('게시글 생성 테스트', () => {
 
       // then - 성공 메시지가 출력되고 상세페이지로 이동한다
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Post created successfully');
+      expect(window.alert).toHaveBeenCalledWith('게시글을 등록했습니다.');
       expect(mockPush).toHaveBeenCalledWith(`/post/1`);
     });
 
@@ -206,7 +223,9 @@ describe('게시글 생성 테스트', () => {
 
       // then - 에러 알럿이 출력된다
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Failed to create post');
+      expect(window.alert).toHaveBeenCalledWith(
+        '게시글을 등록하지 못했습니다.'
+      );
     });
   });
 });

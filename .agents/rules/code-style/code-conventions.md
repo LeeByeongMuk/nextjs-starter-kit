@@ -150,7 +150,7 @@ export type PostType = (typeof POST_TYPES)[number];
   ```
 - **파일 헤더 주석은 두지 않는다** — export JSDoc과 중복. 파일은 `import`부터 시작한다. 헤더 한 줄은 **export JSDoc만으로 파일 역할이 안 드러나는 경우에 한해** 허용 (예: export 없는 스크립트, 여러 fetch를 묶은 api 파일). 이 경우에도 한 줄만
   > 글로벌 CLAUDE.md §6("새 파일 첫 줄 한국어 헤더")은 이 프로젝트에선 위 규칙으로 구체화된다 — export JSDoc이 §6의 "역할 한 줄"을 대신하므로 최상단 헤더는 생략한다.
-- 본문 주석은 **코드가 보여주지 못하는 제약**을 적을 때만 (예: "msw ≥2.15는 중첩 ESM 의존성을 끌고 오므로 두 홉 다 transform 필요")
+- 본문 주석은 **코드가 보여주지 못하는 제약**을 적을 때만 (예: "msw의 ESM 전용 의존성은 호이스팅에 따라 중첩될 수 있어 `msw`도 transform 예외에 둔다")
 - TODO는 `TODO(추적키): 사유` 형식만. 추적 키 없는 TODO 금지
 - `eslint-disable`은 반드시 **사유 주석과 함께, 해당 라인에만** (`-next-line`). 파일 전체 disable 금지
 
