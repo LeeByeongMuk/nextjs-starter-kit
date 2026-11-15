@@ -13,6 +13,16 @@ updates:
         applies-to: security-updates
         patterns: ['*']
         update-types: [minor, patch]
+    # 보류 근거와 재검토 조건은 .agents/rules/infra/library-decisions.md에 있다.
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+      - dependency-name: msw
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /

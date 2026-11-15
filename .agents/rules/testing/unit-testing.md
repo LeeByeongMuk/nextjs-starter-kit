@@ -36,7 +36,7 @@ const extraTransformPkgs = [
 ];
 ```
 
-NextAuth / Auth.js 계열은 ESM 전환이 잦고, msw ≥2.15는 ESM 전용 `@open-draft/deferred-promise`를 중첩 node_modules로 끌고 온다 (중첩 경로는 바깥 패키지 `msw`도 예외 목록에 있어야 변환된다). **테스트가 갑자기 깨지면 여기를 먼저 확인**. 예외 추가 시 `npm test` 전체 재실행 필수.
+NextAuth / Auth.js 계열은 ESM 전환이 잦다. msw가 쓰는 ESM 전용 `@open-draft/deferred-promise` 3.x는 `@mswjs/interceptors`가 쓰는 2.x와 함께 설치되므로 npm 호이스팅에 따라 위치가 바뀐다. 현재 잠금 파일에서는 최상위 `node_modules/@open-draft`에 있어 `@open-draft` 예외로 변환된다. `node_modules/msw/node_modules` 아래로 중첩되면 바깥 패키지 `msw`도 예외 목록에 있어야 변환되므로 두 예외를 함께 유지한다. **테스트가 갑자기 깨지면 여기를 먼저 확인**. 예외 추가 시 `npm test` 전체 재실행 필수.
 
 ---
 
