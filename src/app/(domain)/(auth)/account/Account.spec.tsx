@@ -153,7 +153,7 @@ describe('마이페이지 페이지 테스트', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(window.alert).toHaveBeenCalledWith('회원 탈퇴가 완료되었습니다.');
       expect(deleteCookie).toHaveBeenCalledWith(TOKEN_KEY);
-      expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' });
+      expect(signOut).toHaveBeenCalledWith({ redirectTo: '/' });
       expect(deleteCookie.mock.invocationCallOrder[0]).toBeLessThan(
         (signOut as jest.Mock).mock.invocationCallOrder[0]
       );
