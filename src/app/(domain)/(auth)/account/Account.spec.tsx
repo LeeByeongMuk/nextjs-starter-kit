@@ -85,7 +85,7 @@ describe('마이페이지 페이지 테스트', () => {
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Account updated successfully');
+      expect(window.alert).toHaveBeenCalledWith('회원 정보를 수정했습니다.');
     });
 
     test('회원 정보 수정 실패 시 에러 메세지가 표시된다.', async () => {
@@ -120,7 +120,9 @@ describe('마이페이지 페이지 테스트', () => {
       });
 
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Failed to update account');
+      expect(window.alert).toHaveBeenCalledWith(
+        '회원 정보를 수정하지 못했습니다.'
+      );
     });
   });
 
@@ -131,7 +133,7 @@ describe('마이페이지 페이지 테스트', () => {
 
       // then - 탈퇴 사유 입력 모달이 뜬다
       expect(window.prompt).toHaveBeenCalledWith(
-        'Are you sure you want to delete your account? Please enter a reason'
+        '회원 탈퇴를 진행하려면 탈퇴 사유를 입력해 주세요.'
       );
     });
 
@@ -149,7 +151,7 @@ describe('마이페이지 페이지 테스트', () => {
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Account deleted successfully');
+      expect(window.alert).toHaveBeenCalledWith('회원 탈퇴가 완료되었습니다.');
       expect(deleteCookie).toHaveBeenCalledWith(TOKEN_KEY);
       expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' });
       expect(deleteCookie.mock.invocationCallOrder[0]).toBeLessThan(
@@ -177,7 +179,9 @@ describe('마이페이지 페이지 테스트', () => {
       });
 
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('Failed to delete account');
+      expect(window.alert).toHaveBeenCalledWith(
+        '회원 탈퇴를 완료하지 못했습니다.'
+      );
     });
   });
 });
