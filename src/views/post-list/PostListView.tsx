@@ -4,6 +4,7 @@ import { Pagination } from '@entities/post';
 import {
   PostListContainer,
   PostListFilter,
+  stringifySearchFilters,
   usePostListManager,
 } from '@features/post-list';
 import React from 'react';
@@ -47,14 +48,9 @@ export default function PostListView() {
       {!isError && !isLoading && (
         <Pagination
           meta={meta}
-          getPageHref={page => {
-            const params = new URLSearchParams({
-              type: searchFilters.type,
-              q: searchFilters.q,
-              page: String(page),
-            });
-            return `/post?${params.toString()}`;
-          }}
+          getPageHref={page =>
+            `/post?${stringifySearchFilters({ ...searchFilters, page })}`
+          }
           onPageChange={page => setSearchFilters(prev => ({ ...prev, page }))}
         />
       )}
