@@ -6,3 +6,10 @@ export const getHandlerURI = (path: string): string => {
 
   return path;
 };
+
+/** 브라우저가 문서 탐색에 사용할 주소를 전달한다. */
+export const documentNavigation = {
+  assign(url: string) {
+    window.location.assign(url);
+  },
+};
