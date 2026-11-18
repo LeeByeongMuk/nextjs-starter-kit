@@ -13,6 +13,7 @@ const defaultSessionValue: SessionValue = {
 };
 
 export const useSession = jest.fn(() => defaultSessionValue);
+export const getSession = jest.fn(async () => null);
 export const signIn = jest.fn(async () => ({ ok: true }));
 export const signOut = jest.fn(async () => undefined);
 

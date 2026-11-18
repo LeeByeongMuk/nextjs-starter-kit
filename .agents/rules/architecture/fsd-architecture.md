@@ -214,6 +214,7 @@ widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/pos
 - 레이어 방향 위반 (`shared`가 `features` import 등) — `boundaries/dependencies` (레이어 방향 policy)
 - 동일 레이어 슬라이스 간 직접 import (`features/post-list`가 `features/post-detail` import) — `boundaries/dependencies` (같은 레이어 disallow policy)
 - 슬라이스 내부 경로 deep import (`@features/auth-signin/ui/SignInForm`) — `boundaries/dependencies` (Public API policy)
+- 슬라이스나 레이어를 가로지르는 상대 경로 및 같은 슬라이스 내 alias — `fsd/relative-imports`
 - 어느 레이어에도 속하지 않는 디렉터리 추가 — `boundaries/no-unknown-files`
 
 모든 FSD boundaries 위반은 `error`로 처리하며 CI를 차단한다.

@@ -7,8 +7,9 @@ export const POST_TYPE_LABELS: Record<PostType, string> = {
   faq: 'FAQ',
 };
 
-const isPostType = (type: string): type is PostType =>
-  Object.hasOwn(POST_TYPE_LABELS, type);
+/** URL 필터와 게시글 입력에서 사용할 수 있는 분류인지 확인한다. */
+export const isPostType = (type: unknown): type is PostType =>
+  typeof type === 'string' && Object.hasOwn(POST_TYPE_LABELS, type);
 
 /** 게시글 분류 표시명 — 분류가 없거나 알 수 없는 값이면 '미분류' */
 export const getPostTypeLabel = (type: string | null | undefined): string =>

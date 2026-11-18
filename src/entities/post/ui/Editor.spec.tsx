@@ -1,5 +1,17 @@
 import { execFileSync } from 'node:child_process';
 
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
+import { FormProvider, useForm } from 'react-hook-form';
+
+import { POST_IMAGE_MAX_BYTES } from '../config/editor';
+import Editor from './Editor';
+
 interface EditorInstance {
   destroy(): void;
   setHTML(html: string, cursorToEnd?: boolean): void;
@@ -86,4 +98,70 @@ describe('에디터 보안 패치', () => {
       'const value = 1;'
     );
   });
+});
+
+test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 본문에 삽입한다', async () => {
+  const matchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: () => ({
+      matches: false,
+      addEventListener() {},
+      removeEventListener() {},
+    }),
+  });
+  const change = jest.fn();
+  const imageRead = jest.fn();
+
+  function EditorForm() {
+    const methods = useForm({
+      defaultValues: { contents: '<p><img src="/sample.png" alt="예제"></p>' },
+    });
+    return (
+      <FormProvider {...methods}>
+        <Editor onChange={change} onImageRead={imageRead} />
+      </FormProvider>
+    );
+  }
+
+  try {
+    const { container } = render(<EditorForm />);
+    const field = container.querySelector<HTMLElement>(
+      '.toastui-editor-ww-container [contenteditable="true"]'
+    );
+    if (!field) throw new Error('위지위그 편집 영역을 찾을 수 없습니다.');
+    expect(within(field).getByAltText('예제')).toHaveAttribute(
+      'src',
+      '/sample.png'
+    );
+
+    const pasteImage = (size: number) => {
+      const file = new window.File([new Uint8Array(size)], 'attachment.png', {
+        type: 'image/png',
+      });
+      fireEvent.paste(field, {
+        clipboardData: {
+          getData: () => '',
+          items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        },
+      });
+    };
+
+    pasteImage(POST_IMAGE_MAX_BYTES + 1);
+    expect(screen.getByRole('alert')).toHaveTextContent('256 KiB를 넘습니다');
+    expect(imageRead).not.toHaveBeenCalled();
+
+    pasteImage(124 * 1024);
+    await waitFor(() =>
+      expect(change).toHaveBeenLastCalledWith(
+        expect.stringContaining('data:image/png;base64,')
+      )
+    );
+    expect(imageRead.mock.calls).toEqual([[true], [false]]);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(within(field).getByAltText('attachment.png')).toBeInTheDocument();
+  } finally {
+    if (matchMedia) Object.defineProperty(window, 'matchMedia', matchMedia);
+    else Reflect.deleteProperty(window, 'matchMedia');
+  }
 });

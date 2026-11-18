@@ -7,6 +7,7 @@ export default function useUpdatePostForm() {
   return useForm<UpdatePostFormInput>({
     defaultValues: {
       title: '',
+      type: '',
       contents: '',
     },
   });

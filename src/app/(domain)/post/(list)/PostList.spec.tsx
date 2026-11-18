@@ -152,6 +152,22 @@ describe('게시글 리스트 페이지 테스트', () => {
     queryClient.clear();
   });
 
+  test('검색 조건을 준비하는 동안에도 게시판 제목과 목록 로딩 상태를 표시한다', () => {
+    const pendingSearchParams = new Promise(() => {});
+    jest.mocked(useSearchParams).mockImplementation(() => {
+      throw pendingSearchParams;
+    });
+
+    renderPostList();
+
+    expect(screen.getByRole('heading', { name: '게시판' })).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '게시글을 불러오는 중…'
+    );
+    expect(screen.getByRole('table')).toBeVisible();
+    expect(postRequests).not.toHaveBeenCalled();
+  });
+
   test('초기 URL의 분류, 검색어, 페이지로 요청하고 해당 결과를 표시한다', async () => {
     renderPostList('type=notice&q=React&page=2');
     expect(screen.getByLabelText('검색')).toHaveValue('React');

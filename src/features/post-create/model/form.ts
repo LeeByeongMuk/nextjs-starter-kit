@@ -1,8 +1,4 @@
-import { type PostType } from '@entities/post';
+import { type PostFormInput } from '@entities/post';
 
-export interface CreatePostFormInput {
-  title: string;
-  type: PostType;
-  contents: string;
-  isOpen: '1' | '0';
-}
+/** 글쓰기 폼에 입력하는 값이다. */
+export type CreatePostFormInput = PostFormInput;

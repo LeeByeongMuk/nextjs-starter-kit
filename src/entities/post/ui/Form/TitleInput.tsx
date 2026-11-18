@@ -1,3 +1,5 @@
+'use client';
+
 import ValidationError from '@shared/ui/error/ValidationError';
 import { useFormContext } from 'react-hook-form';
 

@@ -1,5 +1,6 @@
 import { createMiddleware } from '@mswjs/http-middleware';
 import { handlers } from '@shared/api/mocks/handlers';
+import { POST_REQUEST_MAX_BYTES } from '@shared/config/request-size';
 import cors from 'cors';
 import express from 'express';
 
@@ -13,6 +14,9 @@ app.use(
     credentials: true,
   })
 );
+const postJson = express.json({ limit: POST_REQUEST_MAX_BYTES });
+app.post('/api/posts', postJson);
+app.put('/api/posts/:id', postJson);
 app.use(express.json());
 app.use(createMiddleware(...handlers));
 app.listen(port, () => console.log(`Mock server is running on port: ${port}`));

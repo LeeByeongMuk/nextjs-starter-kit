@@ -1,8 +1,4 @@
-import { type PostType } from '@entities/post';
+import { type PostFormInput } from '@entities/post';
 
-export interface UpdatePostFormInput {
-  title: string;
-  type: PostType;
-  contents: string;
-  isOpen: '1' | '0';
-}
+/** 글 수정 폼에 입력하는 값이다. */
+export type UpdatePostFormInput = PostFormInput;

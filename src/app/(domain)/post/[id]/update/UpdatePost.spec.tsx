@@ -155,10 +155,59 @@ describe('게시글 수정 테스트', () => {
         ['FAQ', 'faq'],
       ]);
     });
+
+    test('이전 분류를 선택 상태로 표시하고 새 분류로 기존 HTML을 저장한다', async () => {
+      const contents =
+        '<p><strong>기존 본문</strong><img src="/sample.png" alt="예제"></p>';
+      const save = jest.fn();
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+          HttpResponse.json({
+            ...postData.getEdit,
+            data: { ...postData.getEdit.data, type: 'legacy', contents },
+          })
+        ),
+        http.put(getHandlerURI('/api/posts/:id'), async ({ request }) => {
+          save(await request.json());
+          return HttpResponse.json(postData.update);
+        })
+      );
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      });
+
+      await waitFor(() =>
+        expect(
+          screen.getByRole('combobox', { name: '분류' })
+        ).toHaveDisplayValue('분류 선택')
+      );
+      const select = screen.getByRole('combobox', { name: '분류' });
+      const button = screen.getByRole('button', { name: '저장' });
+      fireEvent.submit(button);
+      await waitFor(() =>
+        expect(select).toHaveAccessibleDescription('분류를 선택해 주세요.')
+      );
+      expect(save).not.toHaveBeenCalled();
+      expect(window.alert).not.toHaveBeenCalled();
+
+      fireEvent.change(select, { target: { value: 'notice' } });
+      fireEvent.submit(button);
+      await waitFor(() =>
+        expect(save).toHaveBeenCalledWith(
+          expect.objectContaining({ type: 'notice', contents })
+        )
+      );
+      expect(
+        await screen.findByRole('button', { name: '저장 완료' })
+      ).toBeDisabled();
+    });
   });
 
   describe('게시글 수정 API 호출', () => {
-    test('게시글 수정에 성공하면 성공 메시지를 출력하고 상세페이지로 이동한다', async () => {
+    test('수정 요청 중과 성공 후 상세 화면으로 이동할 때까지 재제출을 막는다', async () => {
+      const response = Promise.withResolvers<Response>();
+      const save = jest.fn(() => response.promise);
+      server.use(http.put(getHandlerURI('/api/posts/:id'), () => save()));
       // when - 제목, 내용, 타입, 라디오박스를 입력하고 제출 버튼을 클릭한다
       fireEvent.input(await screen.findByLabelText('제목'), {
         target: {
@@ -171,24 +220,29 @@ describe('게시글 수정 테스트', () => {
         },
       });
       fireEvent.click(screen.getByLabelText('공개'));
-      fireEvent.submit(screen.getByRole('button', { name: '저장' }));
-
-      const { result } = renderHook(() => useUpdatePost(), { wrapper });
-
-      act(() => {
-        result.current.mutate({
-          id: 1,
-          title: '제목',
-          contents: '내용',
-          type: 'notice',
-          is_open: true,
-        });
+      const button = screen.getByRole<HTMLButtonElement>('button', {
+        name: '저장',
       });
+      if (!button.form) throw new Error('게시글 폼을 찾을 수 없습니다.');
+      const form = button.form;
+      fireEvent.submit(form);
+      await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+      expect(button).toBeDisabled();
+      fireEvent.submit(form);
+      response.resolve(HttpResponse.json(postData.update));
 
-      // then - 성공 메시지가 출력되고 상세페이지로 이동한다
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(
+        await screen.findByRole('button', { name: '저장 완료' })
+      ).toBeDisabled();
+      expect(mockPush).toHaveBeenCalledWith('/post/1');
+      expect(form).toBeInTheDocument();
+      await waitFor(() => expect(form).toHaveAttribute('aria-busy', 'false'));
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(mockPush).toHaveBeenCalledTimes(1);
       expect(window.alert).toHaveBeenCalledWith('게시글을 수정했습니다.');
-      expect(mockPush).toHaveBeenCalledWith(`/post/1`);
     });
 
     test('게시글 수정에 실패하면 실패 메시지를 출력한다', async () => {

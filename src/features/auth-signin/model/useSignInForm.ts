@@ -1,35 +1,19 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { documentNavigation } from '@shared/lib/url';
+import { type FormEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { signInCredentials } from '../api/signInCredentials';
 import { SignInReq } from '../api/types';
+import { resolveCallbackUrl } from '../lib/resolveCallbackUrl';
 
-// 절대 URL·프로토콜 상대(//) callbackUrl은 open redirect가 되므로 same-origin 경로만 복귀 허용
-const resolveCallbackUrl = (callbackUrl: string | null) => {
-  if (!callbackUrl) {
-    return '/';
-  }
-
-  try {
-    const url = new URL(callbackUrl, window.location.origin);
-    if (url.origin !== window.location.origin) {
-      return '/';
-    }
-    return `${url.pathname}${url.search}`;
-  } catch {
-    return '/';
-  }
-};
+const requestError = '로그인 요청을 완료하지 못했습니다. 다시 시도해 주세요.';
 
 /** 로그인 입력과 같은 출처의 복귀 경로를 관리한다. */
 export function useSignInForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+  const submitting = useRef(false);
+  const [isBusy, setIsBusy] = useState(false);
   const methods = useForm<SignInReq>({
     defaultValues: {
       email: '',
@@ -37,21 +21,39 @@ export function useSignInForm() {
     },
   });
 
-  const handleSignIn = async (data: SignInReq) => {
-    setIsLoading(true);
-    const res = await signIn('credentials', {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
+  const handleSignIn = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting.current) return;
 
-    if (res?.ok) {
-      router.push(resolveCallbackUrl(searchParams.get('callbackUrl')));
-    } else {
-      alert('로그인하지 못했습니다. 이메일과 비밀번호를 확인해 주세요.');
-      setIsLoading(false);
+    submitting.current = true;
+    let navigating = false;
+    let failureMessage: string | undefined;
+    try {
+      await methods.handleSubmit(async data => {
+        setIsBusy(true);
+        const { origin, search } = window.location;
+        const callbackUrl = new URLSearchParams(search).get('callbackUrl');
+        const result = await signInCredentials(data, origin);
+        if (result === 'success') {
+          documentNavigation.assign(resolveCallbackUrl(callbackUrl, origin));
+          navigating = true;
+          return;
+        }
+        failureMessage =
+          result === 'invalid-credentials'
+            ? '로그인하지 못했습니다. 이메일과 비밀번호를 확인해 주세요.'
+            : requestError;
+      })(event);
+    } catch {
+      failureMessage = requestError;
+    } finally {
+      if (!navigating) {
+        submitting.current = false;
+        setIsBusy(false);
+      }
     }
+    if (failureMessage) alert(failureMessage);
   };
 
-  return { isLoading, handleSignIn, methods };
+  return { handleSignIn, isBusy, methods };
 }

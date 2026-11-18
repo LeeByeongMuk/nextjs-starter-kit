@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteAccessToken } from '@shared/lib/api';
+import { deleteAccessToken } from '@shared/lib/deleteAccessToken';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';

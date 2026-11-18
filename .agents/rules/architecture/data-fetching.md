@@ -1,8 +1,8 @@
 ---
 paths:
-  - "src/**/api/**"
-  - "src/**/model/**"
-  - "src/shared/lib/api.ts"
+  - 'src/**/api/**'
+  - 'src/**/model/**'
+  - 'src/shared/lib/api.ts'
 ---
 
 # Data Fetching Guide
@@ -12,11 +12,11 @@ paths:
 
 ## 1. 계층 분리
 
-| 경계 | 사용 수단 |
-|---|---|
-| Server Component (RSC) | `fetchApi<T>()` 직접 호출 |
-| Client Component | TanStack Query 훅 (`useQuery` / `useMutation`) |
-| RSC → Client 전달 | RSC에서 받은 데이터를 Client 훅의 `initialData`로 hydrate |
+| 경계                   | 사용 수단                                                                |
+| ---------------------- | ------------------------------------------------------------------------ |
+| Server Component (RSC) | 기능별 서버 조회 함수 또는 `fetchApi<T>()`                               |
+| Client Component       | TanStack Query 훅 (`useQuery` / `useMutation`)에서 기능별 서버 액션 호출 |
+| RSC → Client 전달      | RSC에서 받은 데이터를 Client 훅의 `initialData`로 hydrate                |
 
 RSC에서 TanStack Query 사용 금지 — 의존 에러와 dehydrate boundary 관리 복잡도 때문. 대신 `fetchApi`로 직접 패칭.
 
@@ -35,10 +35,10 @@ RSC에서 TanStack Query 사용 금지 — 의존 에러와 dehydrate boundary �
 
 ## 3. 네이밍
 
-| 종류 | 패턴 | 예시 |
-|---|---|---|
-| Query | `use<Entity>` 또는 `use<Entity><Action>` | `usePost`, `usePostList` |
-| Mutation | `use<Action><Entity>` | `useCreatePost`, `useUpdatePost`, `useDeletePost` |
+| 종류     | 패턴                                     | 예시                                              |
+| -------- | ---------------------------------------- | ------------------------------------------------- |
+| Query    | `use<Entity>` 또는 `use<Entity><Action>` | `usePost`, `usePostList`                          |
+| Mutation | `use<Action><Entity>`                    | `useCreatePost`, `useUpdatePost`, `useDeletePost` |
 
 ---
 
@@ -70,7 +70,7 @@ useMutation({
     queryClient.invalidateQueries({ queryKey: ['posts'] });
     router.push('/post');
   },
-  onError: (err) => alert(err.message), // TODO: 토스트 도입 후 교체
+  onError: err => alert(err.message), // TODO: 토스트 도입 후 교체
 });
 ```
 
@@ -84,17 +84,10 @@ useMutation({
 
 ## 7. `fetchApi` 래퍼
 
-`src/shared/lib/api.ts` — `'use server'` 지시어 + `cookies()`로 토큰 헤더 자동 주입 + `Content-Type` 기본값 + 실패 시 throw.
-
-```ts
-export const fetchApi = async <Response>(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> => { ... };
-```
-
-- 외부 클라이언트 라이브러리(ky/ofetch) 도입 여부: `.agents/rules/infra/library-decisions.md` §HTTP client 참조 (현재 유지 결정)
-- 모든 feature의 `api/*Service.ts` 파일은 이 `fetchApi`를 사용. 직접 `fetch()` 호출 금지
+- `src/shared/lib/api.ts`는 `server-only` 모듈이다. `APP_API_URL`을 사용하고 리다이렉트를 차단한다. 인증이 필요한 작업에는 서버 쿠키에서 읽은 API 토큰을 전달한다.
+- API의 비정상 HTTP 응답은 상태 코드가 담긴 `ApiError`로 전달한다.
+- 브라우저에서 호출하는 각 `'use server'` 함수는 API 경로와 메서드를 고정한다. 동적 식별자와 폼 값을 검증한 후 허용된 필드만 요청에 포함하고, 응답도 화면에 필요한 필드로 제한한다.
+- 서버 조회·서버 액션은 `fetchApi`를 통해 API에 접근한다. HTTP 클라이언트 도입 기준은 [라이브러리 결정](../infra/library-decisions.md#http-client)을 따른다.
 
 ---
 

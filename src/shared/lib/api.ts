@@ -1,44 +1,60 @@
-'use server';
+import 'server-only';
 
-import { TOKEN_KEY } from '@shared/config/auth';
-import { cookies } from 'next/headers';
+import { getAccessToken } from './accessToken';
 
-/** Auth.js 세션의 존재 여부와 관계없이 API 토큰 쿠키를 삭제한다. */
-export const deleteAccessToken = async () => {
-  const cookieStore = await cookies();
-  cookieStore.delete(TOKEN_KEY);
-};
+interface ApiRequestOptions extends RequestInit {
+  auth?: 'optional' | 'required' | 'none' | { accessToken: string };
+}
 
+/** API가 반환한 HTTP 상태를 호출부에 보존한다. */
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+/** 서버에서 설정한 API에 요청하고 필요에 따라 API 인증 정보를 전달한다. */
 export const fetchApi = async <Response>(
-  url: string,
-  options: RequestInit = {}
+  path: string,
+  { auth = 'optional', ...options }: ApiRequestOptions = {}
 ): Promise<Response> => {
-  // '//'는 프로토콜 상대 URL이라 외부로 나갈 수 있어 함께 차단 (SSRF)
-  if (!url.startsWith('/') || url.startsWith('//')) {
-    throw new Error(`fetchApi는 '/'로 시작하는 상대 경로만 허용합니다: ${url}`);
+  if (!/^\/(?![/\\])/.test(path)) {
+    throw new Error('API 요청 경로가 올바르지 않습니다.');
   }
 
-  const cookieStore = await cookies();
-  const hasAccessToken = cookieStore.has(TOKEN_KEY);
-  const requestUrl = `${process.env.APP_API_URL}${url}`;
-
-  try {
-    const res = await fetch(requestUrl, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: hasAccessToken
-          ? `${cookieStore.get(TOKEN_KEY)?.value}`
-          : '',
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-
-    return res.json();
-  } catch (err: unknown) {
-    throw new Error((err as Error).message);
+  const base = process.env.APP_API_URL;
+  if (!base) {
+    throw new Error('APP_API_URL 설정이 필요합니다.');
   }
+  const requestUrl = `${base.replace(/\/$/, '')}${path}`;
+
+  const accessToken =
+    typeof auth === 'object'
+      ? auth.accessToken
+      : auth === 'none'
+        ? undefined
+        : await getAccessToken();
+  if (auth === 'required' && !accessToken) {
+    throw new Error('로그인이 필요합니다.');
+  }
+
+  const headers = new Headers(options.headers);
+  headers.set('Content-Type', 'application/json');
+  headers.delete('Authorization');
+  if (accessToken) headers.set('Authorization', accessToken);
+
+  const res = await fetch(requestUrl, {
+    ...options,
+    headers,
+    redirect: 'error',
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, res.statusText);
+  }
+
+  return res.json();
 };

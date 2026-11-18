@@ -56,6 +56,7 @@ describe('게시글 생성 테스트', () => {
   const mockPush = jest.fn();
 
   beforeEach(() => {
+    mockPush.mockClear();
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
       get: jest.fn().mockReturnValue({ value: 'test-token' }),
@@ -185,22 +186,112 @@ describe('게시글 생성 테스트', () => {
   });
 
   describe('게시글 생성 API 호출', () => {
-    test('게시글 생성에 성공하면 성공 메시지를 출력하고 상세페이지로 이동한다', async () => {
-      const { result } = renderHook(() => useCreatePost(), { wrapper });
+    test('저장 중 연속 제출을 무시하고 요청이 실패하면 다시 저장할 수 있다', async () => {
+      const firstResponse = Promise.withResolvers<Response>();
+      const save = jest
+        .fn()
+        .mockReturnValueOnce(firstResponse.promise)
+        .mockReturnValue(HttpResponse.json({ data: { id: 1 } }));
+      server.use(http.post(getHandlerURI('/api/posts'), () => save()));
+
+      fireEvent.input(screen.getByLabelText('제목'), {
+        target: { value: '제목' },
+      });
+      fireEvent.change(screen.getByLabelText('본문'), {
+        target: { value: '<p>본문</p>' },
+      });
+      fireEvent.change(screen.getByLabelText('분류'), {
+        target: { value: 'free' },
+      });
+      fireEvent.click(screen.getByLabelText('공개'));
+      const button = screen.getByRole<HTMLButtonElement>('button', {
+        name: '저장',
+      });
+      if (!button.form) throw new Error('게시글 폼을 찾을 수 없습니다.');
+      const form = button.form;
 
       act(() => {
-        result.current.mutate({
-          title: '제목',
-          contents: '내용',
-          type: 'notice',
-          is_open: true,
-        });
+        fireEvent.submit(form);
+        fireEvent.submit(form);
       });
+      await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+      expect(button).toBeDisabled();
+      expect(button).toHaveAccessibleName('저장 중…');
+      fireEvent.submit(form);
+      firstResponse.resolve(new HttpResponse(null, { status: 500 }));
 
-      // then - 성공 메시지가 출력되고 상세페이지로 이동한다
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      await waitFor(() => expect(button).toBeEnabled());
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(screen.getByLabelText('본문')).toHaveValue('<p>본문</p>');
+
+      fireEvent.submit(form);
+      await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
+      await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/post/1'));
+    });
+
+    test('글 전체의 UTF-8 JSON 크기가 한도를 넘으면 안내하고 줄인 후 저장할 수 있다', async () => {
+      const save = jest.fn(() => HttpResponse.json({ data: { id: 1 } }));
+      server.use(http.post(getHandlerURI('/api/posts'), () => save()));
+      fireEvent.input(screen.getByLabelText('제목'), {
+        target: { value: '제목' },
+      });
+      const contents = screen.getByLabelText('본문');
+      fireEvent.change(contents, {
+        target: { value: `<p>${'한글"'.repeat(64 * 1024)}</p>` },
+      });
+      fireEvent.change(screen.getByLabelText('분류'), {
+        target: { value: 'free' },
+      });
+      fireEvent.click(screen.getByLabelText('공개'));
+      const button = screen.getByRole('button', { name: '저장' });
+
+      fireEvent.submit(button);
+      expect(
+        await screen.findByText(/글 전체가 384 KiB를 넘습니다/)
+      ).toBeVisible();
+      expect(save).not.toHaveBeenCalled();
+
+      fireEvent.change(contents, { target: { value: '<p>수정한 내용</p>' } });
+      await waitFor(() =>
+        expect(contents).toHaveAttribute('aria-invalid', 'false')
+      );
+      fireEvent.submit(button);
+      await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+    });
+
+    test('등록이 성공하면 상세 화면으로 이동할 때까지 재제출을 막는다', async () => {
+      const save = jest.fn(() => HttpResponse.json({ data: { id: 1 } }));
+      server.use(http.post(getHandlerURI('/api/posts'), () => save()));
+      fireEvent.input(screen.getByLabelText('제목'), {
+        target: { value: '제목' },
+      });
+      fireEvent.change(screen.getByLabelText('본문'), {
+        target: { value: '<p>본문</p>' },
+      });
+      fireEvent.change(screen.getByLabelText('분류'), {
+        target: { value: 'free' },
+      });
+      fireEvent.click(screen.getByLabelText('공개'));
+      const button = screen.getByRole<HTMLButtonElement>('button', {
+        name: '저장',
+      });
+      if (!button.form) throw new Error('게시글 폼을 찾을 수 없습니다.');
+      const form = button.form;
+
+      fireEvent.submit(form);
+      expect(
+        await screen.findByRole('button', { name: '저장 완료' })
+      ).toBeDisabled();
       expect(window.alert).toHaveBeenCalledWith('게시글을 등록했습니다.');
-      expect(mockPush).toHaveBeenCalledWith(`/post/1`);
+      expect(mockPush).toHaveBeenCalledWith('/post/1');
+      expect(form).toBeInTheDocument();
+      await waitFor(() => expect(form).toHaveAttribute('aria-busy', 'false'));
+
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(mockPush).toHaveBeenCalledTimes(1);
     });
 
     test('게시글 생성에 실패하면 에러 알럿이 출력한다', async () => {
