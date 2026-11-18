@@ -1,5 +1,6 @@
 'use client';
 
+import { isPostType } from '@entities/post';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -13,9 +14,9 @@ export function useUpdatePostManager() {
   const id = Number(params.id);
 
   const methods = useUpdatePostForm();
-  const { setValue } = methods;
+  const { reset } = methods;
 
-  const { mutate, isPending } = useUpdatePost();
+  const { mutateAsync, isPending } = useUpdatePost();
 
   const {
     data: { data: post },
@@ -27,22 +28,23 @@ export function useUpdatePostManager() {
 
   useEffect(() => {
     if (isSuccess) {
-      setValue('title', post.title);
-      setValue('contents', post.contents);
-      setValue('type', post.type);
-      setValue('isOpen', post.is_open ? '1' : '0');
+      reset({
+        title: post.title,
+        contents: post.contents,
+        type: isPostType(post.type) ? post.type : '',
+        isOpen: post.is_open ? '1' : '0',
+      });
     }
-  }, [isSuccess, setValue, post]);
+  }, [isSuccess, post, reset]);
 
-  const handleUpdatePost = (data: UpdatePostFormInput) => {
-    mutate({
+  const handleUpdatePost = (data: UpdatePostFormInput) =>
+    mutateAsync({
       id,
       title: data.title,
       type: data.type || null,
       contents: data.contents,
       is_open: data.isOpen === '1',
     });
-  };
 
   return {
     methods,
