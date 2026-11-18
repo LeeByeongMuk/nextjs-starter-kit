@@ -3,7 +3,7 @@ import '@styles/globals.css';
 import Layout from '@shared/ui/layout';
 import Provider from '@shared/ui/provider';
 import type { Metadata } from 'next';
-import React, { Suspense } from 'react';
+import React from 'react';
 
 /** 앱의 기본 제목과 설명이다. */
 export const metadata: Metadata = {
@@ -21,9 +21,7 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <Provider>
-          <Suspense>
-            <Layout>{children}</Layout>
-          </Suspense>
+          <Layout>{children}</Layout>
         </Provider>
       </body>
     </html>

@@ -9,13 +9,15 @@ import SearchInput from './SearchInput';
 import TypeSelect from './TypeSelect';
 
 interface Props {
+  searchFilters: PostsReq;
   setSearchFilters: React.Dispatch<React.SetStateAction<PostsReq>>;
 }
 
 /** 게시글 분류와 검색, 인증된 사용자의 글쓰기 진입점 */
-export default function ListFilter({ setSearchFilters }: Props) {
+export default function ListFilter({ searchFilters, setSearchFilters }: Props) {
   const { status } = useSession();
   const { methods, handleFormSubmit, updateTypeTrigger } = usePostListForm({
+    searchFilters,
     setSearchFilters,
   });
 
