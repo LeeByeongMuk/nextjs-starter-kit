@@ -59,7 +59,7 @@ mock의 계정·토큰·게시글은 모두 **데모 데이터**입니다. 핸�
 
 실제 API에 연결하려면 서버에서 접근 가능한 `APP_API_URL`을 설정합니다. `fetchApi`는 서버에서 API 토큰 쿠키를 읽어 요청 헤더에 전달합니다. 로그인 시 토큰을 `httpOnly`, `sameSite=lax` 쿠키로 저장하고 production에서는 `secure`를 적용합니다. 로그아웃과 회원 탈퇴는 서버 액션으로 API 토큰을 삭제한 뒤 Auth.js 로그아웃을 진행합니다. 세션 쿠키 누락·손상 시에도 정리되며, Auth.js 로그아웃 이벤트에도 같은 처리를 연결합니다.
 
-게시글 본문은 HTML로 저장·렌더링합니다. **API 서버는 저장하거나 반환하는 HTML을 정제하고 허용 태그·속성·URL 정책을 보장해야 합니다.** 에디터와 타입 선언만으로 이 계약을 대신할 수 없습니다. 이번 템플릿은 별도의 HTML sanitizer를 포함하지 않습니다. Toast UI에 포함된 DOMPurify의 보안 권고와 교체 보류 이유는 [라이브러리 결정](.agents/rules/infra/library-decisions.md#toast-ui-editor--tiptaplexical)에 기록되어 있습니다.
+게시글 본문은 HTML로 저장·렌더링합니다. **API 서버는 저장하거나 반환하는 HTML을 정제하고 허용 태그·속성·URL 정책을 보장해야 합니다.** 에디터와 타입 선언만으로 이 계약을 대신할 수 없습니다. 게시글 상세 화면은 별도의 HTML 정제를 수행하지 않습니다. 에디터 내부 정제기의 설치 패치와 잔여 개발 의존성 취약점은 [의존성 보안 패치](.agents/rules/infra/library-decisions.md#의존성-보안-패치)를 따릅니다.
 
 ## 디자인과 접근성
 

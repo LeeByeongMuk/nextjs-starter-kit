@@ -4,7 +4,9 @@
   "private": true,
   "packageManager": "npm@11.20.0",
   "scripts": {
+    "predev": "node scripts/patch-toast-ui.mjs --check",
     "dev": "next dev",
+    "prebuild": "node scripts/patch-toast-ui.mjs --check",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -15,17 +17,23 @@
     "tsc": "tsc",
     "mock": "tsx watch --env-file-if-exists=.env ./src/shared/api/mocks/server.ts",
     "setup": "node scripts/setup.mjs",
+    "postinstall": "node scripts/patch-toast-ui.mjs",
     "prepare": "husky"
   },
   "overrides": {
     "@toast-ui/react-editor": {
-      "react": "^19"
-    }
+      "react": "^19",
+      "@toast-ui/editor": "$@toast-ui/editor"
+    },
+    "dompurify": "$dompurify",
+    "glob@>=9 <14.0.2": "14.0.6",
+    "minimatch@>=7 <11.0.1": "11.0.9"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.107.1",
-    "@toast-ui/editor": "^3.2.2",
-    "@toast-ui/react-editor": "^3.2.3",
+    "@toast-ui/editor": "3.2.2",
+    "@toast-ui/react-editor": "3.2.3",
+    "dompurify": "3.4.18",
     "next": "^16.4.6",
     "next-auth": "5.0.0-beta.32",
     "react": "^19.3.1",

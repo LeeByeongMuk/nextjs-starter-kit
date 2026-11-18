@@ -31,7 +31,7 @@ paths:
 
 | 보류 대상          | 현재 선택과 근거                                                                                                                                                           | 재검토 조건                                     |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| TypeScript 7       | 6.0.3 유지. typescript-eslint 8.72.2의 TypeScript 지원 범위는 `>=4.8.4 <6.1.0`                                                                                             | parser와 Next 도구 체인이 7 지원                |
+| TypeScript 7       | 6.0.3 유지. typescript-eslint 8.73.0의 TypeScript 지원 범위는 `>=4.8.4 <6.1.0`                                                                                             | parser와 Next 도구 체인이 7 지원                |
 | ESLint 10          | 9.39.5 유지. ESLint 9는 지원이 끝났지만 eslint-config-next 16.4.6이 쓰는 eslint-plugin-react 7.37.5 peer가 `^9.7`까지만 지원                                               | React 플러그인 및 커스텀 규칙 호환              |
 | MSW 3              | 2.15.0 유지. Express mock의 `@mswjs/http-middleware` 0.10.3은 `@msw/serve`로 대체되며 폐기됐고, MSW 3에서 제거된 `handleRequest()`를 호출해 `npm run mock`이 동작하지 않음 | Express mock을 `@msw/serve`로 옮길 때 함께 전환 |
 | NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음                                                                                                                       | v5 안정판 출시                                  |
@@ -40,6 +40,15 @@ paths:
 근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.1), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest), [MSW 3 변경점](https://github.com/mswjs/msw/releases/tag/v3.0.0), [http-middleware 폐기 안내](https://registry.npmjs.org/@mswjs/http-middleware/latest), [ESLint 지원 정책](https://eslint.org/version-support).
 
 ---
+
+## 의존성 보안 패치
+
+- Toast UI Editor 3.2.2와 React wrapper 3.2.3은 보안 패치 대상 배포물을 고정하기 위해 정확한 버전으로 설치한다. wrapper도 같은 에디터를 사용하도록 override한다. DOMPurify는 직접 의존성 3.4.18로 고정하고 에디터의 전이 의존성에도 같은 버전을 적용한다.
+- `scripts/patch-toast-ui.mjs`는 `postinstall`에서 에디터·뷰어의 ESM·UMD 네 파일에 내장된 DOMPurify 2.3.3을 제거한다. ESM은 설치된 DOMPurify를 import하고, UMD는 해당 버전의 CJS 구현과 라이선스를 포함한다. `customHTMLSanitizer`만 설정하면 우회되지 않는 내부 정제 호출도 이 패치의 적용 대상이다.
+- 패치는 원본·결과와 DOMPurify 배포물의 SHA-256을 검증하고, 예상하지 못한 파일에서는 실패한다. 반복 실행은 안전하다. `predev`와 `prebuild`도 적용 상태를 검사한다. `--ignore-scripts`로 설치했다면 `npm run postinstall`을 실행해야 한다. Docker는 설치 전에 패치 스크립트를 복사한다.
+- Toast UI 또는 DOMPurify 버전을 올릴 때는 패치의 해시와 정제 동작을 함께 검증한다. `npm test`의 에디터 보안·HTML 왕복 테스트, 실제 브라우저의 작성·수정·저장, 타입·lint·production build를 통과해야 한다. CI는 `npm audit --omit=dev`로 운영 의존성도 검사한다.
+- [minimatch 패턴 증폭](https://github.com/advisories/GHSA-g3hv-75wg-m249)은 취약 범위 `>=7 <11.0.1`에만 11.0.9를 적용한다. 기존 3.x API는 유지한다. [glob 취소 우회](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)는 `>=9 <14.0.2`에만 14.0.6을 적용한다. typescript-eslint는 수정된 minimatch를 사용하는 8.73.0이며, Jest·test-exclude의 상위 의존성이 수정 버전을 채택하면 해당 override를 제거한다.
+- **잔여 위험:** [picomatch GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf)는 2.3.2·4.0.7에 영향을 주며 공식 수정판이 없다. 이 저장소에서는 lint·Jest·파일 탐색 도구의 개발 의존성이고 `src`가 직접 호출하지 않는다. 공격자가 제어하는 반복 extglob 패턴과 대상 문자열이 들어오면 CPU를 소진할 수 있으므로 개발 도구에 외부 입력을 패턴으로 전달하지 않는다. 개발 의존성을 포함한 `npm audit`는 계속 실패할 수 있으며 이 권고를 숨기거나 해결 처리하지 않는다. 공식 수정판 또는 검증된 완전한 패치가 나오면 다시 검토한다.
 
 ## 결정 요약
 
@@ -59,14 +68,14 @@ paths:
 
 ## Jest → Vitest
 
-- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 테스트 파일 8개 (`src/app/**/*.spec.tsx`, 인증 쿠키 회귀 테스트). 커버리지 60% 기준
+- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 테스트 파일 10개 (페이지 통합, 인증 쿠키, 에디터 보안, 설치 패치 회귀 테스트). 커버리지 60% 기준
 - **교체 찬**: Vitest가 ESM 네이티브 + SWC/esbuild 기반으로 빠름. `transformIgnorePatterns` 같은 수동 튜닝 불필요. Vite 생태계와 호환
 - **교체 반**:
   - Jest 30은 최신 메이저, 기능 결함 없음
-  - 현재 테스트 파일 8개 — 속도 gain 체감 미미 (초 단위)
+  - 현재 테스트 파일 10개 — 속도 gain 체감 미미 (초 단위)
   - NextAuth/Auth.js의 ESM 이슈가 Vitest로 옮긴다고 자동 해결되지 않음 (Vitest도 `deps.inline`/`server.deps` 튜닝 필요)
   - `next/jest` preset을 버려야 하므로 Next.js 공식 경로에서 벗어남
-- **비용**: Medium — 설정 포팅 + 8개 테스트 파일 검증 + CI 파이프라인 조정
+- **비용**: Medium — 설정 포팅 + 10개 테스트 파일 검증 + CI 파이프라인 조정
 - **결정**: **유지**
 - **재검토 조건**: 테스트 파일 수가 30개를 초과하거나 CI에서 `npm test` 소요 시간이 3분을 넘을 때. Vitest v4 이상이 `next/jest` 수준의 공식 preset을 제공할 때
 
@@ -120,7 +129,7 @@ paths:
 
 - **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정 입력은 `src/entities/post/ui/Editor.tsx`와 `src/entities/post/ui/Form/ContentsEditor.tsx`를 사용한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
 - **교체 찬**:
-  - DOMPurify에 [GHSA-mrv2-3pqr-j5jr](https://github.com/advisories/GHSA-mrv2-3pqr-j5jr) high advisory가 남아 있다. 수정판은 3.4.17이며 선언 범위 내 설치 버전은 2.5.9다. Toast UI의 ESM·UMD 배포물에는 2.3.3 구현이 직접 포함되어 외부 패키지 override만으로 실행 코드를 고칠 수 없다. 앱에서 해당 advisory의 `IN_PLACE`·hook 발동 조건 사용은 확인되지 않았지만, 이를 취약점 해결로 간주하지 않는다. 배포물 수정·재빌드 또는 에디터 교체 시 정제와 HTML 왕복 보존을 함께 검증해야 한다.
+  - Toast UI 배포물의 오래된 DOMPurify는 [의존성 보안 패치](#의존성-보안-패치)로 교체한다. 상위 패키지가 수정된 정제기를 배포하기 전까지 설치 패치와 HTML 왕복 검증을 직접 유지해야 한다.
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크
   - 현대적 대안: **TipTap**(Prosemirror, headless, 생태계 풍부), **Lexical**(Meta, 확장성 높음)
