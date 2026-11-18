@@ -10,6 +10,5 @@ export interface SignUpReq {
 export interface SignUpRes extends ApiResponse {
   data: {
     id: number;
-    access_token: string;
   };
 }

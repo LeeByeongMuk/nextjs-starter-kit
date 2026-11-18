@@ -1,3 +1,4 @@
+export { getPostPath, getPostRequestBody } from './api/postRequest';
 export { serializePostBody } from './api/serializePostBody';
 export type { DeletePostReq, DeletePostRes } from './api/types';
 export {

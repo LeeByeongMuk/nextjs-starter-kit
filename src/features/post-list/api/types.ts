@@ -4,7 +4,7 @@ import { ApiResponse } from '@shared/api/types';
 
 export interface PostsReq {
   page: number;
-  type: PostType;
+  type: PostType | '';
   q: string;
 }
 

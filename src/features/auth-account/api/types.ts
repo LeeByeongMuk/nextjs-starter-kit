@@ -15,8 +15,4 @@ export interface DeleteAccountReq {
   deleted_reason: string;
 }
 
-export interface DeleteAccountRes extends ApiResponse {
-  data: {
-    id: string;
-  };
-}
+export type DeleteAccountRes = ApiResponse;
