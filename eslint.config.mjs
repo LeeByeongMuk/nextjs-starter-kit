@@ -119,7 +119,9 @@ const config = [
               from: { element: { type: 'entities' } },
               disallow: {
                 to: {
-                  element: { type: ['app', 'views', 'widgets', 'features'] },
+                  element: {
+                    type: ['app', 'views', 'widgets', 'features', 'entities'],
+                  },
                 },
               },
             },
@@ -171,7 +173,7 @@ const config = [
       ],
       'boundaries/no-unknown-dependencies': 'error',
       'boundaries/no-unknown-files': 'error',
-      // 같은 슬라이스 내부에서는 alias 대신 상대 경로
+      // 슬라이스 내부는 상대 경로, 경계 밖은 alias
       'fsd/relative-imports': 'error',
       'comments/comment-conventions': 'error',
     },
