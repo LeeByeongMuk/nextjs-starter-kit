@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { documentNavigation } from '@shared/lib/url';
+import { toast } from '@shared/ui/toast';
 import { type FormEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -29,6 +30,7 @@ export function useSignInForm() {
     if (submitting.current) return;
 
     submitting.current = true;
+    toast.dismiss();
     let navigating = false;
     let failureMessage: string | undefined;
     try {
@@ -55,7 +57,7 @@ export function useSignInForm() {
         setIsBusy(false);
       }
     }
-    if (failureMessage) alert(failureMessage);
+    if (failureMessage) toast.error(failureMessage);
   };
 
   return { handleSignIn, isBusy, methods };

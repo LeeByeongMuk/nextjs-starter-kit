@@ -9,19 +9,30 @@ import {
 } from '@features/auth-signup';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
 import Link from 'next/link';
+import { useRef } from 'react';
 import { FormProvider } from 'react-hook-form';
 
 /** 인증 폼과 관련 화면으로의 이동을 제공한다. */
 export default function SignUpView() {
   const methods = useSignupForm();
-  const { mutate, isPending } = useSignup();
-  const handleSignUp = ({
+  const { mutateAsync, isPending } = useSignup();
+  const submitting = useRef(false);
+  const handleSignUp = async ({
     email,
     name,
     nickname,
     password,
   }: SignUpFormInput) => {
-    mutate({ email, name, nickname, password });
+    if (submitting.current) return;
+
+    submitting.current = true;
+    try {
+      // 가입에 성공하면 로그인한 화면으로 이동하므로 다시 제출할 수 없게 둔다.
+      await mutateAsync({ email, name, nickname, password });
+    } catch {
+      // 실패는 QueryClient의 중앙 오류 처리가 알린다. 다시 제출할 수 있게 푼다.
+      submitting.current = false;
+    }
   };
 
   return (

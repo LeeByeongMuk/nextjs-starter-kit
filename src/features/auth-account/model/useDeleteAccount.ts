@@ -1,4 +1,5 @@
 import { deleteAccessToken } from '@shared/lib/deleteAccessToken';
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 
@@ -8,15 +9,15 @@ import { fetchDeleteAccount } from '../api/accountService';
 export default function useDeleteAccount() {
   return useMutation({
     mutationFn: fetchDeleteAccount,
+    meta: { errorMessage: '회원 탈퇴를 완료하지 못했습니다.' },
     onSuccess: async () => {
-      alert('회원 탈퇴가 완료되었습니다.');
+      toast.success('회원 탈퇴가 완료되었습니다.', {
+        survivesNavigation: true,
+      });
       await deleteAccessToken();
       await signOut({
         redirectTo: '/',
       });
-    },
-    onError: () => {
-      alert('회원 탈퇴를 완료하지 못했습니다.');
     },
   });
 }

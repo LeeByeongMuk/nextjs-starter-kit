@@ -2,9 +2,12 @@ import '@testing-library/jest-dom';
 
 import Signup from '@app/(domain)/(auth)/signup/page';
 import { useSignup } from '@features/auth-signup';
+import userData from '@shared/api/mocks/data/user.json';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { spyOnToast } from '@shared/lib/testing/toast';
 import { getHandlerURI } from '@shared/lib/url';
+import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -39,6 +42,7 @@ describe('회원가입 테스트', () => {
 
     // given - 회원가입 페이지가 그려짐
     render(<Signup />, { wrapper });
+    render(<Toaster />);
   });
 
   describe('이메일 형식을 확인 한다', () => {
@@ -266,6 +270,121 @@ describe('회원가입 테스트', () => {
   });
 
   describe('회원가입 API 호출', () => {
+    const signupRequest = jest.fn();
+    const account = {
+      email: 'test@email.com',
+      name: 'name',
+      nickname: 'nickname',
+      password: 'Password11!!',
+    };
+    const submitAccount = () => {
+      fireEvent.change(screen.getByLabelText('이메일'), {
+        target: { value: account.email },
+      });
+      fireEvent.change(screen.getByLabelText('이름'), {
+        target: { value: account.name },
+      });
+      fireEvent.change(screen.getByLabelText('닉네임'), {
+        target: { value: account.nickname },
+      });
+      fireEvent.change(screen.getByLabelText('비밀번호'), {
+        target: { value: account.password },
+      });
+      fireEvent.change(screen.getByLabelText('비밀번호 확인'), {
+        target: { value: account.password },
+      });
+      fireEvent.submit(screen.getByRole('button', { name: '회원가입' }));
+    };
+
+    beforeEach(() => {
+      signupRequest.mockClear();
+      jest.mocked(signIn).mockClear();
+      server.use(
+        http.post(getHandlerURI('/api/users/signup'), async ({ request }) => {
+          signupRequest(await request.json());
+          return HttpResponse.json(userData.signup);
+        })
+      );
+    });
+
+    test('화면에서 가입하면 입력한 계정으로 한 번 요청하고 그 계정으로 로그인한다', async () => {
+      const toastCalls = spyOnToast();
+
+      submitAccount();
+
+      await waitFor(() =>
+        expect(signIn).toHaveBeenCalledWith('credentials', {
+          email: account.email,
+          password: account.password,
+          redirectTo: '/',
+        })
+      );
+      expect(signIn).toHaveBeenCalledTimes(1);
+      expect(signupRequest).toHaveBeenCalledTimes(1);
+      expect(signupRequest).toHaveBeenCalledWith(account);
+      expect(toastCalls.success).toHaveBeenCalledWith(
+        '회원가입이 완료되었습니다.',
+        { survivesNavigation: true }
+      );
+    });
+
+    test('연속으로 제출해도 가입과 로그인을 한 번씩만 요청한다', async () => {
+      submitAccount();
+      fireEvent.submit(screen.getByRole('button', { name: '회원가입' }));
+
+      await waitFor(() => expect(signIn).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+      );
+      expect(signupRequest).toHaveBeenCalledTimes(1);
+      expect(signIn).toHaveBeenCalledTimes(1);
+    });
+
+    test('가입에 실패한 뒤에는 다시 제출할 수 있다', async () => {
+      server.use(
+        http.post(
+          getHandlerURI('/api/users/signup'),
+          () => new HttpResponse(null, { status: 500 }),
+          { once: true }
+        )
+      );
+
+      submitAccount();
+      await screen.findByText('회원가입을 완료하지 못했습니다.');
+      fireEvent.submit(screen.getByRole('button', { name: '회원가입' }));
+
+      await waitFor(() => expect(signupRequest).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(signIn).toHaveBeenCalledTimes(1));
+    });
+
+    test('가입한 계정으로 로그인하는 동안 다시 제출해도 한 번만 요청하고 완료 알림을 유지한다', async () => {
+      let finishSignIn = () => {};
+      jest.mocked(signIn).mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            finishSignIn = () =>
+              resolve({
+                error: undefined,
+                code: undefined,
+                status: 200,
+                ok: true,
+                url: null,
+              });
+          })
+      );
+
+      submitAccount();
+      await screen.findByText('회원가입이 완료되었습니다.');
+      fireEvent.submit(screen.getByRole('button', { name: '회원가입' }));
+      finishSignIn();
+
+      await waitFor(() =>
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+      );
+      expect(signupRequest).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('회원가입이 완료되었습니다.')).toBeVisible();
+    });
+
     test('회원가입에 성공하면 회원가입이 완료된다', async () => {
       fireEvent.change(screen.getByLabelText('이메일'), {
         target: { value: 'test@email.com' },
@@ -283,6 +402,9 @@ describe('회원가입 테스트', () => {
         target: { value: 'Password11!!' },
       });
       fireEvent.submit(screen.getByRole('button', { name: '회원가입' }));
+      expect(
+        await screen.findByText('회원가입이 완료되었습니다.')
+      ).toBeInTheDocument();
 
       // when - 회원가입에 성공
       const { result } = renderHook(() => useSignup(), { wrapper });
@@ -297,7 +419,6 @@ describe('회원가입 테스트', () => {
         });
       });
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('회원가입이 완료되었습니다.');
       expect(result.current.data).toEqual({
         ok: true,
         message: 'success',
@@ -334,6 +455,9 @@ describe('회원가입 테스트', () => {
         target: { value: 'Password11!!' },
       });
       fireEvent.submit(screen.getByRole('button', { name: '회원가입' }));
+      expect(
+        await screen.findByText('회원가입을 완료하지 못했습니다.')
+      ).toBeInTheDocument();
 
       // when - 회원가입에 실패
       const { result } = renderHook(() => useSignup(), { wrapper });
@@ -348,9 +472,6 @@ describe('회원가입 테스트', () => {
         });
       });
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(
-        '회원가입을 완료하지 못했습니다.'
-      );
       expect(result.current.data).toBeUndefined();
     });
   });

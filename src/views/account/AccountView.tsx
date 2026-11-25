@@ -3,6 +3,7 @@
 import {
   AccountForm,
   DeleteAccountButton,
+  DeleteAccountDialog,
   useAccountManager,
 } from '@features/auth-account';
 import LayerSpinner from '@shared/ui/spinner/LayerSpinner';
@@ -15,7 +16,12 @@ export default function AccountView() {
     methods,
     handleUpdateAccount,
     handleDeleteAccount,
+    handleCancelDeleteAccount,
+    handleConfirmDeleteAccount,
     handleCheckSession,
+    accountId,
+    isDeleteDialogOpen,
+    deleteButtonRef,
     canEdit,
     isSessionMissing,
     isCheckingSession,
@@ -57,8 +63,17 @@ export default function AccountView() {
           className="min-w-0"
         >
           <AccountForm handleUpdateAccount={handleUpdateAccount} />
-          <DeleteAccountButton handleDeleteAccount={handleDeleteAccount} />
+          <DeleteAccountButton
+            ref={deleteButtonRef}
+            handleDeleteAccount={handleDeleteAccount}
+          />
         </fieldset>
+        <DeleteAccountDialog
+          accountId={accountId}
+          open={isDeleteDialogOpen}
+          onCancel={handleCancelDeleteAccount}
+          onConfirm={handleConfirmDeleteAccount}
+        />
 
         {isLoading && <LayerSpinner />}
       </section>

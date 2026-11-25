@@ -1,3 +1,4 @@
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
 
@@ -7,17 +8,17 @@ import { fetchSignUp } from '../api/signupServices';
 export default function useSignup() {
   return useMutation({
     mutationFn: fetchSignUp,
+    meta: { errorMessage: '회원가입을 완료하지 못했습니다.' },
     onSuccess: async (_, data) => {
-      alert('회원가입이 완료되었습니다.');
+      toast.success('회원가입이 완료되었습니다.', {
+        survivesNavigation: true,
+      });
 
       await signIn('credentials', {
         email: data.email,
         password: data.password,
         redirectTo: '/',
       });
-    },
-    onError: () => {
-      alert('회원가입을 완료하지 못했습니다.');
     },
   });
 }

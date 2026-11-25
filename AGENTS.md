@@ -11,6 +11,7 @@
 | 폼            | React Hook Form 7 + Zod 4 (`defaultValues` 필수) |
 | 인증          | NextAuth v5 (beta)                               |
 | 스타일        | Tailwind CSS v4                                  |
+| 알림·확인     | sonner 2 (`@shared/ui/toast` 래퍼) · `<dialog>`  |
 | 언어/테스트   | TypeScript 6 · Jest 30 + RTL + MSW               |
 | 실행 환경     | Node.js 26 LTS (`.nvmrc`)                        |
 | 패키지 매니저 | npm 11.20 (단일 `package-lock.json`)             |

@@ -63,6 +63,7 @@ paths:
 | [NextAuth v5 beta → stable](#nextauth-v5-beta--stable)                              | **stable 즉시 업그레이드** | stable 릴리스 시                               |
 | [HTTP client (ky/ofetch)](#http-client-kyofetch)                                    | **유지 (자체 `fetchApi`)** | 재시도/타임아웃/인터셉터 중 2개 이상 필요      |
 | [npm workspaces + `packages/eslint-config`](#npm-workspaces--packageseslint-config) | **보류**                   | 두 번째 앱 또는 외부 소비자 발생 시            |
+| [토스트 알림: `sonner`](#토스트-알림-sonner)                                        | **도입**                   | 스타일 주입을 막는 CSP 요구가 생길 때          |
 
 ---
 
@@ -192,6 +193,25 @@ paths:
 - **비용**: Small~Medium (workspaces 전환 + 경로 재배선 + CI 검증)
 - **결정**: **보류** (2026-07-13)
 - **재검토 조건**: 이 레포에 두 번째 앱이 생겨 모노레포로 전환하거나, 다른 레포가 이 ESLint 설정을 소비하게 될 때. 그때 npm workspaces + `packages/eslint-config`(자체 스코프 패키지)로 승격
+
+---
+
+## 토스트 알림 (sonner)
+
+- **현황**: `sonner` 2. `src/shared/ui/toast/`의 래퍼(`toast`, `Toaster`)로만 사용하고 슬라이스는 `sonner`를 직접 import하지 않는다. `unstyled` 모드에 프로젝트 토큰 유틸리티를 적용하며 알림 영역은 루트 레이아웃에 한 번 둔다. 사용 규칙은 [code-conventions.md](../code-style/code-conventions.md) §3
+- **도입 찬**:
+  - 네이티브 `alert()`와 달리 흐름을 막지 않고 토큰·OS 다크 모드·모션 감소 설정을 따른다
+  - React 18·19를 peer로 선언하고 런타임 의존성이 없다
+  - `aria-live` 알림 영역, 알림 영역으로 이동하는 단축키(Alt+T), 닫기 버튼, 스와이프 닫기를 제공한다
+- **도입 반**:
+  - 스타일시트를 런타임에 `<style>` 요소로 주입한다. 인라인 스타일을 금지하는 CSP에서는 이 주입이 차단된다
+  - 주입된 규칙은 캐스케이드 레이어 밖이라 같은 속성의 Tailwind 유틸리티보다 우선한다. 겹치는 속성(토스트의 포커스 표시)은 `!` 유틸리티로 지정한다
+- **버린 대안**:
+  - `react-hot-toast` — `goober` 런타임 CSS-in-JS에 의존해 유틸리티 클래스 전용 스타일 원칙([styling.md](../code-style/styling.md) §1)과 맞지 않는다
+  - 자체 구현 — 라이브 영역, 타이머 일시정지, 제스처, 포커스 처리를 직접 유지해야 한다
+- **비용**: Small
+- **결정**: **도입**
+- **재검토 조건**: 런타임 스타일 주입을 허용할 수 없는 CSP 요구가 생기거나, 사용 중인 React 메이저에 대한 peer 지원이 끊길 때
 
 ---
 

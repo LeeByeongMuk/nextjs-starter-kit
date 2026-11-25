@@ -83,9 +83,9 @@ describe('계정 서버 액션', () => {
     }
   );
 
-  test('회원 탈퇴는 사유를 전송하고 응답의 공통 필드만 전달한다', async () => {
+  test('회원 탈퇴는 확인한 계정으로 로그인되어 있으면 사유만 전송하고 응답의 공통 필드만 전달한다', async () => {
     await expect(
-      fetchDeleteAccount({ deleted_reason: '탈퇴 사유' })
+      fetchDeleteAccount({ deleted_reason: '탈퇴 사유', user_id: '1' })
     ).resolves.toEqual({ ok: true, message: 'success' });
     expect(request).toHaveBeenCalledWith(
       { deleted_reason: '탈퇴 사유' },
@@ -93,9 +93,17 @@ describe('계정 서버 액션', () => {
     );
   });
 
+  test('탈퇴를 확인한 계정과 로그인한 계정이 다르면 탈퇴를 요청하지 않는다', async () => {
+    await expect(
+      fetchDeleteAccount({ deleted_reason: '탈퇴 사유', user_id: '2' })
+    ).rejects.toThrow('탈퇴를 확인한 계정으로 로그인되어 있지 않습니다.');
+    expect(request).not.toHaveBeenCalled();
+  });
+
   test.each([
     ['입력 없음', undefined],
-    ['문자열이 아닌 사유', { deleted_reason: null }],
+    ['문자열이 아닌 사유', { deleted_reason: null, user_id: '1' }],
+    ['확인한 계정 누락', { deleted_reason: '탈퇴 사유' }],
   ])(
     '형식이 맞지 않는 탈퇴 사유(%s)는 API 요청 전에 거절한다',
     async (_, input) => {

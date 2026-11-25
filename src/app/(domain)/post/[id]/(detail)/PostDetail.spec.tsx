@@ -4,7 +4,9 @@ import { usePostDetail } from '@features/post-detail';
 import postData from '@shared/api/mocks/data/post.json';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { spyOnToast } from '@shared/lib/testing/toast';
 import { getHandlerURI } from '@shared/lib/url';
+import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   fireEvent,
@@ -12,6 +14,7 @@ import {
   renderHook,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
@@ -51,6 +54,7 @@ describe('게시글 상세 페이지 테스트', () => {
 
     // given - 게시글 상세 페이지가 그려짐
     render(<PostDetail />, { wrapper });
+    render(<Toaster />);
   });
 
   test('게시글 수정 권한이 없으면 수정 버튼이 보이지 않는다', async () => {
@@ -95,8 +99,33 @@ describe('게시글 상세 페이지 테스트', () => {
     // expect(await screen.findByRole('post-edit-link')).toBeInTheDocument();
   });
 
+  test('작성자와 분류가 비어 있는 글은 대체 표시로 보여 준다', async () => {
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id'), () =>
+        HttpResponse.json({
+          data: {
+            title: postData.getById.data.title,
+            contents: postData.getById.data.contents,
+            created_at: null,
+            user_name: null,
+          },
+        })
+      )
+    );
+    await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+
+    expect(await screen.findByText('작성자 미상')).toBeVisible();
+    expect(screen.getByText('미분류')).toBeVisible();
+  });
+
   describe('게시글 삭제', () => {
     const deleteRequest = jest.fn();
+    const openConfirm = async () => {
+      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+      return screen.getByRole('alertdialog', {
+        name: '이 게시글을 삭제할까요?',
+      });
+    };
 
     beforeEach(async () => {
       deleteRequest.mockClear();
@@ -116,42 +145,44 @@ describe('게시글 상세 페이지 테스트', () => {
     });
 
     test('삭제 확인을 취소하면 삭제를 요청하지 않는다', async () => {
-      const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+      const confirm = await openConfirm();
+      const cancel = within(confirm).getByRole('button', { name: '취소' });
+      expect(cancel).toHaveFocus();
 
-      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+      fireEvent.click(cancel);
 
-      expect(confirm).toHaveBeenCalledWith('이 게시글을 삭제할까요?');
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+      expect(deleteRequest).not.toHaveBeenCalled();
       expect(queryClient.isMutating()).toBe(0);
     });
 
     test('삭제를 확인하면 완료를 알리고 홈으로 이동한다', async () => {
-      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      const confirm = await openConfirm();
 
-      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+      fireEvent.click(within(confirm).getByRole('button', { name: '삭제' }));
 
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith('게시글을 삭제했습니다.')
-      );
+      expect(
+        await screen.findByText('게시글을 삭제했습니다.')
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
       expect(deleteRequest).toHaveBeenCalledWith('1');
       expect(mockPush).toHaveBeenCalledWith('/');
     });
 
     test('삭제에 실패하면 실패를 알리고 화면을 유지한다', async () => {
-      jest.spyOn(window, 'confirm').mockReturnValue(true);
       server.use(
         http.delete(
           getHandlerURI('/api/posts/:id'),
           () => new HttpResponse(null, { status: 500 })
         )
       );
+      const confirm = await openConfirm();
 
-      fireEvent.click(await screen.findByRole('button', { name: '삭제' }));
+      fireEvent.click(within(confirm).getByRole('button', { name: '삭제' }));
 
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(
-          '게시글을 삭제하지 못했습니다.'
-        )
-      );
+      expect(
+        await screen.findByText('게시글을 삭제하지 못했습니다.')
+      ).toBeInTheDocument();
       expect(mockPush).not.toHaveBeenCalled();
     });
   });
@@ -186,6 +217,7 @@ describe('게시글 상세 페이지 테스트', () => {
   });
 
   test('조회 실패 시 오류 화면을 유지하고 사용자가 복귀를 선택한다', async () => {
+    const toastCalls = spyOnToast();
     server.use(
       http.get(getHandlerURI('/api/posts/:id'), () => {
         return new HttpResponse(null, {
@@ -208,7 +240,8 @@ describe('게시글 상세 페이지 테스트', () => {
     expect(
       screen.getByRole('link', { name: '게시판으로 돌아가기' })
     ).toHaveAttribute('href', '/post');
-    expect(window.alert).not.toHaveBeenCalled();
+    expect(toastCalls.success).not.toHaveBeenCalled();
+    expect(toastCalls.error).not.toHaveBeenCalled();
     expect(mockBack).not.toHaveBeenCalled();
   });
 });

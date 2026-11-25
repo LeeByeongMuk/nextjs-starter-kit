@@ -44,7 +44,7 @@ AI 에이전트 스킬 설치는 `npm run setup -- --skills`로 선택할 수 �
 
 | 역할 | 선택 |
 | --- | --- |
-| 앱·UI | Next.js 16 · React 19 · TypeScript 6 · Tailwind CSS 4 |
+| 앱·UI | Next.js 16 · React 19 · TypeScript 6 · Tailwind CSS 4 · sonner 2 |
 | API·폼 | TanStack Query 5 · 자체 `fetchApi` · React Hook Form 7 · Zod 4 |
 | 인증·본문 입력 | NextAuth 5 beta · Toast UI Editor |
 | 테스트·개발 API | Jest 30 · Testing Library · MSW 2 · Express |
@@ -59,7 +59,7 @@ Express 개발 서버와 Jest는 같은 MSW 핸들러를 사용합니다. 브라
 
 mock의 계정·토큰·게시글은 모두 **데모 데이터**입니다. 핸들러는 미리 정한 응답을 반환하므로 실제 비밀번호 인증·작성자 권한·검색·페이지네이션·데이터 영속성을 검증하지 않습니다. 가입·작성·수정·삭제 결과도 서버에 저장되지 않습니다. 실제 서비스에서는 API 서버가 인증·인가·입력 검증을 수행해야 합니다.
 
-실제 API에 연결하려면 서버에서 접근 가능한 `APP_API_URL`을 설정합니다. 브라우저의 TanStack Query는 기능별 서버 액션을 호출합니다. 각 액션은 API 경로와 메서드를 고정하고 허용된 입력과 화면에 필요한 응답 필드만 전달합니다. 응답은 Zod 스키마로 검증하므로 선언한 형식과 다른 응답은 오류로 처리합니다. 요청의 성공 여부는 HTTP 상태로 판정하며, 분류나 작성자 이름처럼 화면에 대체 표시가 있는 값과 화면이 쓰지 않는 값은 비어 있어도 받습니다. 서버 전용 `fetchApi`와 API 토큰 전달 방식은 [데이터 페칭 규칙](.agents/rules/architecture/data-fetching.md)을 따릅니다.
+실제 API에 연결하려면 서버에서 접근 가능한 `APP_API_URL`을 설정합니다. 브라우저의 TanStack Query는 기능별 서버 액션을 호출합니다. 각 액션은 API 경로와 메서드를 고정하고 허용된 입력과 화면에 필요한 응답 필드만 전달합니다. 응답은 Zod 스키마로 검증하므로 선언한 형식과 다른 응답은 오류로 처리합니다. 요청의 성공 여부는 HTTP 상태로 판정하며, 분류나 작성자 이름처럼 화면에 대체 표시가 있는 값과 화면이 쓰지 않는 값은 비어 있어도 받습니다. 회원 탈퇴는 `GET /api/users`로 화면에서 확인한 계정이 맞는지 확인한 뒤 요청합니다. 서버 전용 `fetchApi`와 API 토큰 전달 방식은 [데이터 페칭 규칙](.agents/rules/architecture/data-fetching.md)을 따릅니다.
 
 로그인에 성공하면 같은 출처의 복귀 주소로 이동합니다. Auth.js 세션과 API 토큰 쿠키는 로그인 시점부터 최대 30일간 유효합니다. API 토큰 쿠키 이름이 바뀌었으므로 기존 로그인 세션은 한 번 다시 로그인해야 합니다. 계정 변경을 저장하면 Auth.js가 API에서 프로필을 다시 읽어 세션에 반영합니다. 쿠키와 로그아웃 처리는 [인증 규칙](.agents/rules/architecture/auth.md)을 따릅니다.
 

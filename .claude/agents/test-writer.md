@@ -23,11 +23,11 @@ model: sonnet
 
 정본은 `.agents/rules/testing/unit-testing.md` §4. 확장자는 `.spec.tsx` 고정 — `.test.*` 사용 금지.
 
-| 대상                           | 위치                                     | 예시                   |
-| ------------------------------ | ---------------------------------------- | ---------------------- |
-| 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx` (페이지 옆 배치) | `signin.spec.tsx`      |
-| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 `model/` 또는 `api/`       | `usePostList.spec.tsx` |
-| 컴포넌트 렌더 테스트           | feature view 레벨 통합으로 대체          | —                      |
+| 대상                           | 위치                                                                          | 예시                     |
+| ------------------------------ | ----------------------------------------------------------------------------- | ------------------------ |
+| 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx` (페이지 옆 배치)                                      | `signin.spec.tsx`        |
+| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 `model/` 또는 `api/`                                            | `usePostList.spec.tsx`   |
+| 컴포넌트 테스트                | 컴포넌트 옆 (`ui/`) — 화면 흐름으로 만들기 어려운 상태를 가진 공용 컴포넌트만 | `ConfirmDialog.spec.tsx` |
 
 ```
 src/app/(domain)/(auth)/signin/
@@ -162,7 +162,9 @@ beforeEach(() => {
 - `describe` 블록으로 대상 단위 그룹화
 - `it` 문은 행위 기반으로 작성 (영문 또는 한글)
 - MSW handler는 테스트별로 `server.use()`로 오버라이드
-- QueryClient는 테스트마다 새로 생성 (캐시 격리)
+- 조회만 검증하면 QueryClient를 테스트마다 새로 생성 (캐시 격리). 변경 요청의 실패 알림까지 검증하면 앱의 `getQueryClient()` 사용
+- 알림은 `render(<Toaster />)` 후 `findByText`로 확인. 뜨지 않아야 하는 흐름은 `@shared/lib/testing/toast`의 `spyOnToast()`로 확인 (unit-testing.md §1)
+- 네이티브 `alert`·`confirm`·`prompt`를 mock하지 않는다 — 대화상자는 `getByRole('dialog' | 'alertdialog')`로 찾는다
 - `waitFor`로 비동기 상태 변화 대기
 - 사용자 인터랙션은 `fireEvent` 사용 (`@testing-library/user-event`는 미설치 — 도입 시 예시 갱신)
 

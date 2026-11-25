@@ -1,6 +1,7 @@
 import PostList from '@app/(domain)/post/(list)/page';
 import { type PostListData, type PostsRes } from '@features/post-list';
 import { server } from '@shared/api/mocks/testServer';
+import { spyOnToast } from '@shared/lib/testing/toast';
 import { getHandlerURI } from '@shared/lib/url';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -577,6 +578,7 @@ describe('게시글 리스트 페이지 테스트', () => {
   });
 
   test('목록 요청 실패는 로딩을 끝내고 대화상자 없이 오류 UI를 표시한다', async () => {
+    const toastCalls = spyOnToast();
     server.use(
       http.get(
         getHandlerURI('/api/posts'),
@@ -596,6 +598,7 @@ describe('게시글 리스트 페이지 테스트', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       '게시글을 불러오지 못했습니다.'
     );
-    expect(window.alert).not.toHaveBeenCalled();
+    expect(toastCalls.success).not.toHaveBeenCalled();
+    expect(toastCalls.error).not.toHaveBeenCalled();
   });
 });

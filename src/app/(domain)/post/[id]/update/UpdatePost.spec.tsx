@@ -4,7 +4,9 @@ import { useUpdatePostResource } from '@features/post-update';
 import postData from '@shared/api/mocks/data/post.json';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
+import { spyOnToast } from '@shared/lib/testing/toast';
 import { getHandlerURI } from '@shared/lib/url';
+import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -86,6 +88,7 @@ describe('게시글 수정 테스트', () => {
 
     // given - 게시글 수정 페이지가 그려진다
     render(<UpdatePost />, { wrapper });
+    render(<Toaster />);
   });
 
   describe('게시글 수정 리소스 API 호출', () => {
@@ -101,6 +104,7 @@ describe('게시글 수정 테스트', () => {
     });
 
     test('수정 정보 조회 실패 시 오류 화면과 복귀 링크를 유지한다', async () => {
+      const toastCalls = spyOnToast();
       server.use(
         http.get(getHandlerURI(`/api/posts/:id/edit`), () => {
           return new HttpResponse(null, { status: 500 });
@@ -121,7 +125,8 @@ describe('게시글 수정 테스트', () => {
       expect(
         screen.getByRole('link', { name: '게시판으로 돌아가기' })
       ).toHaveAttribute('href', '/post');
-      expect(window.alert).not.toHaveBeenCalled();
+      expect(toastCalls.success).not.toHaveBeenCalled();
+      expect(toastCalls.error).not.toHaveBeenCalled();
       expect(mockPush).not.toHaveBeenCalled();
     });
   });
@@ -157,6 +162,7 @@ describe('게시글 수정 테스트', () => {
     });
 
     test('이전 분류를 선택 상태로 표시하고 새 분류로 기존 HTML을 저장한다', async () => {
+      const toastCalls = spyOnToast();
       const contents =
         '<p><strong>기존 본문</strong><img src="/sample.png" alt="예제"></p>';
       const save = jest.fn();
@@ -188,7 +194,8 @@ describe('게시글 수정 테스트', () => {
         expect(select).toHaveAccessibleDescription('분류를 선택해 주세요.')
       );
       expect(save).not.toHaveBeenCalled();
-      expect(window.alert).not.toHaveBeenCalled();
+      expect(toastCalls.success).not.toHaveBeenCalled();
+      expect(toastCalls.error).not.toHaveBeenCalled();
 
       fireEvent.change(select, { target: { value: 'notice' } });
       fireEvent.submit(button);
@@ -242,7 +249,9 @@ describe('게시글 수정 테스트', () => {
       });
       expect(save).toHaveBeenCalledTimes(1);
       expect(mockPush).toHaveBeenCalledTimes(1);
-      expect(window.alert).toHaveBeenCalledWith('게시글을 수정했습니다.');
+      expect(
+        await screen.findByText('게시글을 수정했습니다.')
+      ).toBeInTheDocument();
     });
 
     test('게시글 수정에 실패하면 실패 메시지를 출력한다', async () => {
@@ -267,9 +276,9 @@ describe('게시글 수정 테스트', () => {
 
       // then - 실패 메시지가 출력된다
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(
-        '게시글을 수정하지 못했습니다.'
-      );
+      expect(
+        await screen.findByText('게시글을 수정하지 못했습니다.')
+      ).toBeInTheDocument();
     });
   });
 });

@@ -60,17 +60,19 @@ useQuery({ queryKey: ['post', { id }], ... });
 
 ## 5. Mutation 콜백
 
-- `onSuccess`: `queryClient.invalidateQueries({ queryKey: [entity] })` + 라우팅/알림
-- `onError`: 현재는 `alert()` — 토스트 도입 후 중앙 핸들러로 교체 예정 (`.agents/rules/code-style/code-conventions.md` §3)
+- `onSuccess`: `toast.success(...)` 완료 알림 + 라우팅. 이동하지 않고 같은 화면에 남는 변경은 `queryClient.invalidateQueries({ queryKey: [entity] })`로 표시 중인 데이터를 다시 불러온다
+- 실패 알림은 훅에 두지 않는다. `meta.errorMessage`에 문구를 지정하면 `QueryClient`의 `MutationCache`가 `toast.error`로 알린다. 문구를 지정하지 않으면 기본 문구로 알린다
+- `MutationCache`는 변경 요청을 시작할 때 표시 중인 알림을 닫는다. 알림 규칙은 `.agents/rules/code-style/code-conventions.md` §3
 
 ```ts
+// src/features/post-create/model/useCreatePost.ts
 useMutation({
-  mutationFn: fetchCreatePost,
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['posts'] });
-    router.push('/post');
+  mutationFn: (req: CreatePostReq) => fetchCreatePost(req),
+  meta: { errorMessage: '게시글을 등록하지 못했습니다.' },
+  onSuccess: res => {
+    toast.success('게시글을 등록했습니다.');
+    router.push(`/post/${res.data.id}`);
   },
-  onError: err => alert(err.message), // TODO: 토스트 도입 후 교체
 });
 ```
 
@@ -79,6 +81,8 @@ useMutation({
 ## 6. QueryClient 설정
 
 `src/shared/api/tanstack-query/client.ts` **한 곳에서만** 변경. 개별 훅이나 Provider에서 `new QueryClient()` 생성 금지 — 캐시를 격리하려는 테스트는 예외다 ([`unit-testing.md`](../testing/unit-testing.md) §6).
+
+변경 요청의 실패 알림과 `meta` 타입(`errorMessage`)도 이 파일의 `MutationCache`와 `Register` 선언이 정의한다. 직접 만든 `QueryClient`에는 이 알림이 적용되지 않는다.
 
 ---
 
@@ -94,6 +98,7 @@ useMutation({
   - 반드시 있어야 동작하는 값은 그대로 요구한다 (목록·상세의 제목, 본문, 목록 행의 식별자, 페이지 정보). 게시글 등록 응답의 식별자는 곧바로 상세 화면 경로가 되므로 경로와 같은 규칙(`PostIdSchema`)으로 확인한다.
   - 화면에 대체 표시가 있는 값은 비어 있어도 받는다 (분류, 작성자 이름, 닉네임, 작성일, 편집 가능 여부).
   - 화면이 쓰지 않는 값은 `@shared/api/types`의 `lenient()`로 선언한다. 형식이 맞으면 전달하고, 없거나 달라도 요청을 막지 않는다 (공통 필드 `ok`·`message`, 조회수, 수정·가입 응답의 식별자). 변경 요청은 API가 이미 처리한 뒤에 응답을 검증하므로, 쓰지 않는 값 때문에 실패로 알리지 않는다.
+- 되돌릴 수 없는 변경이 화면에서 확인한 대상을 향하는지는 서버 액션이 다시 확인한다. 회원 탈퇴는 화면에서 확인한 계정과 API 토큰의 계정이 같을 때만 요청한다 ([`auth.md`](./auth.md) §5).
 - 서버 조회·서버 액션은 `fetchApi`를 통해 API에 접근한다. HTTP 클라이언트 도입 기준은 [라이브러리 결정](../infra/library-decisions.md#http-client-kyofetch)을 따른다.
 
 ---

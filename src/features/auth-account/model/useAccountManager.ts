@@ -1,6 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getSession, useSession } from 'next-auth/react';
-import { useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useForm } from 'react-hook-form';
 
 import { UpdateAccountReq } from '../api/types';
@@ -68,10 +74,43 @@ export function useAccountManager() {
     }
   });
   const deleteMutate = useDeleteAccount();
+  const [deleteDialogUserId, setDeleteDialogUserId] = useState<string>();
+  // 탈퇴 확인은 대화상자를 연 계정에만 유효하다. 세션이 끝나거나 다른 계정으로 바뀌면 닫는다.
+  if (deleteDialogUserId !== undefined && deleteDialogUserId !== userId) {
+    setDeleteDialogUserId(undefined);
+  }
+  const sessionUserId = useRef(userId);
+  useLayoutEffect(() => {
+    sessionUserId.current = userId;
+  }, [userId]);
   const canEdit = userId !== undefined;
   const isSessionMissing = status === 'unauthenticated';
   const isLoading =
     status === 'loading' || updateMutate.isPending || deleteMutate.isPending;
+
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
+  const restoredDeleteAttempt = useRef<number>(undefined);
+  const failedDeleteAttempt =
+    deleteMutate.isError &&
+    !isLoading &&
+    deleteMutate.variables?.user_id === userId
+      ? deleteMutate.submittedAt
+      : undefined;
+  // 탈퇴를 요청하는 동안 여는 버튼이 비활성화되어 브라우저가 대화상자를 닫으며 초점을 되돌리지 못한다.
+  // 요청이 실패해 버튼을 다시 쓸 수 있게 되면 한 번만, 사용자가 그사이 다른 곳으로 옮기지 않은 초점을 되돌린다.
+  useEffect(() => {
+    if (
+      failedDeleteAttempt === undefined ||
+      restoredDeleteAttempt.current === failedDeleteAttempt
+    ) {
+      return;
+    }
+
+    restoredDeleteAttempt.current = failedDeleteAttempt;
+    if (document.activeElement === document.body) {
+      deleteButtonRef.current?.focus();
+    }
+  }, [failedDeleteAttempt]);
 
   const handleCheckSession = async () => {
     if (isCheckingSession) return;
@@ -87,21 +126,40 @@ export function useAccountManager() {
   };
 
   const handleDeleteAccount = () => {
-    if (!canEdit || isLoading) return;
+    if (canEdit && !isLoading) setDeleteDialogUserId(userId);
+  };
 
-    const deletedReason = prompt(
-      '회원 탈퇴를 진행하려면 탈퇴 사유를 입력해 주세요.'
-    );
-    if (!deletedReason) return;
+  const handleCancelDeleteAccount = () => {
+    setDeleteDialogUserId(undefined);
+  };
 
-    deleteMutate.mutate({ deleted_reason: deletedReason });
+  const handleConfirmDeleteAccount = (deletedReason: string) => {
+    // 폼 검증을 기다린 뒤 호출되므로, 그사이 세션이 바뀌었는지는 렌더 시점의 값이 아닌 최신 값으로 확인한다.
+    if (
+      deleteDialogUserId === undefined ||
+      deleteDialogUserId !== sessionUserId.current ||
+      isLoading
+    ) {
+      return;
+    }
+
+    setDeleteDialogUserId(undefined);
+    deleteMutate.mutate({
+      deleted_reason: deletedReason,
+      user_id: deleteDialogUserId,
+    });
   };
 
   return {
     methods,
     handleUpdateAccount,
     handleDeleteAccount,
+    handleCancelDeleteAccount,
+    handleConfirmDeleteAccount,
     handleCheckSession,
+    accountId: userId,
+    isDeleteDialogOpen: deleteDialogUserId !== undefined,
+    deleteButtonRef,
     canEdit,
     isSessionMissing,
     isCheckingSession,

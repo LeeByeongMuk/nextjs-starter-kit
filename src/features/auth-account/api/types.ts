@@ -20,13 +20,19 @@ export const UpdateAccountResSchema = ApiResponseSchema.extend({
 /** 회원 정보 수정 응답 */
 export type UpdateAccountRes = z.infer<typeof UpdateAccountResSchema>;
 
-/** 회원 탈퇴 요청 스키마 */
+/** 회원 탈퇴 요청 스키마 — 화면에서 탈퇴를 확인한 계정을 함께 받아 그 계정일 때만 탈퇴시킨다 */
 export const DeleteAccountReqSchema = z.object({
   deleted_reason: z.string(),
+  user_id: z.string(),
 });
 
 /** 회원 탈퇴 요청 */
 export type DeleteAccountReq = z.infer<typeof DeleteAccountReqSchema>;
+
+/** API 토큰이 가리키는 회원의 식별자 조회 응답 스키마 */
+export const AccountIdResSchema = z.object({
+  data: UserDataSchema.pick({ id: true }),
+});
 
 /** 회원 탈퇴 응답 스키마 */
 export const DeleteAccountResSchema = ApiResponseSchema;

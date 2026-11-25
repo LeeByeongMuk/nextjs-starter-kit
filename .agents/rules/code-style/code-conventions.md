@@ -17,14 +17,14 @@ paths:
    - 파일 3분할: `model/form.ts`(Zod 스키마·입력 타입·기본값) + `model/use<Slice>Form.ts`(`zodResolver` 연결) + `ui/<Slice>Form.tsx`. `register()` 인라인 룰 금지
    - `useForm()` 호출에 **`defaultValues` 필수**
    - `FormProvider` + `useFormContext()` (prop drilling 금지)
-4. **에러 피드백**: **신규 `alert()` 호출 금지** — §3.4
+4. **피드백**: 완료·실패 알림은 `@shared/ui/toast`의 `toast`, 확인은 `@shared/ui/dialog/ConfirmDialog` — 네이티브 `alert()`·`confirm()`·`prompt()` 금지 — §3
 5. **NextAuth deep-import**: `src/app/auth/config.ts`에서만 허용. 다른 곳에서 복제 금지 — [`auth.md`](../architecture/auth.md) §2
 6. **테스트**: 파일명 `*.spec.tsx` 고정, MSW 오버라이드는 `server.use(http....)` — [`unit-testing.md`](../testing/unit-testing.md)
 
 **Hard rules** (ESLint가 못 잡는 것 포함).
 
 - `useForm()`에서 `defaultValues` 누락 → 작성 전에 반드시 추가
-- `alert()` 신규 호출 → 작성 금지 (기존 호출은 교체 대상)
+- `alert()`·`confirm()`·`prompt()` 호출 → 금지 (ESLint `no-alert`가 error). 알림은 `toast`, 확인·입력은 대화상자 — §3
 - TS `enum` 사용 → as-const union으로 대체 — §1.4
 - `QueryClient` 새로 생성 → `src/shared/api/tanstack-query/client.ts`만 사용
 - `classnames` 신규 import → 금지 (사용처가 없어 의존성 제거) — [`styling.md`](./styling.md) §1
@@ -168,26 +168,33 @@ export type PostType = z.infer<typeof PostTypeSchema>;
 
 ## 3. 에러 / 피드백 정책
 
-### 3.1 현행
+### 3.1 알림 (토스트)
 
-- Mutation 성공: `router.push(...)` + `alert('완료되었습니다.')`
-- Mutation 실패: `alert(error.message)`
-- 입력 검증 실패: RHF `errors` 객체 → 폼 필드 아래 텍스트 렌더
+- 동작의 완료·실패는 `@shared/ui/toast`의 `toast.success(...)` / `toast.error(...)`로 알린다. 슬라이스에서 `sonner`를 직접 import하지 않는다 (라이브러리 선정 근거는 [`library-decisions.md`](../infra/library-decisions.md) §토스트 알림)
+- 알림 영역 `@shared/ui/toast/Toaster`는 루트 레이아웃(`src/app/(domain)/layout.tsx`)에 한 번만 둔다
+- 성공 알림은 잠시 뒤 사라진다. 오류 알림은 닫기 버튼을 누르거나 다음 요청을 시작할 때까지 남는다 — 변경 요청(mutation)과 로그인 시도는 시작할 때 표시 중인 알림을 닫는다
+- Mutation 실패는 `QueryClient`가 한곳에서 알린다. 각 mutation은 `meta.errorMessage`에 문구만 지정한다 — [`data-fetching.md`](../architecture/data-fetching.md) §5
+- 알림 직후 전체 문서 이동(Auth.js `signIn`·`signOut` 리다이렉트)이 이어지면 `toast.success(message, { survivesNavigation: true })`를 쓴다. 표시를 마치기 전에 문서가 바뀌면 다음 문서에서 한 번 더 표시한다
+- 새 변경 요청은 표시 중인 알림을 닫으므로, 요청이 진행 중일 때는 같은 동작을 다시 제출하지 않게 막는다. 렌더된 `isPending`은 연속 제출을 막지 못하므로 제출 순간 잠그는 ref를 쓴다 (`SignUpView`의 가입 요청)
+- 문구는 고정 문자열로 쓰고 서버 오류 원문을 넣지 않는다. 알림은 `aria-live="polite"` 영역으로 전달된다
 
-### 3.2 문제
+### 3.2 확인과 추가 입력 (대화상자)
 
-브라우저 네이티브 `alert()`는 접근성(포커스 강탈), 스타일 커스텀 불가, 비동기 제어(UX 흐름 끊김) 모두 취약. 프로덕션 표준이 될 수 없음.
+- 되돌릴 수 없는 동작은 `@shared/ui/dialog/ConfirmDialog`로 확인받는다. 열리면 취소에 초점을 둔다
+- 확인에 입력이 필요하면 `@shared/ui/dialog/Dialog` 안에 폼을 둔다 (예: `src/features/auth-account/ui/DeleteAccountDialog.tsx`)
+- 대화상자는 네이티브 `<dialog>`의 모달 동작(배경 비활성화, Esc 닫기, 닫힌 뒤 초점 복귀)을 쓰고, 열림 상태는 상위가 `open`으로 제어한다
+- 대화상자가 열린 동안 바깥의 알림 영역은 조작할 수 없다. 대화상자 안에서 생긴 오류는 대화상자 안에 표시한다
+- 대화상자의 열림 상태와 입력은 그것을 연 대상에 묶는다. 대상이 바뀌면 닫고 입력을 버린다 — 탈퇴 대화상자는 연 계정의 세션이 끝나거나 다른 계정으로 바뀌면 닫힌다 (`useAccountManager`). 입력은 `key`로 대화상자를 새로 만들지 않고 `reset()`으로 비운다. 열린 `<dialog>`를 DOM에서 그냥 제거하면 브라우저가 초점을 되돌리지 않는다
+- 확인 뒤 요청하는 동안 여는 버튼이 비활성화되면 브라우저가 초점을 되돌리지 못한다. 요청이 실패해 버튼을 다시 쓸 수 있게 되면 한 번만, 사용자가 그사이 옮기지 않은 초점을 직접 되돌린다 (`useAccountManager`)
 
-### 3.3 목표 (후속 PR)
+### 3.3 화면 안의 상태
 
-- 토스트 라이브러리 도입 (`sonner` 또는 `react-hot-toast` — 선정은 별도 PR)
-- `src/shared/ui/toast/` 래퍼 레이어 → 슬라이스는 `toast.success(...)` / `toast.error(...)` 호출
-- 중앙 Mutation 에러 핸들러: `QueryClient`의 `defaultOptions.mutations.onError`에서 토스트 자동 표시
+- 입력 검증 실패: RHF `errors` → 필드 아래 `ValidationError` (`aria-invalid`·`aria-describedby` 연결)
+- 조회 실패·빈 결과·로딩은 해당 화면 안에 표시한다. 토스트로 대체하지 않는다
 
-### 3.4 지금의 규칙
+### 3.4 금지
 
-- **신규 코드에서 `alert()` 도입 금지**
-- 기존 `alert()` 호출은 토스트 도입 PR에서 일괄 교체 — 개별 PR에서 섞지 않음
+- 네이티브 `alert()`·`confirm()`·`prompt()` — 초점을 빼앗고 스타일을 맞출 수 없으며 흐름을 막는다. ESLint `no-alert`가 error로 막는다
 
 ---
 

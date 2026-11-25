@@ -51,7 +51,7 @@ export default function PostForm({ onSave }: Props) {
         setIsSaved(true);
       }, holdWhileReadingImages)(event);
     } catch {
-      // 저장 오류는 mutation의 onError에서 안내한다.
+      // 저장 오류는 QueryClient의 중앙 오류 처리가 알린다.
     } finally {
       if (submission.current === 'submitting') submission.current = 'idle';
     }

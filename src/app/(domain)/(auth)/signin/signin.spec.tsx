@@ -1,6 +1,8 @@
 import SignIn from '@app/(domain)/(auth)/signin/page';
 import { server } from '@shared/api/mocks/testServer';
+import { queryToasts, spyOnToast } from '@shared/lib/testing/toast';
 import { documentNavigation } from '@shared/lib/url';
+import Toaster from '@shared/ui/toast/Toaster';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 
@@ -65,6 +67,7 @@ describe('이메일 로그인', () => {
         }
       )
     );
+    render(<Toaster />);
   });
 
   test.each([
@@ -85,6 +88,7 @@ describe('이메일 로그인', () => {
   ])(
     'Auth.js 응답 호스트가 %s일 때 검증한 복귀 주소로 이동한다 (%s)',
     async (responseOrigin, returnTo, href) => {
+      const toastCalls = spyOnToast();
       respondToCallback.mockReturnValueOnce(
         signInResponse(`${responseOrigin}/`)
       );
@@ -108,7 +112,8 @@ describe('이메일 로그인', () => {
         returnRedirect: '1',
         body: { ...credentials, csrfToken, callbackUrl: '/' },
       });
-      expect(window.alert).not.toHaveBeenCalled();
+      expect(toastCalls.success).not.toHaveBeenCalled();
+      expect(toastCalls.error).not.toHaveBeenCalled();
     }
   );
 
@@ -178,9 +183,7 @@ describe('이메일 로그인', () => {
       const submit = fillCredentials();
       fireEvent.click(submit);
 
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(requestError)
-      );
+      expect(await screen.findByText(requestError)).toBeInTheDocument();
       expect(window.location.pathname).toBe('/signin');
       expect(navigate).not.toHaveBeenCalled();
       expect(screen.getByLabelText('이메일')).toHaveValue(credentials.email);
@@ -194,6 +197,7 @@ describe('이메일 로그인', () => {
       fireEvent.click(submit);
       await waitFor(() => expect(navigate).toHaveBeenCalledWith(`${origin}/`));
       expect(csrf).toHaveBeenCalledTimes(2);
+      await waitFor(() => expect(queryToasts()).toHaveLength(0));
     }
   );
 
@@ -209,9 +213,7 @@ describe('이메일 로그인', () => {
       const submit = fillCredentials();
       fireEvent.click(submit);
 
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(credentialsError)
-      );
+      expect(await screen.findByText(credentialsError)).toBeInTheDocument();
       expect(navigate).not.toHaveBeenCalled();
       expect(screen.getByLabelText('이메일')).toHaveValue(credentials.email);
       expect(submit).toBeEnabled();

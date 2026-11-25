@@ -1,17 +1,19 @@
 import Account from '@app/(domain)/(auth)/account/page';
-import { useDeleteAccount } from '@features/auth-account';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { TOKEN_KEY } from '@shared/config/auth';
+import { spyOnToast } from '@shared/lib/testing/toast';
 import { getHandlerURI } from '@shared/lib/url';
+import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
   fireEvent,
   render,
-  renderHook,
+  type RenderResult,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { cookies } from 'next/headers';
@@ -67,6 +69,7 @@ describe('마이페이지 페이지 테스트', () => {
       delete: deleteCookie,
     });
     setSession(account);
+    render(<Toaster />);
   });
 
   describe('회원 정보 수정 테스트', () => {
@@ -195,7 +198,9 @@ describe('마이페이지 페이지 테스트', () => {
 
       finishSessionUpdate();
       await waitFor(() => expect(submit).toBeEnabled());
-      expect(window.alert).toHaveBeenCalledWith('회원 정보를 수정했습니다.');
+      expect(
+        await screen.findByText('회원 정보를 수정했습니다.')
+      ).toBeInTheDocument();
       expect(name).toHaveValue(saved.name);
       expect(screen.getByLabelText('닉네임')).toHaveValue(saved.nickname);
 
@@ -226,7 +231,9 @@ describe('마이페이지 페이지 테스트', () => {
 
       await waitFor(() => expect(name).toHaveValue(saved.name));
       expect(getSessionMock).toHaveBeenCalledTimes(1);
-      expect(window.alert).toHaveBeenCalledWith('회원 정보를 수정했습니다.');
+      expect(
+        await screen.findByText('회원 정보를 수정했습니다.')
+      ).toBeInTheDocument();
     });
 
     test('저장 요청 중 계정이 바뀌면 이전 계정의 저장 응답을 폼에 적용하지 않는다', async () => {
@@ -269,11 +276,9 @@ describe('마이페이지 페이지 테스트', () => {
       fireEvent.change(name, { target: { value: '새 이름' } });
       fireEvent.click(submit);
 
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(
-          '회원 정보를 수정하지 못했습니다.'
-        )
-      );
+      expect(
+        await screen.findByText('회원 정보를 수정하지 못했습니다.')
+      ).toBeInTheDocument();
       expect(updateSession).not.toHaveBeenCalled();
       expect(name).toHaveValue('새 이름');
       expect(submit).toBeEnabled();
@@ -281,37 +286,89 @@ describe('마이페이지 페이지 테스트', () => {
   });
 
   describe('회원 탈퇴 테스트', () => {
+    const deleteRequest = jest.fn();
+    let view: RenderResult;
+    const openDialog = () => {
+      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
+      return screen.getByRole('dialog', { name: '회원 탈퇴' });
+    };
+    const submitReason = (dialog: HTMLElement, reason: string) => {
+      fireEvent.change(within(dialog).getByLabelText('탈퇴 사유'), {
+        target: { value: reason },
+      });
+      fireEvent.click(
+        within(dialog).getByRole('button', { name: '회원 탈퇴' })
+      );
+    };
+
     beforeEach(() => {
-      renderAccount();
+      deleteRequest.mockClear();
+      server.use(
+        http.delete(getHandlerURI('/api/users'), async ({ request }) => {
+          deleteRequest(await request.json());
+          return HttpResponse.json({ ok: true, message: 'success' });
+        })
+      );
+      view = renderAccount();
     });
 
     test('회원 탈퇴 버튼 클릭 시 탈퇴 사유 입력 모달이 뜬다', async () => {
       // when - 회원 탈퇴 버튼 클릭
-      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
+      const dialog = openDialog();
 
       // then - 탈퇴 사유 입력 모달이 뜬다
-      expect(window.prompt).toHaveBeenCalledWith(
+      expect(dialog).toHaveAccessibleDescription(
         '회원 탈퇴를 진행하려면 탈퇴 사유를 입력해 주세요.'
       );
+      expect(within(dialog).getByLabelText('탈퇴 사유')).toHaveFocus();
+    });
+
+    test('탈퇴 사유를 입력하지 않으면 오류를 알리고 탈퇴를 요청하지 않는다', async () => {
+      const dialog = openDialog();
+      fireEvent.click(
+        within(dialog).getByRole('button', { name: '회원 탈퇴' })
+      );
+
+      const reason = within(dialog).getByLabelText('탈퇴 사유');
+      await waitFor(() =>
+        expect(reason).toHaveAccessibleDescription('탈퇴 사유를 입력해 주세요.')
+      );
+      expect(dialog).toBeVisible();
+      expect(deleteRequest).not.toHaveBeenCalled();
+    });
+
+    test('취소하면 입력한 사유를 비우고 탈퇴를 요청하지 않는다', async () => {
+      const dialog = openDialog();
+      fireEvent.change(within(dialog).getByLabelText('탈퇴 사유'), {
+        target: { value: 'reason' },
+      });
+      fireEvent.click(within(dialog).getByRole('button', { name: '취소' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(deleteRequest).not.toHaveBeenCalled();
+      expect(within(openDialog()).getByLabelText('탈퇴 사유')).toHaveValue('');
     });
 
     test('회원 탈퇴 성공 시 로그아웃 처리된다.', async () => {
-      // when - 회원 탈퇴 버튼 클릭
-      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
+      const toastCalls = spyOnToast();
+
+      // when - 탈퇴 사유를 입력하고 탈퇴를 확인
+      submitReason(openDialog(), 'reason');
 
       // then - 로그아웃 처리된다
-      const { result } = renderHook(() => useDeleteAccount(), { wrapper });
-
-      act(() => {
-        result.current.mutate({
-          deleted_reason: 'reason',
-        });
-      });
-
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith('회원 탈퇴가 완료되었습니다.');
+      expect(
+        await screen.findByText('회원 탈퇴가 완료되었습니다.')
+      ).toBeInTheDocument();
+      await waitFor(() =>
+        expect(signOut).toHaveBeenCalledWith({ redirectTo: '/' })
+      );
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(toastCalls.success).toHaveBeenCalledWith(
+        '회원 탈퇴가 완료되었습니다.',
+        { survivesNavigation: true }
+      );
+      expect(deleteRequest).toHaveBeenCalledWith({ deleted_reason: 'reason' });
       expect(deleteCookie).toHaveBeenCalledWith(TOKEN_KEY);
-      expect(signOut).toHaveBeenCalledWith({ redirectTo: '/' });
       expect(deleteCookie.mock.invocationCallOrder[0]).toBeLessThan(
         (signOut as jest.Mock).mock.invocationCallOrder[0]
       );
@@ -324,22 +381,151 @@ describe('마이페이지 페이지 테스트', () => {
           return new HttpResponse(null, { status: 500 });
         })
       );
-      // when - 회원 탈퇴 버튼 클릭
-      fireEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }));
+      // when - 탈퇴 사유를 입력하고 탈퇴를 확인
+      submitReason(openDialog(), 'reason');
 
-      // then - 에러 메세지가 표시된다
-      const { result } = renderHook(() => useDeleteAccount(), { wrapper });
+      // then - 에러 메세지가 표시되고 입력한 사유로 다시 시도할 수 있다
+      expect(
+        await screen.findByText('회원 탈퇴를 완료하지 못했습니다.')
+      ).toBeInTheDocument();
+      expect(signOut).not.toHaveBeenCalled();
+      const openButton = screen.getByRole('button', { name: '회원 탈퇴' });
+      await waitFor(() => expect(openButton).toBeEnabled());
+      expect(openButton).toHaveFocus();
+      expect(within(openDialog()).getByLabelText('탈퇴 사유')).toHaveValue(
+        'reason'
+      );
+    });
 
-      act(() => {
-        result.current.mutate({
-          deleted_reason: 'reason',
-        });
+    test('탈퇴를 요청하는 동안 초점을 다른 곳으로 옮겼으면 실패해도 가져오지 않는다', async () => {
+      const deleteStarted = jest.fn();
+      let failDelete = () => {};
+      server.use(
+        http.delete(getHandlerURI('/api/users'), () => {
+          deleteStarted();
+          return new Promise<HttpResponse<null>>(resolve => {
+            failDelete = () => resolve(new HttpResponse(null, { status: 500 }));
+          });
+        })
+      );
+      const elsewhere = document.body.appendChild(
+        document.createElement('button')
+      );
+
+      submitReason(openDialog(), 'reason');
+      await waitFor(() => expect(deleteStarted).toHaveBeenCalled());
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      elsewhere.focus();
+      failDelete();
+
+      await screen.findByText('회원 탈퇴를 완료하지 못했습니다.');
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: '회원 탈퇴' })).toBeEnabled()
+      );
+      expect(elsewhere).toHaveFocus();
+      elsewhere.remove();
+    });
+
+    test('실패한 탈퇴 요청의 초점은 한 번만 되돌린다', async () => {
+      let finishUpdate = () => {};
+      const updateReleased = new Promise<void>(resolve => {
+        finishUpdate = resolve;
+      });
+      updateSession.mockResolvedValue(newSession(account));
+      server.use(
+        http.delete(
+          getHandlerURI('/api/users'),
+          () => new HttpResponse(null, { status: 500 })
+        ),
+        http.put(getHandlerURI('/api/users'), async () => {
+          await updateReleased;
+          return HttpResponse.json({ data: account });
+        })
+      );
+      const openButton = screen.getByRole('button', { name: '회원 탈퇴' });
+      submitReason(openDialog(), 'reason');
+      await screen.findByText('회원 탈퇴를 완료하지 못했습니다.');
+      await waitFor(() => expect(openButton).toHaveFocus());
+
+      openButton.blur();
+      fireEvent.submit(screen.getByRole('button', { name: '변경 사항 저장' }));
+      await waitFor(() => expect(openButton).toBeDisabled());
+      finishUpdate();
+
+      expect(
+        await screen.findByText('회원 정보를 수정했습니다.')
+      ).toBeInTheDocument();
+      await waitFor(() => expect(openButton).toBeEnabled());
+      expect(document.body).toHaveFocus();
+    });
+
+    test('대화상자를 연 뒤 다른 계정으로 바뀌면 닫고 입력한 사유를 버린다', async () => {
+      const other = { ...account, id: '2', email: 'other@email.com' };
+      server.use(
+        http.get(getHandlerURI('/api/users'), () =>
+          HttpResponse.json({ data: other })
+        )
+      );
+      const openButton = screen.getByRole('button', { name: '회원 탈퇴' });
+      openButton.focus();
+      fireEvent.change(within(openDialog()).getByLabelText('탈퇴 사유'), {
+        target: { value: '이전 계정의 사유' },
       });
 
-      await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(
-        '회원 탈퇴를 완료하지 못했습니다.'
+      setSession(other);
+      view.rerender(<Account />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(openButton).toHaveFocus();
+      expect(deleteRequest).not.toHaveBeenCalled();
+
+      const dialog = openDialog();
+      expect(within(dialog).getByLabelText('탈퇴 사유')).toHaveValue('');
+      submitReason(dialog, '새 계정의 사유');
+      await waitFor(() =>
+        expect(deleteRequest).toHaveBeenCalledWith({
+          deleted_reason: '새 계정의 사유',
+        })
       );
+      expect(deleteRequest).toHaveBeenCalledTimes(1);
+    });
+
+    test('탈퇴를 확인한 직후 다른 계정으로 바뀌면 이전 계정의 확인으로 탈퇴를 요청하지 않는다', async () => {
+      const accountRequest = jest.fn();
+      server.use(
+        http.get(getHandlerURI('/api/users'), () => {
+          accountRequest();
+          return HttpResponse.json({ data: account });
+        })
+      );
+
+      submitReason(openDialog(), '이전 계정의 사유');
+      setSession({ ...account, id: '2', email: 'other@email.com' });
+      view.rerender(<Account />);
+
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: '회원 탈퇴' })).toBeEnabled()
+      );
+      await new Promise(resolve => setTimeout(resolve, 50));
+      expect(accountRequest).not.toHaveBeenCalled();
+      expect(deleteRequest).not.toHaveBeenCalled();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    test('대화상자를 연 뒤 세션이 끝나면 닫고, 같은 계정으로 돌아와도 다시 열지 않는다', () => {
+      fireEvent.change(within(openDialog()).getByLabelText('탈퇴 사유'), {
+        target: { value: 'reason' },
+      });
+
+      setMissingSession();
+      view.rerender(<Account />);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      setSession(account);
+      view.rerender(<Account />);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(within(openDialog()).getByLabelText('탈퇴 사유')).toHaveValue('');
+      expect(deleteRequest).not.toHaveBeenCalled();
     });
   });
 });

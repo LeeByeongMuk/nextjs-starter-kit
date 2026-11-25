@@ -24,18 +24,18 @@ user-invocable: true
 2. `git fetch origin develop && git switch develop && git merge --ff-only origin/develop` 후 브랜치: `refactor/<scope>` (PR Policy의 브랜치 이름 패턴: 소문자·슬래시 구분).
 3. **위반 인벤토리 grep 스윕** — 카테고리별 후보 수집 (재검증 전제, false positive 허용):
 
-   | 카테고리                       | 탐지                                                                                                                                                     |
-   | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | FSD 금지 폴더                  | `find src -type d \( -name components -o -name stores -o -name hooks -o -name services -o -name utils -o -name constants \)` → `ui/model/api/lib/config` |
-   | 레이어 역방향/deep import      | `npm run lint` (boundaries 에러)                                                                                                                         |
-   | `I*`/`T*` 타입 접두            | `grep -rnE '\b(interface\s+I[A-Z]                                                                                                                        | type\s+T[A-Z][A-Za-z]_\s_[=<])' src` |
-   | `enum` 사용                    | `grep -rnE '\benum\s' src` → as-const union                                                                                                              |
-   | 신규 `alert()`                 | `grep -rn 'alert(' src`                                                                                                                                  |
-   | `.then().catch()` 체인         | `grep -rn '\.then(' src` (병렬 combinator 제외)                                                                                                          |
-   | `defaultValues` 없는 `useForm` | `grep -rn 'useForm(' src` 후 수동 확인                                                                                                                   |
-   | 야생 `QueryClient` 생성        | `grep -rn 'new QueryClient' src` (shared/api/tanstack-query/client.ts 제외)                                                                              |
-   | 구분선·이력·AI 흔적 주석       | `grep -rnE '//\s*[─-]{2,}' src`                                                                                                                          |
-   | dead/orphan                    | 미사용 export·import·임시 fixtures                                                                                                                       |
+   | 카테고리                            | 탐지                                                                                                                                                     |
+   | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | FSD 금지 폴더                       | `find src -type d \( -name components -o -name stores -o -name hooks -o -name services -o -name utils -o -name constants \)` → `ui/model/api/lib/config` |
+   | 레이어 역방향/deep import           | `npm run lint` (boundaries 에러)                                                                                                                         |
+   | `I*`/`T*` 타입 접두                 | `grep -rnE '\b(interface\s+I[A-Z]                                                                                                                        | type\s+T[A-Z][A-Za-z]_\s_[=<])' src` |
+   | `enum` 사용                         | `grep -rnE '\benum\s' src` → as-const union                                                                                                              |
+   | 네이티브 `alert`·`confirm`·`prompt` | `npm run lint` (`no-alert` 에러)                                                                                                                         |
+   | `.then().catch()` 체인              | `grep -rn '\.then(' src` (병렬 combinator 제외)                                                                                                          |
+   | `defaultValues` 없는 `useForm`      | `grep -rn 'useForm(' src` 후 수동 확인                                                                                                                   |
+   | 야생 `QueryClient` 생성             | `grep -rn 'new QueryClient' src` (shared/api/tanstack-query/client.ts 제외)                                                                              |
+   | 구분선·이력·AI 흔적 주석            | `grep -rnE '//\s*[─-]{2,}' src`                                                                                                                          |
+   | dead/orphan                         | 미사용 export·import·임시 fixtures                                                                                                                       |
 
 4. **확인 포인트**: 인벤토리를 카테고리·파일별 표로 사용자에게 보여주고 _어디까지 이번 범위인지_ 합의.
 

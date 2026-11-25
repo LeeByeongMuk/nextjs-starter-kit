@@ -1,4 +1,5 @@
 import type { UserData } from '@entities/auth';
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { getSession, useSession } from 'next-auth/react';
 
@@ -12,6 +13,7 @@ export default function useUpdateAccount(
 
   return useMutation({
     mutationFn: fetchUpdateAccount,
+    meta: { errorMessage: '회원 정보를 수정하지 못했습니다.' },
     onSuccess: async ({ data }) => {
       // Auth.js는 갱신 데이터를 전달해야 jwt 콜백에 update 트리거를 보낸다.
       const session =
@@ -20,10 +22,7 @@ export default function useUpdateAccount(
       if (!session?.user || String(session.user.id) === String(data.id)) {
         onSaved?.(data);
       }
-      alert('회원 정보를 수정했습니다.');
-    },
-    onError: () => {
-      alert('회원 정보를 수정하지 못했습니다.');
+      toast.success('회원 정보를 수정했습니다.');
     },
   });
 }

@@ -44,20 +44,26 @@ export default function useSomething(params: SomeReq) {
 ### Mutation Hook (model/)
 
 ```typescript
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
+import { fetchDeleteSomething } from '../api/someService';
 
 export default function useDeleteSomething(id: number) {
   const router = useRouter();
   return useMutation({
     mutationFn: () => fetchDeleteSomething({ id }),
+    meta: { errorMessage: '삭제하지 못했습니다.' },
     onSuccess: () => {
+      toast.success('삭제했습니다.');
       router.push('/');
     },
   });
 }
 ```
 
-에러 피드백에 `alert()` 신규 도입 금지 — 기존 코드의 `alert()`는 교체 대상이므로 따라 쓰지 않는다 (`.agents/rules/code-style/code-conventions.md` §3.4).
+실패 알림은 훅에 두지 않는다 — `meta.errorMessage`를 주면 `QueryClient`가 알린다. 네이티브 `alert()`·`confirm()`·`prompt()`는 금지이며 확인은 `@shared/ui/dialog/ConfirmDialog`를 쓴다 (`.agents/rules/code-style/code-conventions.md` §3).
 
 ### API Service (api/)
 
