@@ -16,6 +16,7 @@ export default function PostDetailView() {
     isError,
     isLoading,
     isFetching,
+    isDeleteDisabled,
     isDeleteConfirmOpen,
     handleRedirectBack,
     handleDeletePost,
@@ -53,6 +54,7 @@ export default function PostDetailView() {
         <PostDetailActions
           id={id}
           isEditable={!!post?.is_editable}
+          isDeleteDisabled={isDeleteDisabled}
           handleRedirectBack={handleRedirectBack}
           handleDeletePost={handleDeletePost}
         />

@@ -2,7 +2,7 @@
 
 import { useDeletePost } from '@entities/post';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import usePost from './usePost';
 
@@ -13,7 +13,8 @@ export default function usePostDetail() {
   const id = Number(params.id);
 
   const { data, isError, isLoading, isFetching } = usePost();
-  const { mutate } = useDeletePost();
+  const { mutate, isPending, isSuccess } = useDeletePost();
+  const deleteStarted = useRef(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const handleRedirectBack = useCallback(() => {
@@ -21,7 +22,7 @@ export default function usePostDetail() {
   }, [router]);
 
   const handleDeletePost = useCallback(() => {
-    setIsDeleteConfirmOpen(true);
+    if (!deleteStarted.current) setIsDeleteConfirmOpen(true);
   }, []);
 
   const handleCancelDeletePost = useCallback(() => {
@@ -29,8 +30,15 @@ export default function usePostDetail() {
   }, []);
 
   const handleConfirmDeletePost = useCallback(() => {
+    if (deleteStarted.current) return;
+
+    deleteStarted.current = true;
     setIsDeleteConfirmOpen(false);
-    mutate();
+    mutate(undefined, {
+      onError: () => {
+        deleteStarted.current = false;
+      },
+    });
   }, [mutate]);
 
   return {
@@ -39,6 +47,7 @@ export default function usePostDetail() {
     isError,
     isLoading,
     isFetching,
+    isDeleteDisabled: isPending || isSuccess,
     isDeleteConfirmOpen,
     handleRedirectBack,
     handleDeletePost,

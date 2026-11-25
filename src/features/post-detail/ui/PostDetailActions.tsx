@@ -3,6 +3,7 @@ import Link from 'next/link';
 interface PostDetailActionsProps {
   id: number;
   isEditable: boolean;
+  isDeleteDisabled: boolean;
   handleRedirectBack: () => void;
   handleDeletePost: () => void;
 }
@@ -11,6 +12,7 @@ interface PostDetailActionsProps {
 export default function PostDetailActions({
   id,
   isEditable,
+  isDeleteDisabled,
   handleRedirectBack,
   handleDeletePost,
 }: PostDetailActionsProps) {
@@ -33,8 +35,9 @@ export default function PostDetailActions({
           </Link>
           <button
             type="button"
+            aria-disabled={isDeleteDisabled}
             onClick={handleDeletePost}
-            className="ml-auto min-h-11 rounded px-4 py-2 text-sm text-danger hover:underline"
+            className="ml-auto min-h-11 rounded px-4 py-2 text-sm text-danger hover:underline aria-disabled:cursor-default aria-disabled:opacity-60 aria-disabled:no-underline"
           >
             삭제
           </button>
