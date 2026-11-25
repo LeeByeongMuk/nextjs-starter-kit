@@ -1,4 +1,4 @@
-import { deleteAccessToken } from '@shared/lib/api';
+import { deleteAccessToken } from '@shared/lib/deleteAccessToken';
 import { useMutation } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 

@@ -25,6 +25,7 @@ paths:
 - Node.js는 `.nvmrc`의 26.13.1 LTS, npm은 동봉된 11.20.0을 사용한다. `package.json`의 engines, CI, Docker가 같은 계열을 따른다.
 - `@types/node`는 Node 런타임 메이저(26)에 맞춰 올린다. 그래서 Dependabot 버전 업데이트에서 `@types/node` 메이저를 제외한다.
 - 설치는 `npm ci`로 재현한다. 정확한 패키지 버전은 `package-lock.json`이 정본이다. `npm run setup`도 `npm ci`를 실행하며 AI 스킬은 `--skills`로 선택 설치한다.
+- 운영 의존성만 설치할 때는 같은 잠금 파일로 `npm ci --omit=dev`를 실행한다. `prepare`는 Husky가 설치된 환경에서 훅을 설정하며, `HUSKY=0`이면 건너뛴다.
 - npm 11.20은 `allowScripts`에 기록되지 않은 의존성 install script도 실행하지만 설치할 때마다 경고한다. `package.json`의 `allowScripts`에 실행 여부를 기록한다. `esbuild`는 플랫폼 바이너리를 확인해 CLI에 연결하므로 승인한다. `fsevents`는 실행할 스크립트가 없고, `@parcel/watcher`는 `npm_config_build_from_source`일 때만 빌드하며, `msw`는 `msw.workerDirectory` 설정이 없으면 아무 작업도 하지 않으므로 거부한다. install script가 있는 의존성이 새로 생기면 `npm install-scripts ls`로 확인한 뒤 승인 또는 거부를 기록한다. `npm install-scripts prune`은 설치되지 않은 패키지의 항목도 지우므로 Linux에서 실행하면 macOS 전용 `fsevents` 항목이 빠진다. 이 항목이 없으면 macOS에서 설치할 때 다시 경고하므로 prune이 지운 `fsevents` 항목은 되돌린다.
 - Next/React, Tailwind/PostCSS 플러그인, TanStack Query/devtools/ESLint 플러그인은 각 peer 범위에 맞춰 함께 갱신한다. 같은 메이저라도 타입·lint·테스트·production build를 통과해야 한다.
 - React 19는 Toast UI wrapper의 공식 peer(`^17.0.1`) 밖이다. 기존 override를 유지하며 에디터 작성·수정·저장 흐름을 실제 브라우저에서 확인한다.
@@ -44,7 +45,7 @@ paths:
 ## 의존성 보안 패치
 
 - Toast UI Editor 3.2.2와 React wrapper 3.2.3은 보안 패치 대상 배포물을 고정하기 위해 정확한 버전으로 설치한다. wrapper도 같은 에디터를 사용하도록 override한다. DOMPurify는 직접 의존성 3.4.18로 고정하고 에디터의 전이 의존성에도 같은 버전을 적용한다.
-- `scripts/patch-toast-ui.mjs`는 `postinstall`에서 에디터·뷰어의 ESM·UMD 네 파일에 내장된 DOMPurify 2.3.3을 제거한다. ESM은 설치된 DOMPurify를 import하고, UMD는 해당 버전의 CJS 구현과 라이선스를 포함한다. `customHTMLSanitizer`만 설정하면 우회되지 않는 내부 정제 호출도 이 패치의 적용 대상이다.
+- `scripts/patch-toast-ui.mjs`는 전체 설치와 운영 의존성만 설치할 때 모두 `postinstall`에서 실행된다. 에디터·뷰어의 ESM·UMD 네 파일에 내장된 DOMPurify 2.3.3을 제거한다. ESM은 설치된 DOMPurify를 import하고, UMD는 해당 버전의 CJS 구현과 라이선스를 포함한다. `customHTMLSanitizer`와 관계없이 에디터 자체의 정제 호출에도 패치가 적용된다.
 - 패치는 원본·결과와 DOMPurify 배포물의 SHA-256을 검증하고, 예상하지 못한 파일에서는 실패한다. 반복 실행은 안전하다. `predev`와 `prebuild`도 적용 상태를 검사한다. `--ignore-scripts`로 설치했다면 `npm run postinstall`을 실행해야 한다. Docker는 설치 전에 패치 스크립트를 복사한다.
 - Toast UI 또는 DOMPurify 버전을 올릴 때는 패치의 해시와 정제 동작을 함께 검증한다. `npm test`의 에디터 보안·HTML 왕복 테스트, 실제 브라우저의 작성·수정·저장, 타입·lint·production build를 통과해야 한다. CI는 `npm audit --omit=dev`로 운영 의존성도 검사한다.
 - [minimatch 패턴 증폭](https://github.com/advisories/GHSA-g3hv-75wg-m249)은 취약 범위 `>=7 <11.0.1`에만 11.0.9를 적용한다. 기존 3.x API는 유지한다. [glob 취소 우회](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)는 `>=9 <14.0.2`에만 14.0.6을 적용한다. typescript-eslint는 수정된 minimatch를 사용하는 8.73.0이며, Jest·test-exclude의 상위 의존성이 수정 버전을 채택하면 해당 override를 제거한다.
@@ -68,14 +69,14 @@ paths:
 
 ## Jest → Vitest
 
-- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 테스트 파일 10개 (페이지 통합, 인증 쿠키, 에디터 보안, 설치 패치 회귀 테스트). 커버리지 60% 기준
+- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 페이지 통합과 인증·에디터·설치 패치 회귀 테스트를 실행한다. 커버리지 60% 기준
 - **교체 찬**: Vitest가 ESM 네이티브 + SWC/esbuild 기반으로 빠름. `transformIgnorePatterns` 같은 수동 튜닝 불필요. Vite 생태계와 호환
 - **교체 반**:
   - Jest 30은 최신 메이저, 기능 결함 없음
-  - 현재 테스트 파일 10개 — 속도 gain 체감 미미 (초 단위)
+  - 현재 테스트 규모에서 실행 시간 차이는 작음
   - NextAuth/Auth.js의 ESM 이슈가 Vitest로 옮긴다고 자동 해결되지 않음 (Vitest도 `deps.inline`/`server.deps` 튜닝 필요)
   - `next/jest` preset을 버려야 하므로 Next.js 공식 경로에서 벗어남
-- **비용**: Medium — 설정 포팅 + 10개 테스트 파일 검증 + CI 파이프라인 조정
+- **비용**: Medium — 설정 포팅 + 기존 테스트 검증 + CI 파이프라인 조정
 - **결정**: **유지**
 - **재검토 조건**: 테스트 파일 수가 30개를 초과하거나 CI에서 `npm test` 소요 시간이 3분을 넘을 때. Vitest v4 이상이 `next/jest` 수준의 공식 preset을 제공할 때
 
@@ -83,13 +84,13 @@ paths:
 
 ## Zod 도입
 
-- **현황**: 런타임 검증 **없음**. `React Hook Form`의 `register()` 인라인 룰(regex, required)만 존재. API 응답은 `interface`로 타입 단언만 — 스키마 부재
+- **현황**: 폼은 `React Hook Form`의 `register()` 인라인 룰을 사용한다. 서버 액션은 식별자와 요청값을 각각 확인한다. API 응답 타입과 전달 필드는 함수별로 정의한다.
 - **교체 찬** (도입 찬):
   - **폼 검증 단일화**: `zodResolver(schema)`로 RHF + Zod 연동 → 검증 룰을 한 곳에서 관리
   - **API 경계 안전성**: `fetchApi<Schema>()`가 응답을 런타임 파싱 → 서버 스펙 변경 시 즉시 감지
   - **에러 포맷 표준화**: `ApiError` 스키마 → `onError`에서 일관된 메시지 추출
   - **타입 추론 통합**: `z.infer<typeof SignInReqSchema>` → 수동 `interface` 제거
-- **교체 반**: 없음 — 런타임 검증이 아예 없는 것이 문제
+- **교체 반**: 기존 폼과 서버 액션의 검증 규칙 및 오류 처리를 스키마로 이관해야 함
 - **비용**: Small (2~4h)
 - **결정**: **도입** (별도 PR `feat/zod-validation`)
 - **재검토 조건**: 즉시 유효
@@ -127,14 +128,14 @@ paths:
 
 ## Toast UI Editor → TipTap/Lexical
 
-- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정 입력은 `src/entities/post/ui/Editor.tsx`와 `src/entities/post/ui/Form/ContentsEditor.tsx`를 사용한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override로 강제 설치. FSD 마이그레이션 중 SSR에서 DOM globals 참조로 이슈 발생 → barrel에서 제외, deep-import + ESLint disable 코멘트로 해결
+- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정의 공용 `PostForm`에서 `ContentsEditor`가 `Editor`를 클라이언트 전용으로 로드한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override를 적용한다.
 - **교체 찬**:
   - Toast UI 배포물의 오래된 DOMPurify는 [의존성 보안 패치](#의존성-보안-패치)로 교체한다. 상위 패키지가 수정된 정제기를 배포하기 전까지 설치 패치와 HTML 왕복 검증을 직접 유지해야 한다.
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크
   - 현대적 대안: **TipTap**(Prosemirror, headless, 생태계 풍부), **Lexical**(Meta, 확장성 높음)
 - **교체 반**:
-  - 현재 SSR 이슈는 해결된 상태 (barrel 제외로 번들 오염 차단)
+  - 에디터 코드는 작성·수정 폼에서 동적으로 로드함
   - 에디터 교체는 API·툴바·마크다운 시리얼라이즈 전부 재작성 — 위험도 높음
   - 기능 요구사항 변화 없음 (단순 포스트 작성/표시)
 - **비용**: Large (재작성 + 콘텐츠 마이그레이션 + 재테스트)
@@ -176,12 +177,12 @@ paths:
 
 ## HTTP client (ky/ofetch)
 
-- **현황**: `src/shared/lib/api.ts`의 자체 래퍼(`fetchApi<Response>`). 36줄. `'use server'` 지시어, `cookies()`로 `TOKEN_KEY` 헤더 주입, `Content-Type` 기본값, `!res.ok` 시 throw
+- **현황**: `src/shared/lib/api.ts`의 서버 전용 래퍼(`fetchApi<Response>`)와 기능별 서버 액션을 사용한다. API 경계와 인증 헤더 정책은 [데이터 페칭 규칙](../architecture/data-fetching.md)을 따른다.
 - **교체 찬**: ky/ofetch는 재시도(retry), 타임아웃, 인터셉터, 훅을 제공 → 공통 에러 처리 일원화
 - **교체 반**:
-  - 현재 래퍼가 **Next.js 서버 액션 경계**(`'use server'` + `next/headers`)에 맞춰 짜여 있음 — 외부 클라이언트는 이 경계와 충돌할 수 있음
+  - 교체 시 서버 전용 모듈과 기능별 서버 액션의 동작을 함께 검증해야 함
   - 재시도/타임아웃 현재 요구 없음
-  - 36줄짜리를 의존성으로 교체하는 것은 BLOAT
+  - 현재 요청 정책을 구현하는 데 추가 의존성이 필요하지 않음
 - **비용**: Small (래퍼 교체 자체는 쉽지만 서버 액션 동작 검증 필요)
 - **결정**: **유지 (자체 `fetchApi`)**
 - **재검토 조건**: 다음 중 **2개 이상**이 필요해질 때

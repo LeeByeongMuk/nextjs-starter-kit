@@ -4,7 +4,7 @@ import { ApiResponse } from '@shared/api/types';
 export interface UpdatePostReq {
   id: number;
   title: string;
-  type: PostType;
+  type: PostType | null;
   contents: string;
   is_open: boolean;
 }
@@ -17,7 +17,7 @@ export interface UpdatePostRes extends ApiResponse {
 
 export interface UpdatePostResourceData {
   id: number;
-  type: PostType;
+  type: string | null;
   title: string;
   contents: string;
   is_open: boolean;

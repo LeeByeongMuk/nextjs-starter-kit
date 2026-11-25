@@ -1,4 +1,4 @@
-import { LIST_TYPE_OPTIONS, type PostType } from '@entities/post';
+import { isPostType } from '@entities/post';
 
 import { PostsReq } from '../api/types';
 
@@ -9,9 +9,7 @@ export const parseSearchFilters = (search: string): PostsReq => {
   const page = Number(searchParams.get('page'));
 
   return {
-    type: (LIST_TYPE_OPTIONS.some(option => option.value === type)
-      ? type
-      : '') as PostType,
+    type: isPostType(type) ? type : '',
     q: searchParams.get('q') ?? '',
     page: Number.isSafeInteger(page) && page > 0 ? page : 1,
   };

@@ -8,7 +8,7 @@ import { FormProvider } from 'react-hook-form';
 
 /** 인증 폼과 관련 화면으로의 이동을 제공한다. */
 export default function SignInView() {
-  const { isLoading, handleSignIn, methods } = useSignInForm();
+  const { handleSignIn, isBusy, methods } = useSignInForm();
 
   return (
     <FormProvider {...methods}>
@@ -16,7 +16,7 @@ export default function SignInView() {
         <AuthHeader headText="로그인" />
 
         <div>
-          <SignInForm handleSignIn={handleSignIn} />
+          <SignInForm handleSignIn={handleSignIn} isBusy={isBusy} />
         </div>
         <p className="mt-8 text-sm text-muted">
           아직 계정이 없나요?{' '}
@@ -29,7 +29,7 @@ export default function SignInView() {
         </p>
       </section>
 
-      {isLoading && <LayerSpinner />}
+      {isBusy && <LayerSpinner />}
     </FormProvider>
   );
 }

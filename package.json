@@ -18,7 +18,7 @@
     "mock": "tsx watch --env-file-if-exists=.env ./src/shared/api/mocks/server.ts",
     "setup": "node scripts/setup.mjs",
     "postinstall": "node scripts/patch-toast-ui.mjs",
-    "prepare": "husky"
+    "prepare": "node scripts/prepare-husky.mjs"
   },
   "overrides": {
     "@toast-ui/react-editor": {

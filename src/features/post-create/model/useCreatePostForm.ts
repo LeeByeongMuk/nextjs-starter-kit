@@ -7,6 +7,7 @@ export default function useCreatePostForm() {
   return useForm<CreatePostFormInput>({
     defaultValues: {
       title: '',
+      type: '',
       contents: '',
     },
   });

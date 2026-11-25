@@ -1,20 +1,16 @@
+'use server';
+
+import { getPostRequestBody } from '@entities/post';
 import { fetchApi } from '@shared/lib/api';
 
 import { CreatePostReq, CreatePostRes } from './types';
 
-export const fetchCreatePost = async ({
-  title,
-  type,
-  contents,
-  is_open,
-}: CreatePostReq) => {
-  return (await fetchApi('/api/posts', {
+/** 게시글을 등록하고 상세 화면 이동에 필요한 식별자를 전달한다. */
+export const fetchCreatePost = async (req: CreatePostReq) => {
+  const { ok, message, data } = await fetchApi<CreatePostRes>('/api/posts', {
     method: 'POST',
-    body: JSON.stringify({
-      title,
-      type: type || null,
-      contents,
-      is_open,
-    }),
-  })) as CreatePostRes;
+    auth: 'required',
+    body: getPostRequestBody(req),
+  });
+  return { ok, message, data: { id: data.id } };
 };

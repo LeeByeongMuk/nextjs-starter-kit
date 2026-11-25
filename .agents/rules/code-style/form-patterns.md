@@ -42,6 +42,8 @@ export const useSignupForm = () =>
 
 로그인·가입·게시글 작성·수정 폼 훅은 각 입력 필드의 `defaultValues`를 명시한다. 서버에서 받은 기존 값은 폼의 `reset()`으로 반영한다.
 
+계정처럼 같은 레코드의 서버 값이 편집 중에 갱신되는 폼은 `dirtyFields`를 구독하고 `reset(서버 값, { keepDirtyValues: true })`로 편집 중인 필드를 유지한다. 저장에 성공하면 서버가 확인한 값으로 `reset()`하여 다음 편집의 기준을 갱신한다.
+
 ---
 
 ## 3. FormProvider + `useFormContext` 패턴

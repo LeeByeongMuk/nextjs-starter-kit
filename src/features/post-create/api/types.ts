@@ -3,7 +3,7 @@ import { ApiResponse } from '@shared/api/types';
 
 export interface CreatePostReq {
   title: string;
-  type: PostType;
+  type: PostType | null;
   contents: string;
   is_open: boolean;
 }

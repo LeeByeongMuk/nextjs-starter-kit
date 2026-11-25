@@ -298,12 +298,10 @@ describe('회원가입 테스트', () => {
       });
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(window.alert).toHaveBeenCalledWith('회원가입이 완료되었습니다.');
-      expect(result.current.data).toMatchObject({
+      expect(result.current.data).toEqual({
         ok: true,
         message: 'success',
-        data: {
-          access_token: 'mockaccesstoken0000',
-        },
+        data: { id: 1 },
       });
       expect(signIn).toHaveBeenCalledWith('credentials', {
         email: 'test@email.com',

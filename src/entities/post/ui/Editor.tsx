@@ -2,20 +2,29 @@ import '@toast-ui/editor/dist/toastui-editor.css';
 import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 import '@toast-ui/editor/dist/i18n/ko-kr';
 
+import ValidationError from '@shared/ui/error/ValidationError';
 import { Editor as TuiEditor } from '@toast-ui/react-editor';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+
+import { POST_IMAGE_MAX_BYTES } from '../config/editor';
 
 interface Props {
   onChange: (contents: string) => void;
+  onImageRead: (reading: boolean) => void;
   isInvalid?: boolean;
 }
 
 /** ToastUI의 HTML·도구 모음을 유지하며 편집 영역에 접근성 정보를 연결한다. */
-export default function Editor({ onChange, isInvalid = false }: Props) {
+export default function Editor({
+  onChange,
+  onImageRead,
+  isInvalid = false,
+}: Props) {
   const { getValues } = useFormContext();
   const editorRef = useRef<TuiEditor | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [imageError, setImageError] = useState('');
   const toolbarItems = [
     ['heading', 'bold', 'italic', 'strike'],
     ['hr'],
@@ -25,6 +34,30 @@ export default function Editor({ onChange, isInvalid = false }: Props) {
     ['code'],
     ['scrollSync'],
   ];
+
+  const addImage = (blob: Blob, insert: (url: string) => void) => {
+    if (blob.size === 0 || !blob.type.startsWith('image/')) {
+      setImageError('읽을 수 있는 이미지 파일을 선택해 주세요.');
+      return;
+    }
+    if (blob.size > POST_IMAGE_MAX_BYTES) {
+      setImageError(
+        `이미지 파일이 ${POST_IMAGE_MAX_BYTES / 1024} KiB를 넘습니다. 이미지를 줄이거나 이미지 URL을 사용해 주세요.`
+      );
+      return;
+    }
+
+    const reader = new FileReader();
+    setImageError('');
+    onImageRead(true);
+    reader.onloadend = () => {
+      onImageRead(false);
+      if (!containerRef.current) return;
+      if (typeof reader.result === 'string') insert(reader.result);
+      else setImageError('이미지를 읽지 못했습니다. 다시 첨부해 주세요.');
+    };
+    reader.readAsDataURL(blob);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -39,19 +72,22 @@ export default function Editor({ onChange, isInvalid = false }: Props) {
   }, []);
 
   useEffect(() => {
+    const descriptions = [
+      'contents-size-hint',
+      isInvalid ? 'contents-error' : '',
+      imageError ? 'contents-image-error' : '',
+    ].filter(Boolean);
     const syncFields = () => {
       containerRef.current
         ?.querySelectorAll<HTMLElement>('[contenteditable="true"], textarea')
         .forEach(field => {
-          if (field.contentEditable === 'true') {
+          if (field.getAttribute('contenteditable') === 'true') {
             field.setAttribute('role', 'textbox');
             field.setAttribute('aria-multiline', 'true');
           }
           field.setAttribute('aria-label', '본문');
           field.setAttribute('aria-invalid', String(isInvalid));
-          if (isInvalid)
-            field.setAttribute('aria-describedby', 'contents-error');
-          else field.removeAttribute('aria-describedby');
+          field.setAttribute('aria-describedby', descriptions.join(' '));
         });
       containerRef.current
         ?.querySelectorAll<HTMLButtonElement>('button.more')
@@ -68,7 +104,7 @@ export default function Editor({ onChange, isInvalid = false }: Props) {
         subtree: true,
       });
     return () => observer.disconnect();
-  }, [isInvalid]);
+  }, [imageError, isInvalid]);
 
   return (
     <div ref={containerRef} className="post-editor">
@@ -85,10 +121,16 @@ export default function Editor({ onChange, isInvalid = false }: Props) {
         }
         usageStatistics={false}
         toolbarItems={toolbarItems}
+        hooks={{ addImageBlobHook: addImage }}
         language="ko-KR"
         onChange={() =>
           onChange(editorRef.current?.getInstance().getHTML() || '')
         }
+      />
+      <ValidationError
+        id="contents-image-error"
+        isError={!!imageError}
+        message={imageError}
       />
     </div>
   );

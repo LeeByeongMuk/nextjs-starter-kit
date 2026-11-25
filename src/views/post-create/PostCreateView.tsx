@@ -12,16 +12,15 @@ import { FormProvider } from 'react-hook-form';
 /** 게시글 편집 폼과 진행 상태를 조합한다. */
 export default function PostCreateView() {
   const methods = useCreatePostForm();
-  const { mutate, isPending } = useCreatePost();
+  const { mutateAsync, isPending } = useCreatePost();
 
-  const handleCreatePost = (data: CreatePostFormInput) => {
-    mutate({
+  const handleCreatePost = (data: CreatePostFormInput) =>
+    mutateAsync({
       title: data.title,
-      type: data.type,
+      type: data.type || null,
       contents: data.contents,
       is_open: data.isOpen === '1',
     });
-  };
 
   return (
     <FormProvider {...methods}>
