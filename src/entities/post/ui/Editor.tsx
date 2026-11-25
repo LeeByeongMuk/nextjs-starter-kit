@@ -4,10 +4,11 @@ import '@toast-ui/editor/dist/i18n/ko-kr';
 
 import ValidationError from '@shared/ui/error/ValidationError';
 import { Editor as TuiEditor } from '@toast-ui/react-editor';
-import { useEffect, useRef, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { POST_IMAGE_MAX_BYTES } from '../config/editor';
+import { type PostFormInput } from '../model/form';
 
 interface Props {
   onChange: (contents: string) => void;
@@ -21,7 +22,9 @@ export default function Editor({
   onImageRead,
   isInvalid = false,
 }: Props) {
-  const { getValues } = useFormContext();
+  const contents = useWatch<PostFormInput, 'contents'>({ name: 'contents' });
+  const displayedContents = useRef(contents);
+  const applyingContents = useRef(false);
   const editorRef = useRef<TuiEditor | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [imageError, setImageError] = useState('');
@@ -34,6 +37,20 @@ export default function Editor({
     ['code'],
     ['scrollSync'],
   ];
+
+  // Toast UI는 initialValue를 마운트할 때만 읽는다. 서버에서 바뀐 본문만 반영해 편집 중인 커서를 유지한다.
+  useLayoutEffect(() => {
+    const editor = editorRef.current?.getInstance();
+    if (!editor || contents === displayedContents.current) return;
+
+    applyingContents.current = true;
+    try {
+      editor.setHTML(contents, false);
+      displayedContents.current = contents;
+    } finally {
+      applyingContents.current = false;
+    }
+  }, [contents]);
 
   const addImage = (blob: Blob, insert: (url: string) => void) => {
     if (blob.size === 0 || !blob.type.startsWith('image/')) {
@@ -111,7 +128,7 @@ export default function Editor({
       <TuiEditor
         ref={editorRef}
         minHeight="400px"
-        initialValue={getValues('contents') || ' '}
+        initialValue={contents || ' '}
         initialEditType="wysiwyg"
         previewStyle={window.innerWidth > 1000 ? 'vertical' : 'tab'}
         theme={
@@ -123,9 +140,14 @@ export default function Editor({
         toolbarItems={toolbarItems}
         hooks={{ addImageBlobHook: addImage }}
         language="ko-KR"
-        onChange={() =>
-          onChange(editorRef.current?.getInstance().getHTML() || '')
-        }
+        onChange={() => {
+          const editor = editorRef.current?.getInstance();
+          if (!editor || applyingContents.current) return;
+
+          const html = editor.getHTML();
+          displayedContents.current = html;
+          onChange(html);
+        }}
       />
       <ValidationError
         id="contents-image-error"

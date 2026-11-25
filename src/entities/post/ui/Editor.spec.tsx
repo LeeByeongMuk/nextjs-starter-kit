@@ -100,7 +100,7 @@ describe('에디터 보안 패치', () => {
   });
 });
 
-test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 본문에 삽입한다', async () => {
+test('서버 본문을 편집기에 반영하고 허용 크기의 이미지 파일만 본문에 삽입한다', async () => {
   const matchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
   Object.defineProperty(window, 'matchMedia', {
     configurable: true,
@@ -113,9 +113,10 @@ test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 
   const change = jest.fn();
   const imageRead = jest.fn();
 
-  function EditorForm() {
+  function EditorForm({ contents }: { contents: string }) {
     const methods = useForm({
-      defaultValues: { contents: '<p><img src="/sample.png" alt="예제"></p>' },
+      defaultValues: { contents },
+      values: { contents },
     });
     return (
       <FormProvider {...methods}>
@@ -125,7 +126,9 @@ test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 
   }
 
   try {
-    const { container } = render(<EditorForm />);
+    const { container, rerender } = render(
+      <EditorForm contents={'<p><img src="/sample.png" alt="예제"></p>'} />
+    );
     const field = container.querySelector<HTMLElement>(
       '.toastui-editor-ww-container [contenteditable="true"]'
     );
@@ -160,6 +163,14 @@ test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 
     expect(imageRead.mock.calls).toEqual([[true], [false]]);
     expect(screen.queryByRole('alert')).toBeNull();
     expect(within(field).getByAltText('attachment.png')).toBeInTheDocument();
+
+    change.mockClear();
+    rerender(<EditorForm contents="<p>서버에서 갱신된 본문</p>" />);
+    await waitFor(() =>
+      expect(field).toHaveTextContent('서버에서 갱신된 본문')
+    );
+    expect(change).not.toHaveBeenCalled();
+    expect(field).toBeInTheDocument();
   } finally {
     if (matchMedia) Object.defineProperty(window, 'matchMedia', matchMedia);
     else Reflect.deleteProperty(window, 'matchMedia');

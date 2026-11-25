@@ -21,6 +21,7 @@ import { cookies } from 'next/headers';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -40,6 +41,7 @@ jest.mock('next/dynamic', () => () => {
   }) {
     return (
       <textarea
+        value={useWatch({ name: 'contents' })}
         aria-label="본문"
         aria-invalid={isInvalid}
         aria-describedby={isInvalid ? 'contents-error' : undefined}
@@ -61,6 +63,7 @@ describe('게시글 수정 테스트', () => {
   const mockPush = jest.fn();
 
   beforeEach(() => {
+    queryClient.clear();
     mockPush.mockClear();
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
@@ -86,8 +89,6 @@ describe('게시글 수정 테스트', () => {
       update: jest.fn(),
     });
 
-    // given - 게시글 수정 페이지가 그려진다
-    render(<UpdatePost />, { wrapper });
     render(<Toaster />);
   });
 
@@ -99,7 +100,7 @@ describe('게시글 수정 테스트', () => {
       // then - 게시글 정보를 가져온다
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
-        expect(result.current.data.data).toEqual(postData.getEdit.data);
+        expect(result.current.data?.data).toEqual(postData.getEdit.data);
       });
     });
 
@@ -110,15 +111,10 @@ describe('게시글 수정 테스트', () => {
           return new HttpResponse(null, { status: 500 });
         })
       );
-      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
-
-      // when - 게시글 수정 리소스 API 호출에 실패
-      const { result } = renderHook(() => useUpdatePostResource(), { wrapper });
-
-      // then - 실패 메시지를 출력한다
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+      render(<UpdatePost />, { wrapper });
+      expect(screen.getByRole('status')).toHaveTextContent(
+        '불러오는 중입니다.'
+      );
       expect(await screen.findByRole('alert')).toHaveTextContent(
         '수정할 글을 불러오지 못했습니다.'
       );
@@ -131,6 +127,96 @@ describe('게시글 수정 테스트', () => {
     });
   });
 
+  test('재조회 중 본문 포커스와 편집값을 유지하고 변경하지 않은 필드만 갱신한다', async () => {
+    const response = Promise.withResolvers<Response>();
+    const reload = jest.fn(() => response.promise);
+    const save = jest.fn();
+    render(<UpdatePost />, { wrapper });
+    const title = await screen.findByRole('textbox', { name: '제목' });
+    const editor = screen.getByRole('textbox', { name: '본문' });
+    expect(editor).toHaveValue(postData.getEdit.data.contents);
+    fireEvent.change(title, { target: { value: '작성 중 제목' } });
+    editor.focus();
+    fireEvent.change(editor, { target: { value: '<p>작성 중 본문</p>' } });
+
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), reload),
+      http.put(getHandlerURI('/api/posts/:id'), async ({ request }) => {
+        save(await request.json());
+        return HttpResponse.json(postData.update);
+      })
+    );
+    void queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+    expect(editor).toHaveFocus();
+    response.resolve(
+      HttpResponse.json({
+        ...postData.getEdit,
+        data: {
+          ...postData.getEdit.data,
+          title: '서버 제목',
+          contents: '<p>서버 본문</p>',
+          type: 'faq',
+        },
+      })
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveValue('faq')
+    );
+    expect(title).toHaveValue('작성 중 제목');
+    expect(editor).toHaveValue('<p>작성 중 본문</p>');
+    expect(editor).toHaveFocus();
+
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    await waitFor(() =>
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: '작성 중 제목',
+          contents: '<p>작성 중 본문</p>',
+          type: 'faq',
+        })
+      )
+    );
+  });
+
+  test('재조회 실패 후에도 편집을 계속하고 다른 글로 이동하면 새 글의 값으로 시작한다', async () => {
+    const { rerender } = render(<UpdatePost />, { wrapper });
+    const title = await screen.findByRole('textbox', { name: '제목' });
+    fireEvent.change(title, { target: { value: '첫 글 임시 제목' } });
+    const nextPost = {
+      ...postData.getEdit,
+      data: {
+        ...postData.getEdit.data,
+        id: 2,
+        title: '다른 글',
+        contents: '<p>다른 본문</p>',
+      },
+    };
+    queryClient.setQueryData(['posts', { id: 2 }], nextPost);
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), ({ params }) =>
+        params.id === '1'
+          ? new HttpResponse(null, { status: 503 })
+          : HttpResponse.json(nextPost)
+      )
+    );
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+    expect(
+      await screen.findByText(/최신 글을 불러오지 못했습니다/)
+    ).toBeInTheDocument();
+    expect(title).toHaveValue('첫 글 임시 제목');
+    fireEvent.change(title, { target: { value: '계속 편집' } });
+    expect(title).toHaveValue('계속 편집');
+
+    (useParams as jest.Mock).mockReturnValue({ id: '2' });
+    rerender(<UpdatePost />);
+    expect(await screen.findByDisplayValue('다른 글')).toBeInTheDocument();
+    expect(screen.getByLabelText('본문')).toHaveValue('<p>다른 본문</p>');
+  });
+
   describe('분류 선택지를 확인한다', () => {
     test('FAQ 글을 불러오면 FAQ를 선택하고 분류 선택, 자유, 공지, FAQ 순서로 표시한다', async () => {
       server.use(
@@ -141,7 +227,7 @@ describe('게시글 수정 테스트', () => {
           })
         )
       );
-      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      render(<UpdatePost />, { wrapper });
 
       await waitFor(() =>
         expect(
@@ -178,9 +264,7 @@ describe('게시글 수정 테스트', () => {
           return HttpResponse.json(postData.update);
         })
       );
-      await act(async () => {
-        await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
-      });
+      render(<UpdatePost />, { wrapper });
 
       await waitFor(() =>
         expect(
@@ -215,6 +299,7 @@ describe('게시글 수정 테스트', () => {
       const response = Promise.withResolvers<Response>();
       const save = jest.fn(() => response.promise);
       server.use(http.put(getHandlerURI('/api/posts/:id'), () => save()));
+      render(<UpdatePost />, { wrapper });
       // when - 제목, 내용, 타입, 라디오박스를 입력하고 제출 버튼을 클릭한다
       fireEvent.input(await screen.findByLabelText('제목'), {
         target: {
