@@ -24,26 +24,26 @@ user-invocable: true
 2. `git fetch origin develop && git switch develop && git merge --ff-only origin/develop` 후 브랜치: `refactor/<scope>` (branch-name-check 패턴: 소문자·슬래시 구분).
 3. **위반 인벤토리 grep 스윕** — 카테고리별 후보 수집 (재검증 전제, false positive 허용):
 
-   | 카테고리 | 탐지 |
-   | --- | --- |
-   | FSD 금지 폴더 | `find src -type d \( -name components -o -name stores -o -name hooks -o -name services -o -name utils -o -name constants \)` → `ui/model/api/lib/config` |
-   | 레이어 역방향/deep import | `npm run lint` (boundaries 에러) |
-   | `I*`/`T*` 타입 접두 | `grep -rnE '\b(interface\s+I[A-Z]|type\s+T[A-Z][A-Za-z]*\s*[=<])' src` |
-   | `enum` 사용 | `grep -rnE '\benum\s' src` → as-const union |
-   | 신규 `alert()` | `grep -rn 'alert(' src` |
-   | `.then().catch()` 체인 | `grep -rn '\.then(' src` (병렬 combinator 제외) |
-   | `defaultValues` 없는 `useForm` | `grep -rn 'useForm(' src` 후 수동 확인 |
-   | 야생 `QueryClient` 생성 | `grep -rn 'new QueryClient' src` (shared/api/tanstack-query/client.ts 제외) |
-   | 구분선·이력·AI 흔적 주석 | `grep -rnE '//\s*[─-]{2,}' src` |
-   | dead/orphan | 미사용 export·import·임시 fixtures |
+   | 카테고리                       | 탐지                                                                                                                                                     |
+   | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | FSD 금지 폴더                  | `find src -type d \( -name components -o -name stores -o -name hooks -o -name services -o -name utils -o -name constants \)` → `ui/model/api/lib/config` |
+   | 레이어 역방향/deep import      | `npm run lint` (boundaries 에러)                                                                                                                         |
+   | `I*`/`T*` 타입 접두            | `grep -rnE '\b(interface\s+I[A-Z]                                                                                                                        | type\s+T[A-Z][A-Za-z]_\s_[=<])' src` |
+   | `enum` 사용                    | `grep -rnE '\benum\s' src` → as-const union                                                                                                              |
+   | 신규 `alert()`                 | `grep -rn 'alert(' src`                                                                                                                                  |
+   | `.then().catch()` 체인         | `grep -rn '\.then(' src` (병렬 combinator 제외)                                                                                                          |
+   | `defaultValues` 없는 `useForm` | `grep -rn 'useForm(' src` 후 수동 확인                                                                                                                   |
+   | 야생 `QueryClient` 생성        | `grep -rn 'new QueryClient' src` (shared/api/tanstack-query/client.ts 제외)                                                                              |
+   | 구분선·이력·AI 흔적 주석       | `grep -rnE '//\s*[─-]{2,}' src`                                                                                                                          |
+   | dead/orphan                    | 미사용 export·import·임시 fixtures                                                                                                                       |
 
-4. **확인 포인트**: 인벤토리를 카테고리·파일별 표로 사용자에게 보여주고 *어디까지 이번 범위인지* 합의.
+4. **확인 포인트**: 인벤토리를 카테고리·파일별 표로 사용자에게 보여주고 _어디까지 이번 범위인지_ 합의.
 
 ## Phase 2 — 분류 · 계획
 
 1. 인벤토리를 **즉시 교정 / 손댈 때 전환(레거시) / 범위 밖** 으로 분류.
 2. 교정 방식 결정 — 단순 삭제(주석·dead) / 형식 치환(네이밍·async) / `git mv` 재배치 / 분리.
-3. **레이어 재배치 판단** — 분할 ≠ 승격. 같은 슬라이스 내 분할은 그 자리에, 다른 슬라이스 재사용이 *실제로* 있을 때만 entities 승격 (fsd-architecture.md §7). 임의 승격 금지.
+3. **레이어 재배치 판단** — 분할 ≠ 승격. 같은 슬라이스 내 분할은 그 자리에, 다른 슬라이스 재사용이 _실제로_ 있을 때만 entities 승격 (fsd-architecture.md §7). 임의 승격 금지.
 4. **확인 포인트**: 교정 계획(특히 `git mv` 대상·승격 판단)을 사용자와 합의 후 Phase 3.
 
 ## Phase 3 — 리팩토링 실행
