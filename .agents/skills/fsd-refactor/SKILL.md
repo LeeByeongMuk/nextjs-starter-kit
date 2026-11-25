@@ -21,7 +21,7 @@ user-invocable: true
 ## Phase 1 — Setup + 위반 인벤토리
 
 1. 룰 선독 — `.agents/rules/architecture/fsd-architecture.md`, `.agents/rules/code-style/code-conventions.md`, 대상에 따라 `data-fetching.md` / `form-patterns.md` / `auth.md` / `styling.md`.
-2. `git fetch origin develop && git switch develop && git merge --ff-only origin/develop` 후 브랜치: `refactor/<scope>` (branch-name-check 패턴: 소문자·슬래시 구분).
+2. `git fetch origin develop && git switch develop && git merge --ff-only origin/develop` 후 브랜치: `refactor/<scope>` (PR Policy의 브랜치 이름 패턴: 소문자·슬래시 구분).
 3. **위반 인벤토리 grep 스윕** — 카테고리별 후보 수집 (재검증 전제, false positive 허용):
 
    | 카테고리                       | 탐지                                                                                                                                                     |
@@ -59,11 +59,12 @@ user-invocable: true
 
 1. `npm run tsc` — 이동·리네임 후 import 깨짐 0.
 2. `npm run lint` — 0 errors (boundaries 레이어 경계·Public API 통과).
-3. `npm test` — 기존 테스트 그대로 통과 + coverage 60% 게이트 유지 (동작 무변경 증거).
-4. `npm run build` — production build 통과.
-5. **grep 재검증** — Phase 1 쿼리를 다시 돌려 해당 카테고리 0건 확인.
-6. **마크업 동결 diff 확인** — `git diff -M`에서 JSX·className·라벨 변경이 섞이지 않았는지, 파일 이동이 리네임(R)으로 인식되는지.
-7. **선택**: 적대적 리뷰(`/code-review`) 또는 Codex 심층 리뷰 — high/medium 지적은 grep으로 직접 검증 후 수정.
+3. `npm run prettier` — src 포맷 검사 통과.
+4. `npm test` — 기존 테스트 그대로 통과 + coverage 60% 게이트 유지 (동작 무변경 증거).
+5. `npm run build` — production build 통과.
+6. **grep 재검증** — Phase 1 쿼리를 다시 돌려 해당 카테고리 0건 확인.
+7. **마크업 동결 diff 확인** — `git diff -M`에서 JSX·className·라벨 변경이 섞이지 않았는지, 파일 이동이 리네임(R)으로 인식되는지.
+8. **선택**: 적대적 리뷰(`/code-review`) 또는 Codex 심층 리뷰 — high/medium 지적은 grep으로 직접 검증 후 수정.
 
 ## Phase 5 — 마무리
 
@@ -75,8 +76,8 @@ user-invocable: true
    refactor(shared): .then 체인 async/await 전환
    ```
 
-2. **PR 생성** (`gh pr create --base develop --draft`) — Summary에 인벤토리→교정 결과 표, "무변경 보증" 체크리스트(마크업·API path·기존 테스트), Test plan(4대 게이트 + grep 재검증 0건).
-3. `gh pr checks`로 branch-name-check · pr-title-check · CI · coverage 통과 확인.
+2. **PR 생성** (`gh pr create --base develop --draft`) — Summary에 인벤토리→교정 결과 표, "무변경 보증" 체크리스트(마크업·API path·기존 테스트), Test plan(품질 게이트 5개 + grep 재검증 0건).
+3. `gh pr checks`로 `validate`(브랜치 이름·PR 제목)와 `check`(CI, 커버리지 게이트 포함) 통과 확인.
 
 ## DO / DON'T
 
@@ -86,7 +87,7 @@ user-invocable: true
 
 ## 참고 자산 (교정 기준 SSOT)
 
-- `.agents/rules/architecture/fsd-architecture.md` — 레이어 경계·금지 폴더·분할 vs 승격·§7 결정 트리
+- `.agents/rules/architecture/fsd-architecture.md` — 레이어 경계·세그먼트·Public API·§7 결정 트리
 - `.agents/rules/code-style/code-conventions.md` — 네이밍·주석·에러 정책·프리플라이트
 - `.agents/rules/architecture/data-fetching.md` — 쿼리키·훅 배치
 - `.agents/rules/code-style/form-patterns.md` — RHF 3분할·defaultValues

@@ -48,6 +48,7 @@ FSD는 파일 위치만 정한다. 슬라이스 안쪽 스타일은 주제별 �
 ```
 npm run tsc      # type check
 npm run lint     # boundaries 규칙 포함
+npm run prettier # src 포맷 검사
 npm test         # jest (coverage 60% 게이트 포함)
 npm run build    # next production build
 ```

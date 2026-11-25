@@ -59,7 +59,9 @@ code-reviewer 에이전트를 호출하여 전체 변경 사항을 검증한다:
 ```bash
 npm run tsc
 npm run lint
+npm run prettier
 npm test
+npm run build
 ```
 
 모두 통과하면 변경 요약을 보고한다.

@@ -93,6 +93,7 @@ Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데�
 ```bash
 npm run tsc
 npm run lint
+npm run prettier
 npm test -- --runInBand
 npm run build
 ```

@@ -25,7 +25,7 @@ RSC에서 TanStack Query 사용 금지 — 의존 에러와 dehydrate boundary �
 ## 2. 훅 위치 (FSD 레이어와의 관계)
 
 - **여러 슬라이스에서 공용** → `src/entities/<e>/model/`
-  - 예: `useDeletePost`가 `post-detail` / `post-update` 두 feature에서 쓰이므로 `src/entities/post/model/`
+  - 예: `useDeletePost` → `src/entities/post/model/useDeletePost.ts`
 - **특정 feature 전용** → `src/features/<slice>/model/`
   - 예: `usePostList` → `src/features/post-list/model/usePostList.ts`
 
@@ -78,7 +78,7 @@ useMutation({
 
 ## 6. QueryClient 설정
 
-`src/shared/api/tanstack-query/client.ts` **한 곳에서만** 변경. 개별 훅이나 Provider에서 `new QueryClient()` 생성 금지 — 테스트 환경(`jest.setup.ts`)은 예외.
+`src/shared/api/tanstack-query/client.ts` **한 곳에서만** 변경. 개별 훅이나 Provider에서 `new QueryClient()` 생성 금지 — 캐시를 격리하려는 테스트는 예외다 ([`unit-testing.md`](../testing/unit-testing.md) §6).
 
 ---
 
@@ -87,7 +87,7 @@ useMutation({
 - `src/shared/lib/api.ts`는 `server-only` 모듈이다. `APP_API_URL`을 사용하고 리다이렉트를 차단한다. 인증이 필요한 작업에는 서버 쿠키에서 읽은 API 토큰을 전달한다.
 - API의 비정상 HTTP 응답은 상태 코드가 담긴 `ApiError`로 전달한다.
 - 브라우저에서 호출하는 각 `'use server'` 함수는 API 경로와 메서드를 고정한다. 동적 식별자와 폼 값을 검증한 후 허용된 필드만 요청에 포함하고, 응답도 화면에 필요한 필드로 제한한다.
-- 서버 조회·서버 액션은 `fetchApi`를 통해 API에 접근한다. HTTP 클라이언트 도입 기준은 [라이브러리 결정](../infra/library-decisions.md#http-client)을 따른다.
+- 서버 조회·서버 액션은 `fetchApi`를 통해 API에 접근한다. HTTP 클라이언트 도입 기준은 [라이브러리 결정](../infra/library-decisions.md#http-client-kyofetch)을 따른다.
 
 ---
 

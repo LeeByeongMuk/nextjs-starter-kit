@@ -49,7 +49,6 @@ paths:
 - 패치는 원본·결과와 DOMPurify 배포물의 SHA-256을 검증하고, 예상하지 못한 파일에서는 실패한다. 반복 실행은 안전하다. `predev`와 `prebuild`도 적용 상태를 검사한다. `--ignore-scripts`로 설치했다면 `npm run postinstall`을 실행해야 한다. Docker는 설치 전에 패치 스크립트를 복사한다.
 - Toast UI 또는 DOMPurify 버전을 올릴 때는 패치의 해시와 정제 동작을 함께 검증한다. `npm test`의 에디터 보안·HTML 왕복 테스트, 실제 브라우저의 작성·수정·저장, 타입·lint·production build를 통과해야 한다. CI는 `npm audit --omit=dev`로 운영 의존성도 검사한다.
 - [minimatch 패턴 증폭](https://github.com/advisories/GHSA-g3hv-75wg-m249)은 취약 범위 `>=7 <11.0.1`에만 11.0.9를 적용한다. 기존 3.x API는 유지한다. [glob 취소 우회](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)는 `>=9 <14.0.2`에만 14.0.6을 적용한다. typescript-eslint는 수정된 minimatch를 사용하는 8.73.0이며, Jest·test-exclude의 상위 의존성이 수정 버전을 채택하면 해당 override를 제거한다.
-- **잔여 위험:** [picomatch GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf)는 2.3.2·4.0.7에 영향을 주며 공식 수정판이 없다. 이 저장소에서는 lint·Jest·파일 탐색 도구의 개발 의존성이고 `src`가 직접 호출하지 않는다. 공격자가 제어하는 반복 extglob 패턴과 대상 문자열이 들어오면 CPU를 소진할 수 있으므로 개발 도구에 외부 입력을 패턴으로 전달하지 않는다. 개발 의존성을 포함한 `npm audit`는 계속 실패할 수 있으며 이 권고를 숨기거나 해결 처리하지 않는다. 공식 수정판 또는 검증된 완전한 패치가 나오면 다시 검토한다.
 
 ## 결정 요약
 
@@ -128,11 +127,12 @@ paths:
 
 ## Toast UI Editor → TipTap/Lexical
 
-- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정의 공용 `PostForm`에서 `ContentsEditor`가 `Editor`를 클라이언트 전용으로 로드한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override를 적용한다.
+- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정의 공용 `PostForm`에서 `ContentsEditor`가 `Editor`를 클라이언트 전용으로 로드한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override를 적용한다. 업스트림 저장소(nhn/tui.editor)는 2026-11-15에 유지보수 종료를 공지하고 보관되었다. 마지막 릴리스는 에디터 3.2.3과 React wrapper 3.2.4이며 내장 DOMPurify는 2.3.3 그대로다.
 - **교체 찬**:
   - Toast UI 배포물의 오래된 DOMPurify는 [의존성 보안 패치](#의존성-보안-패치)로 교체한다. 상위 패키지가 수정된 정제기를 배포하기 전까지 설치 패치와 HTML 왕복 검증을 직접 유지해야 한다.
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크
+  - 업스트림이 유지보수를 종료해 이후 결함·보안 수정이 제공되지 않는다
   - 현대적 대안: **TipTap**(Prosemirror, headless, 생태계 풍부), **Lexical**(Meta, 확장성 높음)
 - **교체 반**:
   - 에디터 코드는 작성·수정 폼에서 동적으로 로드함
@@ -195,11 +195,11 @@ paths:
 
 ## npm workspaces + `packages/eslint-config`
 
-- **현황**: 커스텀 ESLint 룰은 루트 `eslint-rules/fsd-relative-imports.mjs` 1파일, FSD 정책은 `eslint.config.mjs`에 인라인. 모노레포 워크스페이스 없음
+- **현황**: 커스텀 ESLint 룰은 루트 `eslint-rules/`의 2파일(`comment-conventions.mjs`, `fsd-relative-imports.mjs`), FSD 정책은 `eslint.config.mjs`에 인라인. 모노레포 워크스페이스 없음
 - **도입 찬**: 터보레포식 `packages/eslint-config`로 분리하면 설정이 패키지 단위로 캡슐화되고, 여러 앱이 생겼을 때 공유 가능
 - **도입 반**:
   - 단일 앱 레포 — 공유할 두 번째 소비자가 없음
-  - 옮길 실체가 룰 1파일 + 설정 블록뿐. workspaces를 켜면 install 호이스팅·lint-staged 경로·CI 캐시 등 관리 표면만 증가
+  - 옮길 실체가 룰 2파일 + 설정 블록뿐. workspaces를 켜면 install 호이스팅·lint-staged 경로·CI 캐시 등 관리 표면만 증가
   - "2곳 이상에서 실제 재사용될 때 승격" 원칙과 충돌
 - **비용**: Small~Medium (workspaces 전환 + 경로 재배선 + CI 검증)
 - **결정**: **보류** (2026-07-13)

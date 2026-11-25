@@ -83,9 +83,9 @@ app  →  views  →  widgets  →  features  →  entities  →  shared
 | --------- | -------------------------------- | ------------------------------------------------------ |
 | `ui/`     | 컴포넌트 (React)                 | `SignInForm.tsx`, `PostListItem.tsx`                   |
 | `model/`  | 상태/훅/뷰모델/폼 타입           | `useSignInForm.ts`, `usePostListManager.ts`, `form.ts` |
-| `api/`    | 서버 통신, 요청/응답 타입        | `signinService.ts`, `api.ts`(Req/Res)                  |
+| `api/`    | 서버 통신, 요청/응답 타입        | `signinService.ts`, `types.ts`(Req/Res)                |
 | `lib/`    | 슬라이스 로컬 헬퍼 (외부 비공개) | 날짜 포맷터, validators                                |
-| `config/` | 상수, enum, constants            | `TOKEN_KEY`, `PostType`                                |
+| `config/` | 상수, 설정값                     | `TOKEN_KEY`, `POST_TYPE_LABELS`                        |
 
 세그먼트는 모두 선택. 사용 안 하면 폴더를 만들지 않는다.
 
@@ -97,9 +97,9 @@ app  →  views  →  widgets  →  features  →  entities  →  shared
 
 ```ts
 // src/features/auth-signin/index.ts
-export { SignInForm } from './ui/SignInForm';
+export type { SignInReq, SignInRes } from './api/types';
 export { useSignInForm } from './model/useSignInForm';
-export type { SignInRequest } from './api/types';
+export { default as SignInForm } from './ui/SignInForm';
 ```
 
 외부에서는 슬라이스 루트 import만 허용:
@@ -138,8 +138,7 @@ ESLint `boundaries/dependencies`(Public API policy) + `fsd/relative-imports`가 
 - **`src/app/**/page.tsx`는 `views/`만 import**. 비즈니스 로직·합성은 view에 위임.
   ```tsx
   // src/app/(domain)/post/(list)/page.tsx
-  import { PostListView } from '@views/post-list';
-  export default PostListView;
+  export { PostListView as default } from '@views/post-list';
   ```
 - 메타데이터(`export const metadata`, `generateMetadata`)는 `page.tsx` 또는 `layout.tsx`에 둔다(Next.js가 이 두 파일에서만 인식).
 - `layout.tsx`도 `page.tsx`와 동일 원칙: 얇게 유지, 합성 로직이 자라면 view 또는 widget으로 추출하고 import만 한다.
@@ -169,45 +168,7 @@ NextAuth v5는 `auth.ts`의 위치를 강제하지 않는다. 본 프로젝트�
 
 ---
 
-## 8. 마이그레이션 매핑 표
-
-현재 → 목표 (Phase C에서 단계적 적용):
-
-| 현재 위치                                               | 이동 후                                                                  |
-| ------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `src/domains/auth/_components/AuthHeader.tsx`           | `src/entities/auth/ui/AuthHeader.tsx`                                    |
-| `src/domains/auth/_components/AuthForm/*`               | `src/entities/auth/ui/AuthForm/*`                                        |
-| `src/domains/auth/_constants/auth.ts` (TOKEN_KEY)       | `src/shared/config/auth.ts` (cross-cutting cookie key)                   |
-| `src/domains/auth/_services/userServices.ts`            | `src/entities/auth/api/userServices.ts`                                  |
-| `src/domains/auth/_types/api.ts`                        | `src/entities/auth/api/types.ts`                                         |
-| `src/domains/auth/signin/**`                            | `src/features/auth-signin/{ui,model,api}/`                               |
-| `src/domains/auth/signup/**`                            | `src/features/auth-signup/{ui,model,api}/`                               |
-| `src/domains/auth/account/**`                           | `src/features/auth-account/{ui,model,api}/`                              |
-| `src/domains/post/_components/Pagination.tsx`           | `src/entities/post/ui/Pagination.tsx`                                    |
-| `src/domains/post/_components/{Editor,Form/*}`          | `src/entities/post/ui/*`                                                 |
-| `src/domains/post/_constants/post.ts`                   | `src/entities/post/config/post.ts`                                       |
-| `src/domains/post/_types/postType.ts`                   | `src/entities/post/model/types.ts`                                       |
-| `src/domains/post/list/**`                              | `src/features/post-list/{ui,model,api}/`                                 |
-| `src/domains/post/detail/**`                            | `src/features/post-detail/{ui,model,api}/`                               |
-| `src/domains/post/create/**`                            | `src/features/post-create/{ui,model,api}/`                               |
-| `src/domains/post/update/**`                            | `src/features/post-update/{ui,model,api}/`                               |
-| `src/shared/components/{Layout,Provider,Spinner,Error}` | `src/shared/ui/{layout,provider,spinner,error}/`                         |
-| `src/shared/utils/{api,date,url}.ts`                    | `src/shared/lib/{api,date,url}/`                                         |
-| `src/shared/types/{api,pagination}.ts`                  | `src/shared/api/types.ts`                                                |
-| `src/shared/types/declare/*`                            | `src/shared/config/declare/*`                                            |
-| `src/lib/tanstackQuery/*`                               | `src/shared/api/tanstack-query/*`                                        |
-| `src/lib/mocks/*`                                       | `src/shared/api/mocks/*`                                                 |
-| `src/tests/mocks/*`                                     | `src/shared/lib/testing/*`                                               |
-| `src/auth.ts`                                           | `src/app/auth/config.ts` (NextAuth orchestration belongs to app layer)   |
-| `src/app/(domain)/.../page.tsx` 합성 로직               | `src/views/<route>/` (page.tsx는 view import만)                          |
-| `src/app/(domain)/.../layout.tsx` 합성 로직             | `src/views/<route>/` 또는 `src/widgets/<name>/` (layout.tsx는 import만)  |
-| `src/proxy.ts`                                          | (이동 없음) — Next.js 강제. 내부 로직은 entities/shared로 추출 후 import |
-
-widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/post-list-container/` (Phase C-5에서 결정).
-
----
-
-## 9. ESLint 강제 규칙
+## 8. ESLint 강제 규칙
 
 `eslint-plugin-boundaries`로 다음을 차단한다:
 
@@ -221,7 +182,7 @@ widgets 후보: `PostListContainer + PostListFilter` 묶음 → `src/widgets/pos
 
 ---
 
-## 10. 참고 자료
+## 9. 참고 자료
 
 - 공식 문서: https://feature-sliced.design
 - Next.js 통합 가이드: https://feature-sliced.design/docs/guides/tech/with-nextjs

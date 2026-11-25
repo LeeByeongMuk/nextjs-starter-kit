@@ -19,7 +19,7 @@ src/features/<domain>-<action>/
 ├── model/         # 훅, 상태, 폼 타입
 ├── api/           # fetch 함수, 요청/응답 타입
 ├── lib/           # 로컬 헬퍼 (비공개)
-├── config/        # 상수, enum
+├── config/        # 상수, 설정값
 └── index.ts       # Public API (외부 노출 심볼만)
 ```
 

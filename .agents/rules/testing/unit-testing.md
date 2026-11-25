@@ -56,7 +56,7 @@ NextAuth / Auth.js 계열은 ESM 전환이 잦다. msw가 쓰는 ESM 전용 `@op
 | 대상                           | 위치                                 | 네이밍            |
 | ------------------------------ | ------------------------------------ | ----------------- |
 | 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx`              | `signin.spec.tsx` |
-| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 (`model/` 또는 `api/`) | `<file>.spec.ts`  |
+| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 (`model/` 또는 `api/`) | `<file>.spec.tsx` |
 | 컴포넌트 렌더 테스트           | feature view 레벨 통합으로 대체      | —                 |
 
 UI 컴포넌트 단위 snapshot 테스트는 지양 — 렌더 구조 변경에 취약하고 가치 낮음.
@@ -69,13 +69,13 @@ UI 컴포넌트 단위 snapshot 테스트는 지양 — 렌더 구조 변경에 
 
 ### 5.1 기본 핸들러
 
-도메인별로 `src/shared/api/mocks/handlers/*.ts`에 분리:
+도메인별로 `src/shared/api/mocks/handlers/*.ts`에 분리하고 `handlers/index.ts`에서 합친다. 경로는 `getHandlerURI()`로 만든다:
 
 ```ts
-// src/shared/api/mocks/handlers/auth.ts
-export const authHandlers = [
-  http.post('/api/auth/signin', () =>
-    HttpResponse.json({ user: mockUser, accessToken: '...' })
+// src/shared/api/mocks/handlers/userHandler.ts
+export const userHandler = [
+  http.post(getHandlerURI('/api/users/signin'), () =>
+    HttpResponse.json(userData.signin)
   ),
 ];
 ```
@@ -84,8 +84,9 @@ export const authHandlers = [
 
 ```ts
 server.use(
-  http.post('/api/auth/signin', () =>
-    HttpResponse.json({ error: 'invalid' }, { status: 401 })
+  http.post(
+    getHandlerURI('/api/users/signin'),
+    () => new HttpResponse(null, { status: 401 })
   )
 );
 ```
