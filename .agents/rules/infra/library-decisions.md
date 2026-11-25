@@ -55,7 +55,7 @@ paths:
 | 후보                                                                                | 결정                       | 재검토 조건                                    |
 | ----------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------- |
 | [Jest → Vitest](#jest--vitest)                                                      | **유지 (Jest 30)**         | 테스트 파일 > 30 또는 CI 테스트 시간 > 3분     |
-| [폼/API 런타임 검증: Zod](#zod-도입)                                                | **도입 (별도 PR)**         | 즉시 유효 — 후속 `feat/zod-validation`         |
+| [폼/API 런타임 검증: Zod](#zod)                                                     | **유지**                   | 스키마 코드가 번들 사이즈 경보를 유발할 때     |
 | [`classnames` → `clsx`](#classnames--clsx)                                          | **제거 (사용처 없음)**     | 복잡한 조건부 스타일·variants가 필요할 때      |
 | [MSW 2](#msw-2)                                                                     | **유지**                   | —                                              |
 | [Toast UI Editor → TipTap/Lexical](#toast-ui-editor--tiptaplexical)                 | **유지 (보류)**            | Editor 성능·SSR 이슈 재발 또는 협업 기능 요구  |
@@ -81,28 +81,16 @@ paths:
 
 ---
 
-## Zod 도입
+## Zod
 
-- **현황**: 폼은 `React Hook Form`의 `register()` 인라인 룰을 사용한다. 서버 액션은 식별자와 요청값을 각각 확인한다. API 응답 타입과 전달 필드는 함수별로 정의한다.
-- **교체 찬** (도입 찬):
-  - **폼 검증 단일화**: `zodResolver(schema)`로 RHF + Zod 연동 → 검증 룰을 한 곳에서 관리
-  - **API 경계 안전성**: `fetchApi<Schema>()`가 응답을 런타임 파싱 → 서버 스펙 변경 시 즉시 감지
-  - **에러 포맷 표준화**: `ApiError` 스키마 → `onError`에서 일관된 메시지 추출
-  - **타입 추론 통합**: `z.infer<typeof SignInReqSchema>` → 수동 `interface` 제거
-- **교체 반**: 기존 폼과 서버 액션의 검증 규칙 및 오류 처리를 스키마로 이관해야 함
-- **비용**: Small (2~4h)
-- **결정**: **도입** (별도 PR `feat/zod-validation`)
-- **재검토 조건**: 즉시 유효
-
-### Zod 도입 체크리스트 (후속 PR)
-
-1. `npm i zod @hookform/resolvers`
-2. 각 `src/features/*/api/types.ts`를 Zod 스키마로 재작성하고 기존 `interface`는 `z.infer<...>`로 대체
-   - 우선순위: `auth-signin` → `auth-signup` → `post-create` → `post-update` → `post-list`
-3. `src/features/*/model/use<Slice>Form.ts`에 `zodResolver(schema)` 연결
-4. `src/shared/lib/api.ts`의 `fetchApi<T>()`에 optional `schema?: ZodSchema<T>` 파라미터 추가 → 있으면 `schema.parse(json)`
-5. `src/shared/api/types.ts`에 `ApiErrorSchema` 정의 → 중앙 에러 핸들러 기반 확보
-6. 테스트: 기존 `*.spec.tsx` 통과 + 신규 스키마 단위 테스트(`*.schema.spec.ts`)
+- **현황**: `zod` 4와 `@hookform/resolvers` 7. 폼은 `model/form.ts`의 스키마를 `zodResolver`로 연결하고, 서버 액션은 `api/types.ts`의 요청 스키마로 입력을 확인한다. `fetchApi`는 `schema` 옵션으로 받은 응답 스키마로 API 응답을 검증해 선언한 필드만 반환한다. 요청·응답·폼 타입은 스키마에서 유도한다. 사용 규칙은 [폼 규칙](../code-style/form-patterns.md) §4와 [데이터 페칭 규칙](../architecture/data-fetching.md) §7을 따른다.
+- **교체 찬**: 없음 — 폼 검증 규칙, 서버 액션 입력 확인, API 응답 검증, 타입 선언을 스키마 하나로 유지한다
+- **교체 반**: N/A
+- **비용**: N/A
+- **결정**: **유지**
+- **재검토 조건**: 폼 청크의 스키마 코드가 번들 사이즈 경보를 유발할 때 같은 패키지의 `zod/mini` 전환을 검토한다
+- **함께 갱신**: `@hookform/resolvers`의 peer는 `react-hook-form ^7.55.0`, `zod ^3.25.0 || ^4.0.0`이다. 세 패키지는 이 범위에 맞춰 함께 올린다
+- **적용하지 않는 곳**: API 오류 응답의 본문은 스키마로 읽지 않는다. `fetchApi`는 비정상 응답의 HTTP 상태만 `ApiError`로 전달하고, 서버 액션이 던진 오류의 메시지는 production 빌드에서 브라우저로 전달되지 않는다
 
 ---
 

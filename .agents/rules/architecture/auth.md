@@ -60,7 +60,7 @@ import { fetchSignIn } from '@features/auth-signin/api/signinService';
 
 ## 4. Credentials Provider
 
-`authorize`는 이메일·비밀번호가 유효한 문자열인지 확인하고 `fetchSignIn()`으로 API 로그인을 수행한다. 새 API 토큰으로 `fetchUser()`를 호출한다. 두 요청에 성공한 경우 토큰 쿠키를 저장하고 프로필과 절대 만료 시각을 반환한다.
+`authorize`는 `fetchSignIn()`으로 API 로그인을 수행한다. `fetchSignIn()`은 이메일·비밀번호가 공백이 아닌 문자열인지 스키마로 확인하고 맞지 않으면 로그인 실패로 처리한다. 응답의 인증 정보(`data`)에 회원 식별자와 API 토큰이 모두 있어야 로그인하며, 인증 정보를 쓸 수 없으면 로그인 실패로 처리한다. 응답이 인증 정보를 아예 싣지 않으면 오류를 전달하고 로그인 화면은 요청 실패로 안내한다. 새 API 토큰으로 `fetchUser()`를 호출한다. 두 요청에 성공한 경우 토큰 쿠키를 저장하고 프로필과 절대 만료 시각을 반환한다.
 
 `authorize`는 API 로그인이 HTTP 401을 반환하면 Auth.js에 자격 증명 실패(`CredentialsSignin`)를 알린다. 로그인 성공 시 반환된 user 객체는 JWT 콜백의 `user` 파라미터로 전달된다.
 

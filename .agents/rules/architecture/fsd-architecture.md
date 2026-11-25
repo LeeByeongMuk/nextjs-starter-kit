@@ -82,8 +82,8 @@ app  →  views  →  widgets  →  features  →  entities  →  shared
 | 세그먼트  | 내용                             | 예시                                                   |
 | --------- | -------------------------------- | ------------------------------------------------------ |
 | `ui/`     | 컴포넌트 (React)                 | `SignInForm.tsx`, `PostListItem.tsx`                   |
-| `model/`  | 상태/훅/뷰모델/폼 타입           | `useSignInForm.ts`, `usePostListManager.ts`, `form.ts` |
-| `api/`    | 서버 통신, 요청/응답 타입        | `signinService.ts`, `types.ts`(Req/Res)                |
+| `model/`  | 상태/훅/뷰모델/폼 스키마·타입    | `useSignInForm.ts`, `usePostListManager.ts`, `form.ts` |
+| `api/`    | 서버 통신, 요청/응답 스키마·타입 | `signinService.ts`, `types.ts`(Req/Res)                |
 | `lib/`    | 슬라이스 로컬 헬퍼 (외부 비공개) | 날짜 포맷터, validators                                |
 | `config/` | 상수, 설정값                     | `TOKEN_KEY`, `POST_TYPE_LABELS`                        |
 
@@ -143,6 +143,7 @@ ESLint `boundaries/dependencies`(Public API policy) + `fsd/relative-imports`가 
 - 메타데이터(`export const metadata`, `generateMetadata`)는 `page.tsx` 또는 `layout.tsx`에 둔다(Next.js가 이 두 파일에서만 인식).
 - `layout.tsx`도 `page.tsx`와 동일 원칙: 얇게 유지, 합성 로직이 자라면 view 또는 widget으로 추출하고 import만 한다.
 - 클라이언트/서버 컴포넌트 분기(`'use client'`)는 view 또는 widget에서 결정.
+- 서버 액션이 스키마나 함수를 가져오는 슬라이스(`@entities/auth`, `@entities/post`)의 barrel은 서버 모듈 그래프에도 포함된다. 이 barrel이 내보내는 컴포넌트 가운데 hook을 쓰는 것은 파일에 `'use client'`를 직접 선언한다 — 빠지면 production build가 실패한다.
 - `src/proxy.ts`는 Next.js 16의 Node.js 런타임 인증 경계다. Next.js가 위치를 `src/` 루트로 강제하므로 옮기지 않는다(`src/app/` 안에 두지 못함). app 레이어 멤버이며, 다른 routing 파일과 동일하게 얇게 유지한다.
 - `src/app/api/**/route.ts`는 라우트 핸들러로서 app 레이어 멤버. 비즈니스 로직은 features/entities/shared로 위임한다.
 - Route Group(`(domain)`, `(auth)` 등) 네이밍은 라우팅 표현이며 FSD 슬라이스와 1:1 매핑하지 않는다.

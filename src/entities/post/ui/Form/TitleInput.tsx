@@ -21,7 +21,7 @@ export default function TitleInput() {
         aria-describedby={errors.title ? 'title-error' : undefined}
         className="mt-2 min-h-12 w-full rounded border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted"
         placeholder="어떤 이야기를 나누고 싶나요?"
-        {...register('title', { required: '제목을 입력해 주세요.' })}
+        {...register('title')}
       />
       <ValidationError
         id="title-error"

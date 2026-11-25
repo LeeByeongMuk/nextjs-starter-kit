@@ -61,6 +61,8 @@ NextAuth / Auth.js 계열은 ESM 전환이 잦다. msw가 쓰는 ESM 전용 `@op
 
 UI 컴포넌트 단위 snapshot 테스트는 지양 — 렌더 구조 변경에 취약하고 가치 낮음.
 
+폼 스키마의 오류 문구는 `@shared/lib/testing/form`의 `resolveFormErrors(schema, values)`로 단언한다. 화면과 같은 `zodResolver`가 고른 필드별 오류를 돌려주며, 이 값은 `safeParse`의 `issues[0]`과 다를 수 있다. 필드 하나의 규칙은 `z.object({ value: schema })`로 감싸 확인한다.
+
 테스트 파일 확장자는 `.spec.tsx` 고정. `.test.tsx` 사용 금지.
 
 ---

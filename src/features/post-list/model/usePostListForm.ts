@@ -1,9 +1,11 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { PostListSearch, PostsReq } from '../api/types';
+import { PostsReq } from '../api/types';
+import { type PostListSearch, PostListSearchSchema } from './form';
 
 interface UsePostListFormProps {
   searchFilters: PostsReq;
@@ -20,6 +22,7 @@ export function usePostListForm({
       type: searchFilters.type,
       q: searchFilters.q,
     },
+    resolver: zodResolver(PostListSearchSchema),
   });
 
   const { getValues, resetField } = methods;

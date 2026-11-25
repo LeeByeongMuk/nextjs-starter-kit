@@ -2,7 +2,7 @@
 
 import {
   CreatePostForm,
-  type CreatePostFormInput,
+  type CreatePostFormOutput,
   useCreatePost,
   useCreatePostForm,
 } from '@features/post-create';
@@ -14,10 +14,10 @@ export default function PostCreateView() {
   const methods = useCreatePostForm();
   const { mutateAsync, isPending } = useCreatePost();
 
-  const handleCreatePost = (data: CreatePostFormInput) =>
+  const handleCreatePost = (data: CreatePostFormOutput) =>
     mutateAsync({
       title: data.title,
-      type: data.type || null,
+      type: data.type,
       contents: data.contents,
       is_open: data.isOpen === '1',
     });

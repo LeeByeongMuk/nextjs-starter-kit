@@ -61,24 +61,76 @@ export default function useDeleteSomething(id: number) {
 
 ### API Service (api/)
 
-```typescript
-import { fetchApi } from '@shared/lib/api';
-import type { SomeReq, SomeRes } from './types';
+요청·응답은 `api/types.ts`에 Zod 스키마로 선언하고 타입을 유도한다. 서버 액션은 요청 스키마로 입력을 확인하고 `fetchApi`의 `schema` 옵션으로 응답을 검증한다 (`.agents/rules/architecture/data-fetching.md` §7).
 
-export const fetchSomething = async (params: SomeReq) => {
-  const url = `/api/something?${new URLSearchParams(params)}`;
-  return (await fetchApi(url, { method: 'GET' })) as SomeRes;
+```typescript
+// api/types.ts
+import { ApiResponseSchema } from '@shared/api/types';
+import { z } from 'zod';
+
+export const SomeReqSchema = z.object({ page: z.int().positive() });
+export type SomeReq = z.infer<typeof SomeReqSchema>;
+
+export const SomeResSchema = ApiResponseSchema.extend({
+  data: z.array(z.object({ id: z.number(), title: z.string() })),
+});
+export type SomeRes = z.infer<typeof SomeResSchema>;
+```
+
+```typescript
+// api/someService.ts
+'use server';
+
+import { fetchApi } from '@shared/lib/api';
+
+import { SomeReq, SomeReqSchema, SomeRes, SomeResSchema } from './types';
+
+export const fetchSomething = async (req: SomeReq): Promise<SomeRes> => {
+  const parsed = SomeReqSchema.safeParse(req);
+  if (!parsed.success) {
+    throw new Error('조회 조건을 확인해 주세요.');
+  }
+
+  const params = new URLSearchParams({ page: String(parsed.data.page) });
+  return fetchApi(`/api/something?${params}`, {
+    method: 'GET',
+    schema: SomeResSchema,
+  });
 };
 ```
 
 ### React Hook Form (model/)
 
+검증 규칙과 문구는 `model/form.ts`의 스키마에 두고 `zodResolver`로 연결한다. `register()` 인라인 룰은 쓰지 않는다 (`.agents/rules/code-style/form-patterns.md` §4).
+
 ```typescript
+// model/form.ts
+import { z } from 'zod';
+
+const titleRequired = '제목을 입력해 주세요.';
+
+export const SomeFormSchema = z.object({
+  title: z.string(titleRequired).min(1, titleRequired),
+});
+export type SomeFormInput = z.input<typeof SomeFormSchema>;
+export const SOME_DEFAULT_VALUES: SomeFormInput = { title: '' };
+```
+
+```typescript
+// model/useSomeForm.ts
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
+import {
+  SOME_DEFAULT_VALUES,
+  type SomeFormInput,
+  SomeFormSchema,
+} from './form';
+
 export default function useSomeForm() {
-  return useForm<SomeFormData>({
-    defaultValues: { title: '', type: '' },
+  return useForm<SomeFormInput>({
+    defaultValues: SOME_DEFAULT_VALUES,
+    resolver: zodResolver(SomeFormSchema),
   });
 }
 ```

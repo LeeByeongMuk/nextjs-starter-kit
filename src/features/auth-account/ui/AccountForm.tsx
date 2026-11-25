@@ -5,15 +5,15 @@ import { NickNameInput } from '@entities/auth';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { UpdateAccountReq } from '../api/types';
+import { AccountFormInput } from '../model/form';
 
 interface AccountFormProps {
-  handleUpdateAccount: (req: UpdateAccountReq) => void;
+  handleUpdateAccount: (data: AccountFormInput) => void;
 }
 
 /** 인증 정보를 검증한 뒤 제출한다. */
 export default function AccountForm({ handleUpdateAccount }: AccountFormProps) {
-  const { handleSubmit } = useFormContext<UpdateAccountReq>();
+  const { handleSubmit } = useFormContext<AccountFormInput>();
 
   return (
     <form

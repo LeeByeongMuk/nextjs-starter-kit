@@ -4,16 +4,16 @@
 
 ## 기술 스택
 
-| 영역          | 선택                                     |
-| ------------- | ---------------------------------------- |
-| 프레임워크    | Next.js 16 (App Router) · React 19       |
-| 데이터 페칭   | TanStack Query v5 + `fetchApi` 래퍼      |
-| 폼            | React Hook Form 7 (`defaultValues` 필수) |
-| 인증          | NextAuth v5 (beta)                       |
-| 스타일        | Tailwind CSS v4                          |
-| 언어/테스트   | TypeScript 6 · Jest 30 + RTL + MSW       |
-| 실행 환경     | Node.js 26 LTS (`.nvmrc`)                |
-| 패키지 매니저 | npm 11.20 (단일 `package-lock.json`)     |
+| 영역          | 선택                                             |
+| ------------- | ------------------------------------------------ |
+| 프레임워크    | Next.js 16 (App Router) · React 19               |
+| 데이터 페칭   | TanStack Query v5 + `fetchApi` 래퍼              |
+| 폼            | React Hook Form 7 + Zod 4 (`defaultValues` 필수) |
+| 인증          | NextAuth v5 (beta)                               |
+| 스타일        | Tailwind CSS v4                                  |
+| 언어/테스트   | TypeScript 6 · Jest 30 + RTL + MSW               |
+| 실행 환경     | Node.js 26 LTS (`.nvmrc`)                        |
+| 패키지 매니저 | npm 11.20 (단일 `package-lock.json`)             |
 
 ## 아키텍처 — Feature-Sliced Design
 

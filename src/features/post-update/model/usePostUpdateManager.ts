@@ -4,11 +4,12 @@ import { isPostType } from '@entities/post';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { UpdatePostFormInput } from './form';
+import { UpdatePostFormOutput } from './form';
 import useUpdatePost from './useUpdatePost';
 import useUpdatePostForm from './useUpdatePostForm';
 import useUpdatePostResource from './useUpdatePostResource';
 
+/** 편집용 데이터로 폼을 채우고 수정 동작과 조회·저장 상태를 화면에 제공한다. */
 export function useUpdatePostManager() {
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
@@ -37,11 +38,11 @@ export function useUpdatePostManager() {
     }
   }, [isSuccess, post, reset]);
 
-  const handleUpdatePost = (data: UpdatePostFormInput) =>
+  const handleUpdatePost = (data: UpdatePostFormOutput) =>
     mutateAsync({
       id,
       title: data.title,
-      type: data.type || null,
+      type: data.type,
       contents: data.contents,
       is_open: data.isOpen === '1',
     });

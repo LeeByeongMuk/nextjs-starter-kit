@@ -1,8 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { getSession, useSession } from 'next-auth/react';
 import { useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { UpdateAccountReq } from '../api/types';
+import { type AccountFormInput, AccountFormSchema } from './form';
 import useDeleteAccount from './useDeleteAccount';
 import useUpdateAccount from './useUpdateAccount';
 
@@ -19,8 +21,9 @@ export function useAccountManager() {
   const name = user?.name ?? '';
   const nickname = user?.nickname ?? '';
   const [isCheckingSession, setIsCheckingSession] = useState(false);
-  const methods = useForm<UpdateAccountReq>({
+  const methods = useForm<AccountFormInput>({
     defaultValues: { email, name, nickname },
+    resolver: zodResolver(AccountFormSchema),
   });
   const {
     reset,
@@ -79,7 +82,7 @@ export function useAccountManager() {
     setIsCheckingSession(false);
   };
 
-  const handleUpdateAccount = (data: UpdateAccountReq) => {
+  const handleUpdateAccount = (data: AccountFormInput) => {
     if (canEdit && !isLoading) updateMutate.mutate(data);
   };
 

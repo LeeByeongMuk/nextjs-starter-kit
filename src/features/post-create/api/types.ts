@@ -1,15 +1,14 @@
-import { type PostType } from '@entities/post';
-import { ApiResponse } from '@shared/api/types';
+import { type PostBody, PostIdSchema } from '@entities/post';
+import { ApiResponseSchema } from '@shared/api/types';
+import { z } from 'zod';
 
-export interface CreatePostReq {
-  title: string;
-  type: PostType | null;
-  contents: string;
-  is_open: boolean;
-}
+/** 게시글 등록 요청 — 형식과 크기는 서버 액션의 getPostRequestBody가 확인한다 */
+export type CreatePostReq = PostBody;
 
-export interface CreatePostRes extends ApiResponse {
-  data: {
-    id: number;
-  };
-}
+/** 게시글 등록 응답 스키마 — 상세 화면 경로에 쓰는 식별자라 경로와 같은 규칙으로 확인한다 */
+export const CreatePostResSchema = ApiResponseSchema.extend({
+  data: z.object({ id: PostIdSchema }),
+});
+
+/** 게시글 등록 응답 */
+export type CreatePostRes = z.infer<typeof CreatePostResSchema>;

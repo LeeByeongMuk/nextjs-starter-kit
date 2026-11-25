@@ -1,6 +1,11 @@
+import { z } from 'zod';
+
 import { type SignInReq } from './types';
 
 type SignInResult = 'success' | 'invalid-credentials' | 'unavailable';
+
+const CsrfResSchema = z.object({ csrfToken: z.string().min(1) });
+const CallbackResSchema = z.object({ url: z.string() });
 
 const requestOptions = {
   cache: 'no-store',
@@ -16,9 +21,8 @@ export async function signInCredentials(
   const csrf = await fetch(new URL('/api/auth/csrf', origin), requestOptions);
   if (!csrf.ok) return 'unavailable';
 
-  const csrfData = (await csrf.json()) as { csrfToken?: unknown } | null;
-  const csrfToken = csrfData?.csrfToken;
-  if (typeof csrfToken !== 'string' || !csrfToken) return 'unavailable';
+  const csrfData = CsrfResSchema.safeParse(await csrf.json());
+  if (!csrfData.success) return 'unavailable';
 
   const response = await fetch(
     new URL('/api/auth/callback/credentials', origin),
@@ -29,17 +33,17 @@ export async function signInCredentials(
       body: new URLSearchParams({
         email,
         password,
-        csrfToken,
+        csrfToken: csrfData.data.csrfToken,
         callbackUrl: '/',
       }),
     }
   );
   if (!response.ok) return 'unavailable';
 
-  const result = (await response.json()) as { url?: unknown } | null;
-  if (typeof result?.url !== 'string') return 'unavailable';
+  const result = CallbackResSchema.safeParse(await response.json());
+  if (!result.success) return 'unavailable';
 
-  const resultUrl = new URL(result.url);
+  const resultUrl = new URL(result.data.url);
   if (
     (resultUrl.protocol !== 'http:' && resultUrl.protocol !== 'https:') ||
     resultUrl.username ||

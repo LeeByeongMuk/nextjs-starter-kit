@@ -9,12 +9,12 @@ paths:
 
 ## 프리플라이트 (새 코드 작성 전 순서대로 확인)
 
-1. **Type 이름**: API 경계 타입이면 `interface` + `Req`/`Res` suffix — §1.1
+1. **Type 이름**: API 경계 값은 `api/types.ts`의 `<이름>Schema`와 거기서 유도한 `Req`/`Res` 타입 — §1.1
 2. **TanStack Query 훅** — [`data-fetching.md`](../architecture/data-fetching.md)
    - 위치: 여러 슬라이스 공용 → `entities/<e>/model/`, 한 슬라이스 전용 → `features/<slice>/model/`
    - 쿼리키: `[entity, paramsObject]` 고정 (파라미터는 항상 객체 래핑)
 3. **React Hook Form** — [`form-patterns.md`](../code-style/form-patterns.md)
-   - 파일 3분할: `model/form.ts` + `model/use<Slice>Form.ts` + `ui/<Slice>Form.tsx`
+   - 파일 3분할: `model/form.ts`(Zod 스키마·입력 타입·기본값) + `model/use<Slice>Form.ts`(`zodResolver` 연결) + `ui/<Slice>Form.tsx`. `register()` 인라인 룰 금지
    - `useForm()` 호출에 **`defaultValues` 필수**
    - `FormProvider` + `useFormContext()` (prop drilling 금지)
 4. **에러 피드백**: **신규 `alert()` 호출 금지** — §3.4
@@ -29,7 +29,7 @@ paths:
 - `QueryClient` 새로 생성 → `src/shared/api/tanstack-query/client.ts`만 사용
 - `classnames` 신규 import → 금지 (사용처가 없어 의존성 제거) — [`styling.md`](./styling.md) §1
 
-**라이브러리 추가**: 새 런타임 의존성을 제안하기 전에 [`library-decisions.md`](../infra/library-decisions.md) 결정 테이블을 확인한다. "유지" 결정이 박힌 후보의 역(교체)을 무단 제안하지 말 것. 재검토 조건이 충족됐다면 그 조건을 인용해 사용자에게 확인 요청. 예외: **Zod**는 "도입" 결정이므로 후속 PR에서 능동 적용 가능.
+**라이브러리 추가**: 새 런타임 의존성을 제안하기 전에 [`library-decisions.md`](../infra/library-decisions.md) 결정 테이블을 확인한다. "유지" 결정이 박힌 후보의 역(교체)을 무단 제안하지 말 것. 재검토 조건이 충족됐다면 그 조건을 인용해 사용자에게 확인 요청.
 
 **When in doubt**: 새 패턴을 도입하기 전에 사용자에게 묻는다. 컨벤션에서 벗어난 한 줄은 수개월 후 표준을 오염시킨다.
 
@@ -44,7 +44,7 @@ paths:
 | 주제                                     | 문서                                                                              |
 | ---------------------------------------- | --------------------------------------------------------------------------------- |
 | 데이터 페칭 (TanStack Query, `fetchApi`) | [`.agents/rules/architecture/data-fetching.md`](../architecture/data-fetching.md) |
-| 폼 (React Hook Form)                     | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md)     |
+| 폼 (React Hook Form, Zod)                | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md)     |
 | 인증 (NextAuth v5)                       | [`.agents/rules/architecture/auth.md`](../architecture/auth.md)                   |
 | 스타일링 (Tailwind v4)                   | [`.agents/rules/code-style/styling.md`](../code-style/styling.md)                 |
 | 테스팅 (Jest / RTL / MSW)                | [`.agents/rules/testing/unit-testing.md`](../testing/unit-testing.md)             |
@@ -70,43 +70,47 @@ paths:
 - `moduleResolution: bundler`, `module: esnext`, `isolatedModules: true` — 신규 파일은 항상 ESM 문법 사용
 - import 순서: ESLint `simple-import-sort` 자동 정렬 (`npm run lint:fix`)에 위임. 수동 조정 금지
 
-### 1.1 요청/응답 타입: `interface` + `Req`/`Res` suffix
+### 1.1 요청/응답 타입: 스키마에서 유도 + `Req`/`Res` suffix
 
-API 경계를 넘나드는 타입은 `interface`로 선언하고 `Req`/`Res` suffix를 붙인다.
+API 경계를 넘나드는 값은 `api/types.ts`에 Zod 스키마로 선언하고 타입은 스키마에서 유도한다. 스키마는 `<이름>Schema`, 타입은 `Schema`를 뺀 같은 이름을 쓰며 `Req`/`Res` suffix로 끝낸다.
 
 ```ts
-// src/features/auth-signin/api/types.ts
-export interface SignInReq {
-  email: string;
-  password: string;
-}
+// src/features/auth-signup/api/types.ts
+/** 회원가입 응답 스키마 — 화면에서 쓰는 계정 식별자만 남긴다 */
+export const SignUpResSchema = ApiResponseSchema.extend({
+  data: z.object({ id: z.number() }),
+});
 
-export interface SignInRes extends ApiResponse {
-  accessToken: string;
-  user: User;
-}
+/** 회원가입 응답 */
+export type SignUpRes = z.infer<typeof SignUpResSchema>;
 ```
 
-근거 파일: `src/features/auth-signin/api/types.ts`, `src/features/post-list/api/types.ts`.
+- 요청 스키마는 서버 액션이 받는 값의 형식을, 응답 스키마는 화면이 쓰는 필드를 선언한다 — [`data-fetching.md`](../architecture/data-fetching.md) §7
+- 사용자 입력 규칙은 요청 스키마가 아니라 폼 스키마에 둔다 — [`form-patterns.md`](./form-patterns.md) §4
+- 스키마로 검증하지 않는 요청 형태(식별자만 받는 `DeletePostReq` 등)는 `interface`로 선언한다. 쓰이지 않는 스키마는 만들지 않는다
 
-### 1.2 도메인 모델 / 폼 입력: `interface` + `PascalCase`
+근거 파일: `src/features/auth-signup/api/types.ts`, `src/features/post-list/api/types.ts`.
 
-도메인 모델(`Post`, `User`), 폼 입력 타입(`CreatePostFormInput`)은 `interface`. 이유: 추후 선언 병합·확장 여지.
+### 1.2 폼 입력 타입 / 스키마가 없는 객체 타입
+
+- 폼 입력 타입은 `model/form.ts`의 폼 스키마에서 유도한다 (`SignUpFormInput`, `PostFormInput`) — [`form-patterns.md`](./form-patterns.md) §4.2
+- 스키마가 없는 객체 타입(컴포넌트 props, 훅 인자, 검증하지 않는 요청 형태)은 `interface` + `PascalCase`로 선언한다
 
 ### 1.3 단순 별칭 / 유니온: `type`
 
 ```ts
-export type DeletePostRes = ApiResponse;
-export type PostType = 'notice' | 'general';
+export type CreatePostReq = PostBody;
+type SignInResult = 'success' | 'invalid-credentials' | 'unavailable';
 ```
 
 ### 1.4 `enum` 대신 as-const union
 
-런타임 객체를 불필요하게 만드는 TS `enum`은 사용하지 않는다.
+런타임 객체를 불필요하게 만드는 TS `enum`은 사용하지 않는다. 검증에도 쓰는 값 집합은 `z.enum()`에서 타입을 유도한다.
 
 ```ts
-export const POST_TYPES = ['notice', 'general'] as const;
-export type PostType = (typeof POST_TYPES)[number];
+// src/entities/post/model/types.ts
+export const PostTypeSchema = z.enum(['notice', 'faq', 'free']);
+export type PostType = z.infer<typeof PostTypeSchema>;
 ```
 
 ### 1.5 `I*`/`T*` 타입 접두사 금지 (ESLint 강제)
@@ -122,8 +126,8 @@ export type PostType = (typeof POST_TYPES)[number];
 | 컴포넌트 파일   | `PascalCase.tsx`             | `PostListItem.tsx`                 |
 | 훅 파일         | `camelCase.ts`, `use` 접두사 | `useCreatePostForm.ts`             |
 | 서비스 / 유틸   | `camelCase.ts`               | `signinService.ts`, `date.ts`      |
-| API 타입 전용   | `types.ts`                   | `src/features/*/api/types.ts`      |
-| 폼 타입 전용    | `form.ts`                    | `src/features/*/model/form.ts`     |
+| API 스키마·타입 | `types.ts`                   | `src/features/*/api/types.ts`      |
+| 폼 스키마·타입  | `form.ts`                    | `src/features/*/model/form.ts`     |
 | 상수            | `<domain>.ts`                | `src/entities/post/config/post.ts` |
 | 슬라이스 barrel | `index.ts` (고정)            | `src/features/post-list/index.ts`  |
 | 테스트          | `<file>.spec.tsx`            | `signin.spec.tsx`                  |

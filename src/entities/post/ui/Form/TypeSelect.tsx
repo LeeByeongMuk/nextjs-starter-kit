@@ -3,7 +3,7 @@
 import ValidationError from '@shared/ui/error/ValidationError';
 import { useFormContext } from 'react-hook-form';
 
-import { isPostType, TYPE_OPTIONS } from '../../config/post';
+import { TYPE_OPTIONS } from '../../config/post';
 
 /** 게시글 분류를 선택한다. */
 export default function TypeSelect() {
@@ -21,9 +21,7 @@ export default function TypeSelect() {
         aria-invalid={!!errors.type}
         aria-describedby={errors.type ? 'type-error' : undefined}
         className="mt-2 min-h-12 w-full rounded border border-line bg-surface py-2 pr-9 pl-3 text-ink"
-        {...register('type', {
-          validate: value => isPostType(value) || '분류를 선택해 주세요.',
-        })}
+        {...register('type')}
       >
         {TYPE_OPTIONS.map(({ value, label }) => (
           <option key={value} value={value}>

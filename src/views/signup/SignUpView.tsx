@@ -3,7 +3,7 @@
 import { AuthHeader } from '@entities/auth';
 import {
   SignUpForm,
-  type SignUpReq,
+  type SignUpFormInput,
   useSignup,
   useSignupForm,
 } from '@features/auth-signup';
@@ -15,8 +15,13 @@ import { FormProvider } from 'react-hook-form';
 export default function SignUpView() {
   const methods = useSignupForm();
   const { mutate, isPending } = useSignup();
-  const handleSignUp = (req: SignUpReq) => {
-    mutate(req);
+  const handleSignUp = ({
+    email,
+    name,
+    nickname,
+    password,
+  }: SignUpFormInput) => {
+    mutate({ email, name, nickname, password });
   };
 
   return (
