@@ -11,26 +11,26 @@ const files = [
   {
     path: 'dist/esm/index.js',
     original:
-      'ff71315070f5151b638307fc66faa7e22c479a5e8e3fd566442475958401e524',
-    patched: 'f93cab11da3245e34e31826301410d52e3b47c5f3023f4d2046592581f0de14a',
+      '05455ecf4ba8d4e802bda04eb2c5e5c76836ae7888edca006a01135413f72d9a',
+    patched: 'afdb191f7a5b679df98bb0438953acb8ab1f4a8a8311b5d2ef6eac076b6eb355',
   },
   {
     path: 'dist/esm/indexViewer.js',
     original:
-      'ff1665cc086371b2a0be531a9a2559216e325a96074cb5ed0565f7a84f7a29ce',
-    patched: '9fe883dfbfbeb7660589f4ef8ad1f90814cbbe7e4fba7a523d3932850c34268a',
+      '64a05ae607c8f866e9f8dc8dea49f7e711bfb6796be6b7a651df41928e913d9d',
+    patched: '47f3a5a06fbff0498bb56a860824daec5def0f45b1bc6e355c77ff6f9cdb6853',
   },
   {
     path: 'dist/toastui-editor.js',
     original:
-      'f9553b03d05eea45f6f3c066e270f0e3f2911d345e194907381c61158cf6d51b',
-    patched: '7c0589f12a1d5a640d5bc27c9e406c46de4704b50c5cd8dc5b865942bc1dc371',
+      '1ea4b2f7d61153c03dd895acaa468e5994fb9f072b8663e1dd0f049dfaf05e5e',
+    patched: 'd5e29ffcb00fdf28447afd59736ce1bd7ebd27cca7d49ab5ace6c1cb7fcbeede',
   },
   {
     path: 'dist/toastui-editor-viewer.js',
     original:
-      'a13b3fc83a1a3d0bfd4e0b1d6c1deaa756e0082689843cf9cde7fa17776160c2',
-    patched: '8604fcaaecb03795c87dd50da0207c9352d1bf98aa242890a0021cae6d5ed469',
+      '63b2622c5f78f233bea3f2d37c3a0b716c4f2ba189762d3a8e50c68228c57448',
+    patched: '6b7beab413dd50d94bbe1e2b344e3ac30ab5fb7465a2a7502145c5e9d0e0fd2e',
   },
 ];
 const dompurify = readFileSync(
@@ -40,7 +40,7 @@ const dompurify = readFileSync(
 
 if (
   digest(dompurify) !==
-  'e9ddd339c8823bdef37e0efa07cf24a896f97bb137890da48d1ac28a4ba1940c'
+  '84ebab629e420dc2b7c1e87df880e915df2834c5a8f0494bfbb077fed333fb32'
 ) {
   throw new Error(
     'DOMPurify 배포물이 변경되었습니다. 보안 패치를 재검증하세요.'
@@ -84,5 +84,5 @@ const updates = files.flatMap(file => {
 
 for (const update of updates) writeFileSync(update.path, update.source);
 console.log(
-  'Toast UI의 ESM·UMD 에디터와 뷰어에 DOMPurify 3.4.18 적용을 확인했습니다.'
+  'Toast UI의 ESM·UMD 에디터와 뷰어에 DOMPurify 3.5.0 적용을 확인했습니다.'
 );
