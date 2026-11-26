@@ -48,6 +48,7 @@ paths:
 - `scripts/patch-toast-ui.mjs`는 전체 설치와 운영 의존성만 설치할 때 모두 `postinstall`에서 실행된다. 에디터·뷰어의 ESM·UMD 네 파일에 내장된 DOMPurify 2.3.3을 제거한다. ESM은 설치된 DOMPurify를 import하고, UMD는 해당 버전의 CJS 구현과 라이선스를 포함한다. `customHTMLSanitizer`와 관계없이 에디터 자체의 정제 호출에도 패치가 적용된다.
 - 패치는 원본·결과와 DOMPurify 배포물의 SHA-256을 검증하고, 예상하지 못한 파일에서는 실패한다. 반복 실행은 안전하다. `predev`와 `prebuild`도 적용 상태를 검사한다. `--ignore-scripts`로 설치했다면 `npm run postinstall`을 실행해야 한다. Docker는 설치 전에 패치 스크립트를 복사한다.
 - Toast UI 또는 DOMPurify 버전을 올릴 때는 패치의 해시와 정제 동작을 함께 검증한다. `npm test`의 에디터 보안·HTML 왕복 테스트, 실제 브라우저의 작성·수정·저장, 타입·lint·production build를 통과해야 한다. CI는 `npm audit --omit=dev`로 운영 의존성도 검사한다.
+- 설치 패치가 해시를 고정한 `@toast-ui/editor`와 `dompurify`, 에디터와 함께 올리는 `@toast-ui/react-editor`는 Dependabot의 버전·보안 묶음에서 제외해 개별 PR로 받는다(`.github/dependabot.yml`). 에디터나 DOMPurify의 새 버전에서는 설치 패치가 실패하므로 그 PR은 해시를 다시 고정하기 전까지 CI를 통과하지 못하고, 다른 의존성의 묶음 업데이트는 막지 않는다.
 - [minimatch 패턴 증폭](https://github.com/advisories/GHSA-g3hv-75wg-m249)은 취약 범위 `>=7 <11.0.1`에만 11.0.9를 적용한다. 기존 3.x API는 유지한다. [glob 취소 우회](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)는 `>=9 <14.0.2`에만 14.0.6을 적용한다. typescript-eslint는 수정된 minimatch를 사용하는 8.73.0이며, Jest·test-exclude의 상위 의존성이 수정 버전을 채택하면 해당 override를 제거한다.
 
 ## 결정 요약

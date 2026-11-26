@@ -5,13 +5,16 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
+    # 설치 패치와 함께 검증해야 하는 패키지는 묶음에서 빼 개별 PR로 받는다. 절차는 .agents/rules/infra/library-decisions.md의 의존성 보안 패치 절에 있다.
     groups:
       npm-minor-and-patch:
         patterns: ['*']
+        exclude-patterns: ['@toast-ui/*', 'dompurify']
         update-types: [minor, patch]
       npm-security:
         applies-to: security-updates
         patterns: ['*']
+        exclude-patterns: ['@toast-ui/*', 'dompurify']
         update-types: [minor, patch]
     # 보류 근거와 재검토 조건은 .agents/rules/infra/library-decisions.md에 있다.
     ignore:
