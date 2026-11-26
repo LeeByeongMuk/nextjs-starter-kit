@@ -15,31 +15,36 @@ export default function usePostDetail() {
   const { data, isError, isLoading, isFetching } = usePost();
   const { mutate, isPending, isSuccess } = useDeletePost();
   const deleteStarted = useRef(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<number>();
+  const canDelete = !isError && !!data?.data.is_editable;
+  const isDeleteConfirmOpen = deleteTarget === id && canDelete;
+  if (deleteTarget !== undefined && !isDeleteConfirmOpen) {
+    setDeleteTarget(undefined);
+  }
 
   const handleRedirectBack = useCallback(() => {
     router.back();
   }, [router]);
 
   const handleDeletePost = useCallback(() => {
-    if (!deleteStarted.current) setIsDeleteConfirmOpen(true);
-  }, []);
+    if (canDelete && !deleteStarted.current) setDeleteTarget(id);
+  }, [canDelete, id]);
 
   const handleCancelDeletePost = useCallback(() => {
-    setIsDeleteConfirmOpen(false);
+    setDeleteTarget(undefined);
   }, []);
 
   const handleConfirmDeletePost = useCallback(() => {
-    if (deleteStarted.current) return;
+    if (!isDeleteConfirmOpen || deleteStarted.current) return;
 
     deleteStarted.current = true;
-    setIsDeleteConfirmOpen(false);
+    setDeleteTarget(undefined);
     mutate(undefined, {
       onError: () => {
         deleteStarted.current = false;
       },
     });
-  }, [mutate]);
+  }, [isDeleteConfirmOpen, mutate]);
 
   return {
     id,

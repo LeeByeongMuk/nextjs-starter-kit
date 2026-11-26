@@ -157,6 +157,32 @@ describe('게시글 상세 페이지 테스트', () => {
       expect(queryClient.isMutating()).toBe(0);
     });
 
+    test('삭제 확인 중 재조회에서 편집 권한이 사라지면 기존 확인을 폐기한다', async () => {
+      await openConfirm();
+      server.use(
+        http.get(
+          getHandlerURI('/api/posts/:id'),
+          () =>
+            HttpResponse.json({
+              ...postData.getById,
+              data: { ...postData.getById.data, is_editable: false },
+            }),
+          { once: true }
+        )
+      );
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+      });
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+      });
+      expect(await screen.findByRole('button', { name: '삭제' })).toBeEnabled();
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(deleteRequest).not.toHaveBeenCalled();
+    });
+
     test('연속으로 삭제를 확인해도 한 번만 요청하고 홈 이동 전까지 다시 삭제할 수 없다', async () => {
       const response = Promise.withResolvers<Response>();
       server.use(
