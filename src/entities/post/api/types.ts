@@ -23,7 +23,7 @@ export interface DeletePostReq {
 }
 
 /** 게시글 삭제 응답 스키마 */
-export const DeletePostResSchema = ApiResponseSchema;
+export const DeletePostResSchema = ApiResponseSchema.default({});
 
 /** 게시글 삭제 응답 */
 export type DeletePostRes = z.infer<typeof DeletePostResSchema>;

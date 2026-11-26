@@ -15,7 +15,7 @@ export type SignUpReq = z.infer<typeof SignUpReqSchema>;
 /** 회원가입 응답 스키마 — 계정 식별자만 남긴다. 화면이 쓰지 않는 값이라 없어도 가입 결과를 막지 않는다 */
 export const SignUpResSchema = ApiResponseSchema.extend({
   data: lenient(z.object({ id: lenient(z.number()) })),
-});
+}).default({});
 
 /** 회원가입 응답 */
 export type SignUpRes = z.infer<typeof SignUpResSchema>;

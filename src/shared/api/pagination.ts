@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 /** 목록 응답의 페이지 정보 스키마 — 화면이 쓰는 값만 남긴다 */
 export const PaginationMetaSchema = z.object({
-  current_page: z.number(),
-  last_page: z.number(),
-  total: z.number(),
+  current_page: z.int().positive(),
+  last_page: z.int().nonnegative(),
+  total: z.int().nonnegative(),
 });
 
 /** 목록 응답의 페이지 정보 */

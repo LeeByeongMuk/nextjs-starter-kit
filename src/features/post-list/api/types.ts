@@ -1,4 +1,4 @@
-import { PostTypeSchema } from '@entities/post';
+import { PostIdSchema, PostTypeSchema } from '@entities/post';
 import { PaginationDataSchema } from '@shared/api/pagination';
 import { ApiResponseSchema, lenient } from '@shared/api/types';
 import { z } from 'zod';
@@ -20,7 +20,7 @@ const PostListDataSchema = z.object({
     .nullish()
     .transform(date => date ?? ''),
   hit: lenient(z.number()),
-  id: z.number(),
+  id: PostIdSchema,
   title: z.string(),
   type: z.string().nullish(),
   user: z

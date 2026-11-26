@@ -10,7 +10,7 @@ export interface UpdatePostReq extends PostBody {
 /** 게시글 수정 응답 스키마 — 화면이 쓰지 않는 식별자라 없어도 수정 결과를 막지 않는다 */
 export const UpdatePostResSchema = ApiResponseSchema.extend({
   data: lenient(z.object({ id: lenient(z.number()) })),
-});
+}).default({});
 
 /** 게시글 수정 응답 */
 export type UpdatePostRes = z.infer<typeof UpdatePostResSchema>;

@@ -35,7 +35,7 @@ export const AccountIdResSchema = z.object({
 });
 
 /** 회원 탈퇴 응답 스키마 */
-export const DeleteAccountResSchema = ApiResponseSchema;
+export const DeleteAccountResSchema = ApiResponseSchema.default({});
 
 /** 회원 탈퇴 응답 */
 export type DeleteAccountRes = z.infer<typeof DeleteAccountResSchema>;

@@ -107,4 +107,21 @@ describe('게시글 목록 서버 액션', () => {
 
     await expect(fetchPosts(filters)).rejects.toBeInstanceOf(ZodError);
   });
+
+  test.each([0, 1.5, Number.MAX_SAFE_INTEGER + 1])(
+    '상세 경로에서 열 수 없는 식별자 %p를 목록 링크로 전달하지 않는다',
+    async id => {
+      respond.mockReturnValue({ data: [{ ...post, id }], meta });
+
+      await expect(fetchPosts(filters)).rejects.toBeInstanceOf(ZodError);
+    }
+  );
+
+  test.each([{ current_page: 0 }, { last_page: 1.5 }, { total: -1 }])(
+    '목록에 쓸 수 없는 페이지 정보 %p를 거절한다',
+    async invalid => {
+      respond.mockReturnValue({ data: [post], meta: { ...meta, ...invalid } });
+      await expect(fetchPosts(filters)).rejects.toBeInstanceOf(ZodError);
+    }
+  );
 });

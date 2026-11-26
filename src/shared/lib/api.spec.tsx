@@ -38,4 +38,17 @@ describe('fetchApi 응답 검증', () => {
       data: { id: 1, secret: 'hidden' },
     });
   });
+
+  test('본문이 없어도 필수 응답 필드는 검증한다', async () => {
+    server.use(
+      http.get(
+        getHandlerURI('/api/items/1'),
+        () => new HttpResponse(null, { status: 204 })
+      )
+    );
+
+    await expect(
+      fetchApi('/api/items/1', { auth: 'none', schema: ItemResSchema })
+    ).rejects.toBeInstanceOf(z.ZodError);
+  });
 });

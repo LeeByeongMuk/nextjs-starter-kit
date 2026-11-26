@@ -100,6 +100,18 @@ describe('계정 서버 액션', () => {
     expect(request).not.toHaveBeenCalled();
   });
 
+  test('탈퇴 API가 204로 응답하면 본문 없이 완료된 요청으로 처리한다', async () => {
+    server.use(
+      http.delete(
+        getHandlerURI('/api/users'),
+        () => new HttpResponse(null, { status: 204 })
+      )
+    );
+    await expect(
+      fetchDeleteAccount({ deleted_reason: '탈퇴 사유', user_id: '1' })
+    ).resolves.toEqual({});
+  });
+
   test.each([
     ['입력 없음', undefined],
     ['문자열이 아닌 사유', { deleted_reason: null, user_id: '1' }],

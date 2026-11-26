@@ -73,6 +73,7 @@ export async function fetchApi(
     throw new ApiError(res.status, res.statusText);
   }
 
-  const body: unknown = await res.json();
+  const text = await res.text();
+  const body: unknown = text.length ? JSON.parse(text) : undefined;
   return schema ? schema.parse(body) : body;
 }
