@@ -15,6 +15,12 @@ import { FormProvider } from 'react-hook-form';
 /** 게시글 편집 폼과 진행 상태를 조합한다. */
 export default function PostUpdateView() {
   const { id } = useParams<{ id: string }>();
+
+  // 조회와 폼을 글마다 새로 마운트한다. 마운트 한 번이 한 글의 한 방문이 되어 다른 글이나 이전 방문의 조회와 편집 상태를 이어받지 않는다.
+  return <PostUpdate key={id} />;
+}
+
+function PostUpdate() {
   const { data, isError } = useUpdatePostResource();
 
   if (!data && isError)
@@ -40,20 +46,18 @@ export default function PostUpdateView() {
       </section>
     );
 
-  return (
-    <PostUpdateContent key={id} post={data.data} isRefetchError={isError} />
-  );
+  return <PostUpdateContent post={data.data} isRefetchError={isError} />;
 }
 
-function PostUpdateContent({
-  post,
-  isRefetchError,
-}: {
+interface PostUpdateContentProps {
   post: UpdatePostResourceRes['data'];
   isRefetchError: boolean;
-}) {
+}
+
+function PostUpdateContent({ post, isRefetchError }: PostUpdateContentProps) {
   const { methods, handleUpdatePost, isPending } = useUpdatePostManager(post);
   const hasDraft = Object.keys(methods.formState.dirtyFields).length > 0;
+
   return (
     <FormProvider {...methods}>
       <section className="mx-auto w-full max-w-[760px]">

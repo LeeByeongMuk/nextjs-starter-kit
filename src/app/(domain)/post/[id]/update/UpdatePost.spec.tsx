@@ -125,6 +125,122 @@ describe('게시글 수정 테스트', () => {
       expect(toastCalls.error).not.toHaveBeenCalled();
       expect(mockPush).not.toHaveBeenCalled();
     });
+
+    test('수정 화면에 다시 들어오면 이전 방문의 값 대신 새로 조회한 값으로 시작한다', async () => {
+      const firstVisit = render(<UpdatePost />, { wrapper });
+      expect(await screen.findByRole('textbox', { name: '제목' })).toHaveValue(
+        postData.getEdit.data.title
+      );
+      firstVisit.unmount();
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+          HttpResponse.json({
+            ...postData.getEdit,
+            data: { ...postData.getEdit.data, title: '저장한 제목' },
+          })
+        )
+      );
+
+      render(<UpdatePost />, { wrapper });
+
+      expect(screen.getByRole('status')).toHaveTextContent(
+        '불러오는 중입니다.'
+      );
+      expect(
+        screen.queryByRole('textbox', { name: '제목' })
+      ).not.toBeInTheDocument();
+      expect(await screen.findByRole('textbox', { name: '제목' })).toHaveValue(
+        '저장한 제목'
+      );
+    });
+
+    test('이전 방문에서 시작한 조회의 응답을 편집 기준으로 쓰지 않는다', async () => {
+      const firstVisit = render(<UpdatePost />, { wrapper });
+      await screen.findByRole('textbox', { name: '제목' });
+      const late = Promise.withResolvers<Response>();
+      const reload = jest.fn(() => late.promise);
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), reload, { once: true })
+      );
+      void queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+      firstVisit.unmount();
+      const visit = jest.fn(() =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, title: '이번 방문의 제목' },
+        })
+      );
+      server.use(http.get(getHandlerURI('/api/posts/:id/edit'), visit));
+
+      render(<UpdatePost />, { wrapper });
+
+      const title = await screen.findByRole('textbox', { name: '제목' });
+      expect(visit).toHaveBeenCalledTimes(1);
+      expect(title).toHaveValue('이번 방문의 제목');
+      late.resolve(HttpResponse.json(postData.getEdit));
+      await act(async () => {
+        await late.promise;
+      });
+      expect(title).toHaveValue('이번 방문의 제목');
+    });
+
+    test('다른 글로 갔다 돌아오면 보류 중이던 조회 대신 새로 조회한다', async () => {
+      const pending = Promise.withResolvers<Response>();
+      let requests = 0;
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), ({ params }) => {
+          if (params.id === '2') return new HttpResponse(null, { status: 500 });
+          requests += 1;
+          return requests === 1
+            ? pending.promise
+            : HttpResponse.json({
+                ...postData.getEdit,
+                data: { ...postData.getEdit.data, title: '다시 조회한 제목' },
+              });
+        })
+      );
+      const { rerender } = render(<UpdatePost />, { wrapper });
+      await waitFor(() => expect(requests).toBe(1));
+
+      (useParams as jest.Mock).mockReturnValue({ id: '2' });
+      rerender(<UpdatePost />);
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '수정할 글을 불러오지 못했습니다.'
+      );
+      (useParams as jest.Mock).mockReturnValue({ id: '1' });
+      rerender(<UpdatePost />);
+
+      const title = await screen.findByRole('textbox', { name: '제목' });
+      expect(requests).toBe(2);
+      expect(title).toHaveValue('다시 조회한 제목');
+      pending.resolve(HttpResponse.json(postData.getEdit));
+      await act(async () => {
+        await pending.promise;
+      });
+      expect(title).toHaveValue('다시 조회한 제목');
+    });
+
+    test('다시 들어왔을 때 조회에 실패하면 이전 방문의 값으로 폼을 열지 않는다', async () => {
+      const firstVisit = render(<UpdatePost />, { wrapper });
+      await screen.findByRole('textbox', { name: '제목' });
+      firstVisit.unmount();
+      server.use(
+        http.get(
+          getHandlerURI('/api/posts/:id/edit'),
+          () => new HttpResponse(null, { status: 500 })
+        )
+      );
+
+      render(<UpdatePost />, { wrapper });
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '수정할 글을 불러오지 못했습니다.'
+      );
+      expect(
+        screen.queryByRole('textbox', { name: '제목' })
+      ).not.toBeInTheDocument();
+    });
   });
 
   test('재조회 중 본문 포커스와 편집값을 유지하고 변경하지 않은 필드만 갱신한다', async () => {
@@ -193,7 +309,6 @@ describe('게시글 수정 테스트', () => {
         contents: '<p>다른 본문</p>',
       },
     };
-    queryClient.setQueryData(['posts', { id: 2 }], nextPost);
     server.use(
       http.get(getHandlerURI('/api/posts/:id/edit'), ({ params }) =>
         params.id === '1'
