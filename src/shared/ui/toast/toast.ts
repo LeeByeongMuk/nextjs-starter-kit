@@ -72,6 +72,7 @@ export const toast = {
     sonnerToast.error(message, { duration: Infinity });
   },
   dismiss() {
+    removePendingToast();
     sonnerToast.dismiss();
   },
 };

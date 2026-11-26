@@ -174,7 +174,7 @@ export type PostType = z.infer<typeof PostTypeSchema>;
 - 알림 영역 `@shared/ui/toast/Toaster`는 루트 레이아웃(`src/app/(domain)/layout.tsx`)에 한 번만 둔다
 - 성공 알림은 잠시 뒤 사라진다. 오류 알림은 닫기 버튼을 누르거나 다음 요청을 시작할 때까지 남는다 — 변경 요청(mutation)과 로그인 시도는 시작할 때 표시 중인 알림을 닫는다
 - Mutation 실패는 `QueryClient`가 한곳에서 알린다. 각 mutation은 `meta.errorMessage`에 문구만 지정한다 — [`data-fetching.md`](../architecture/data-fetching.md) §5
-- 알림 직후 전체 문서 이동(Auth.js `signIn`·`signOut` 리다이렉트)이 이어지면 `toast.success(message, { survivesNavigation: true })`를 쓴다. 표시를 마치기 전에 문서가 바뀌면 다음 문서에서 한 번 더 표시한다
+- 알림 직후 전체 문서 이동(Auth.js `signIn`·`signOut` 리다이렉트)이 이어지면 `toast.success(message, { survivesNavigation: true })`를 쓴다. 표시를 마치기 전에 문서가 바뀌면 다음 문서에서 한 번 더 표시한다. `toast.dismiss()`는 다음 문서에 표시할 알림도 지운다
 - 새 변경 요청은 표시 중인 알림을 닫으므로, 요청이 진행 중일 때는 같은 동작을 다시 제출하지 않게 막는다. 렌더된 `isPending`은 연속 제출을 막지 못하므로 제출 순간 잠그는 ref를 쓴다 (`SignUpView`의 가입 요청)
 - 문구는 고정 문자열로 쓰고 서버 오류 원문을 넣지 않는다. 알림은 `aria-live="polite"` 영역으로 전달된다
 

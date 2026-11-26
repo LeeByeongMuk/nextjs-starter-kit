@@ -98,13 +98,24 @@ describe('알림', () => {
       toast.success(message, { survivesNavigation: true });
       await screen.findByText(message);
       previousDocument.unmount();
-      toast.dismiss();
       expect(pendingToast()).toBe(message);
 
       render(<Toaster />);
 
       expect(await screen.findByText(message)).toBeInTheDocument();
       expect(pendingToast()).toBeNull();
+    });
+
+    test('새 요청이 알림을 모두 닫으면 다음 문서에서도 다시 표시하지 않는다', async () => {
+      const previousDocument = render(<Toaster />);
+      toast.success(message, { survivesNavigation: true });
+      await screen.findByText(message);
+
+      toast.dismiss();
+      previousDocument.unmount();
+      expect(pendingToast()).toBeNull();
+      render(<Toaster />);
+      expect(screen.queryByText(message)).toBeNull();
     });
 
     test('같은 문구의 알림이 둘이면 나중 알림이 닫힐 때까지 저장해 둔다', async () => {
