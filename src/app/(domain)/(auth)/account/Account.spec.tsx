@@ -3,7 +3,7 @@ import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { TOKEN_KEY } from '@shared/config/auth';
 import { spyOnToast } from '@shared/lib/testing/toast';
-import { getHandlerURI } from '@shared/lib/url';
+import { documentNavigation, getHandlerURI } from '@shared/lib/url';
 import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -307,6 +307,7 @@ describe('마이페이지 페이지 테스트', () => {
 
     beforeEach(() => {
       deleteRequest.mockClear();
+      jest.spyOn(documentNavigation, 'assign').mockImplementation(() => {});
       server.use(
         http.delete(getHandlerURI('/api/users'), async ({ request }) => {
           deleteRequest(await request.json());
@@ -353,8 +354,11 @@ describe('마이페이지 페이지 테스트', () => {
       expect(within(openDialog()).getByLabelText('탈퇴 사유')).toHaveValue('');
     });
 
-    test('회원 탈퇴 성공 시 로그아웃 처리된다.', async () => {
+    test('탈퇴 후 세션을 종료하고 현재 출처의 홈으로 이동한다', async () => {
       const toastCalls = spyOnToast();
+      jest
+        .mocked(signOut)
+        .mockResolvedValueOnce({ url: 'https://auth.example.test/' });
 
       // when - 탈퇴 사유를 입력하고 탈퇴를 확인
       submitReason(openDialog(), 'reason');
@@ -364,8 +368,12 @@ describe('마이페이지 페이지 테스트', () => {
         await screen.findByText('회원 탈퇴가 완료되었습니다.')
       ).toBeInTheDocument();
       await waitFor(() =>
-        expect(signOut).toHaveBeenCalledWith({ redirectTo: '/' })
+        expect(documentNavigation.assign).toHaveBeenCalledWith('/')
       );
+      expect(signOut).toHaveBeenCalledWith({
+        redirect: false,
+        redirectTo: '/',
+      });
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(toastCalls.success).toHaveBeenCalledWith(
         '회원 탈퇴가 완료되었습니다.',
@@ -398,6 +406,7 @@ describe('마이페이지 페이지 테스트', () => {
 
       expect(await screen.findByText(/다시 로그아웃해 주세요/)).toBeVisible();
       expect(screen.queryByText('회원 탈퇴를 완료하지 못했습니다.')).toBeNull();
+      expect(documentNavigation.assign).not.toHaveBeenCalled();
       expect(screen.getByRole('button', { name: '회원 탈퇴' })).toBeDisabled();
       expect(deleteRequest).toHaveBeenCalledTimes(1);
     });
