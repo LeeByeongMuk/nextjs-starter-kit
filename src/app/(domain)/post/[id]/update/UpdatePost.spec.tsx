@@ -21,6 +21,7 @@ import { cookies } from 'next/headers';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
@@ -33,18 +34,29 @@ jest.mock('next-auth/react');
 jest.mock('next/dynamic', () => () => {
   function MockEditor({
     onChange,
+    onImageRead,
     isInvalid,
   }: {
     onChange: (value: string) => void;
+    onImageRead: (reading: boolean) => void;
     isInvalid: boolean;
   }) {
     return (
-      <textarea
-        aria-label="본문"
-        aria-invalid={isInvalid}
-        aria-describedby={isInvalid ? 'contents-error' : undefined}
-        onChange={event => onChange(event.target.value)}
-      />
+      <>
+        <textarea
+          value={useWatch({ name: 'contents' })}
+          aria-label="본문"
+          aria-invalid={isInvalid}
+          aria-describedby={isInvalid ? 'contents-error' : undefined}
+          onChange={event => onChange(event.target.value)}
+        />
+        <button type="button" onClick={() => onImageRead(true)}>
+          이미지 읽기 시작
+        </button>
+        <button type="button" onClick={() => onImageRead(false)}>
+          이미지 읽기 완료
+        </button>
+      </>
     );
   }
   return MockEditor;
@@ -61,6 +73,7 @@ describe('게시글 수정 테스트', () => {
   const mockPush = jest.fn();
 
   beforeEach(() => {
+    queryClient.clear();
     mockPush.mockClear();
     (cookies as jest.Mock).mockResolvedValue({
       has: jest.fn().mockReturnValue(true),
@@ -86,8 +99,6 @@ describe('게시글 수정 테스트', () => {
       update: jest.fn(),
     });
 
-    // given - 게시글 수정 페이지가 그려진다
-    render(<UpdatePost />, { wrapper });
     render(<Toaster />);
   });
 
@@ -99,7 +110,7 @@ describe('게시글 수정 테스트', () => {
       // then - 게시글 정보를 가져온다
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
-        expect(result.current.data.data).toEqual(postData.getEdit.data);
+        expect(result.current.data?.data).toEqual(postData.getEdit.data);
       });
     });
 
@@ -110,15 +121,10 @@ describe('게시글 수정 테스트', () => {
           return new HttpResponse(null, { status: 500 });
         })
       );
-      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
-
-      // when - 게시글 수정 리소스 API 호출에 실패
-      const { result } = renderHook(() => useUpdatePostResource(), { wrapper });
-
-      // then - 실패 메시지를 출력한다
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+      render(<UpdatePost />, { wrapper });
+      expect(screen.getByRole('status')).toHaveTextContent(
+        '불러오는 중입니다.'
+      );
       expect(await screen.findByRole('alert')).toHaveTextContent(
         '수정할 글을 불러오지 못했습니다.'
       );
@@ -129,6 +135,309 @@ describe('게시글 수정 테스트', () => {
       expect(toastCalls.error).not.toHaveBeenCalled();
       expect(mockPush).not.toHaveBeenCalled();
     });
+
+    test('수정 화면에 다시 들어오면 이전 방문의 값 대신 새로 조회한 값으로 시작한다', async () => {
+      const firstVisit = render(<UpdatePost />, { wrapper });
+      expect(await screen.findByRole('textbox', { name: '제목' })).toHaveValue(
+        postData.getEdit.data.title
+      );
+      firstVisit.unmount();
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+          HttpResponse.json({
+            ...postData.getEdit,
+            data: { ...postData.getEdit.data, title: '저장한 제목' },
+          })
+        )
+      );
+
+      render(<UpdatePost />, { wrapper });
+
+      expect(screen.getByRole('status')).toHaveTextContent(
+        '불러오는 중입니다.'
+      );
+      expect(
+        screen.queryByRole('textbox', { name: '제목' })
+      ).not.toBeInTheDocument();
+      expect(await screen.findByRole('textbox', { name: '제목' })).toHaveValue(
+        '저장한 제목'
+      );
+    });
+
+    test('이전 방문에서 시작한 조회의 응답을 편집 기준으로 쓰지 않는다', async () => {
+      const firstVisit = render(<UpdatePost />, { wrapper });
+      await screen.findByRole('textbox', { name: '제목' });
+      const late = Promise.withResolvers<Response>();
+      const reload = jest.fn(() => late.promise);
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), reload, { once: true })
+      );
+      void queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+      firstVisit.unmount();
+      const visit = jest.fn(() =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, title: '이번 방문의 제목' },
+        })
+      );
+      server.use(http.get(getHandlerURI('/api/posts/:id/edit'), visit));
+
+      render(<UpdatePost />, { wrapper });
+
+      const title = await screen.findByRole('textbox', { name: '제목' });
+      expect(visit).toHaveBeenCalledTimes(1);
+      expect(title).toHaveValue('이번 방문의 제목');
+      late.resolve(HttpResponse.json(postData.getEdit));
+      await act(async () => {
+        await late.promise;
+      });
+      expect(title).toHaveValue('이번 방문의 제목');
+    });
+
+    test('다른 글로 갔다 돌아오면 보류 중이던 조회 대신 새로 조회한다', async () => {
+      const pending = Promise.withResolvers<Response>();
+      let requests = 0;
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), ({ params }) => {
+          if (params.id === '2') return new HttpResponse(null, { status: 500 });
+          requests += 1;
+          return requests === 1
+            ? pending.promise
+            : HttpResponse.json({
+                ...postData.getEdit,
+                data: { ...postData.getEdit.data, title: '다시 조회한 제목' },
+              });
+        })
+      );
+      const { rerender } = render(<UpdatePost />, { wrapper });
+      await waitFor(() => expect(requests).toBe(1));
+
+      (useParams as jest.Mock).mockReturnValue({ id: '2' });
+      rerender(<UpdatePost />);
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '수정할 글을 불러오지 못했습니다.'
+      );
+      (useParams as jest.Mock).mockReturnValue({ id: '1' });
+      rerender(<UpdatePost />);
+
+      const title = await screen.findByRole('textbox', { name: '제목' });
+      expect(requests).toBe(2);
+      expect(title).toHaveValue('다시 조회한 제목');
+      pending.resolve(HttpResponse.json(postData.getEdit));
+      await act(async () => {
+        await pending.promise;
+      });
+      expect(title).toHaveValue('다시 조회한 제목');
+    });
+
+    test('다시 들어왔을 때 조회에 실패하면 이전 방문의 값으로 폼을 열지 않는다', async () => {
+      const firstVisit = render(<UpdatePost />, { wrapper });
+      await screen.findByRole('textbox', { name: '제목' });
+      firstVisit.unmount();
+      server.use(
+        http.get(
+          getHandlerURI('/api/posts/:id/edit'),
+          () => new HttpResponse(null, { status: 500 })
+        )
+      );
+
+      render(<UpdatePost />, { wrapper });
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '수정할 글을 불러오지 못했습니다.'
+      );
+      expect(
+        screen.queryByRole('textbox', { name: '제목' })
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test('재조회 중 본문 포커스와 편집값을 유지하고 변경하지 않은 필드만 갱신한다', async () => {
+    const response = Promise.withResolvers<Response>();
+    const reload = jest.fn(() => response.promise);
+    const save = jest.fn();
+    render(<UpdatePost />, { wrapper });
+    const title = await screen.findByRole('textbox', { name: '제목' });
+    const editor = screen.getByRole('textbox', { name: '본문' });
+    expect(editor).toHaveValue(postData.getEdit.data.contents);
+    fireEvent.change(title, { target: { value: '작성 중 제목' } });
+    editor.focus();
+    fireEvent.change(editor, { target: { value: '<p>작성 중 본문</p>' } });
+
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), reload),
+      http.put(getHandlerURI('/api/posts/:id'), async ({ request }) => {
+        save(await request.json());
+        return HttpResponse.json(postData.update);
+      })
+    );
+    void queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+    expect(editor).toHaveFocus();
+    response.resolve(
+      HttpResponse.json({
+        ...postData.getEdit,
+        data: {
+          ...postData.getEdit.data,
+          title: '서버 제목',
+          contents: '<p>서버 본문</p>',
+          type: 'faq',
+        },
+      })
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveValue('faq')
+    );
+    expect(title).toHaveValue('작성 중 제목');
+    expect(editor).toHaveValue('<p>작성 중 본문</p>');
+    expect(editor).toHaveFocus();
+
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    await waitFor(() =>
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: '작성 중 제목',
+          contents: '<p>작성 중 본문</p>',
+          type: 'faq',
+        })
+      )
+    );
+  });
+
+  test('재조회가 다른 필드를 갱신해도 표시 중인 검증 오류를 다시 알리지 않고 유지한다', async () => {
+    render(<UpdatePost />, { wrapper });
+    const title = await screen.findByRole('textbox', { name: '제목' });
+    fireEvent.change(title, { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    const error = await screen.findByText('제목을 입력해 주세요.');
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, type: 'faq' },
+        })
+      )
+    );
+
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveValue('faq')
+    );
+    expect(error).toBeInTheDocument();
+    expect(title).toHaveAttribute('aria-invalid', 'true');
+
+    fireEvent.change(title, { target: { value: '고친 제목' } });
+
+    await waitFor(() => expect(error).not.toBeInTheDocument());
+  });
+
+  test('재조회로 해소된 검증 오류는 지운다', async () => {
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, type: 'legacy' },
+        })
+      )
+    );
+    render(<UpdatePost />, { wrapper });
+    await screen.findByRole('textbox', { name: '제목' });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveAttribute(
+        'aria-invalid',
+        'true'
+      )
+    );
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, type: 'faq' },
+        })
+      )
+    );
+
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveValue('faq')
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveAttribute(
+        'aria-invalid',
+        'false'
+      )
+    );
+  });
+
+  test('첨부 중 재조회해도 저장을 막은 이유는 파일 읽기가 끝날 때까지 보인다', async () => {
+    render(<UpdatePost />, { wrapper });
+    await screen.findByLabelText('제목');
+    fireEvent.click(screen.getByRole('button', { name: '이미지 읽기 시작' }));
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    const message = await screen.findByText(/이미지를 불러오는 중입니다/);
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, title: '새 제목' },
+        })
+      )
+    );
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('제목')).toHaveValue('새 제목')
+    );
+    expect(message).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: '이미지 읽기 완료' }));
+    await waitFor(() => expect(message).not.toBeInTheDocument());
+  });
+
+  test('재조회 실패 후에도 편집을 계속하고 다른 글로 이동하면 새 글의 값으로 시작한다', async () => {
+    const { rerender } = render(<UpdatePost />, { wrapper });
+    const title = await screen.findByRole('textbox', { name: '제목' });
+    fireEvent.change(title, { target: { value: '첫 글 임시 제목' } });
+    const nextPost = {
+      ...postData.getEdit,
+      data: {
+        ...postData.getEdit.data,
+        id: 2,
+        title: '다른 글',
+        contents: '<p>다른 본문</p>',
+      },
+    };
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), ({ params }) =>
+        params.id === '1'
+          ? new HttpResponse(null, { status: 503 })
+          : HttpResponse.json(nextPost)
+      )
+    );
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+    expect(
+      await screen.findByText(/최신 글을 불러오지 못했습니다/)
+    ).toBeInTheDocument();
+    expect(title).toHaveValue('첫 글 임시 제목');
+    fireEvent.change(title, { target: { value: '계속 편집' } });
+    expect(title).toHaveValue('계속 편집');
+
+    (useParams as jest.Mock).mockReturnValue({ id: '2' });
+    rerender(<UpdatePost />);
+    expect(await screen.findByDisplayValue('다른 글')).toBeInTheDocument();
+    expect(screen.getByLabelText('본문')).toHaveValue('<p>다른 본문</p>');
   });
 
   describe('분류 선택지를 확인한다', () => {
@@ -141,7 +450,7 @@ describe('게시글 수정 테스트', () => {
           })
         )
       );
-      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      render(<UpdatePost />, { wrapper });
 
       await waitFor(() =>
         expect(
@@ -178,9 +487,7 @@ describe('게시글 수정 테스트', () => {
           return HttpResponse.json(postData.update);
         })
       );
-      await act(async () => {
-        await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
-      });
+      render(<UpdatePost />, { wrapper });
 
       await waitFor(() =>
         expect(
@@ -215,6 +522,7 @@ describe('게시글 수정 테스트', () => {
       const response = Promise.withResolvers<Response>();
       const save = jest.fn(() => response.promise);
       server.use(http.put(getHandlerURI('/api/posts/:id'), () => save()));
+      render(<UpdatePost />, { wrapper });
       // when - 제목, 내용, 타입, 라디오박스를 입력하고 제출 버튼을 클릭한다
       fireEvent.input(await screen.findByLabelText('제목'), {
         target: {
@@ -234,6 +542,22 @@ describe('게시글 수정 테스트', () => {
       const form = button.form;
       fireEvent.submit(form);
       await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+          HttpResponse.json({
+            ...postData.getEdit,
+            data: { ...postData.getEdit.data, type: 'faq' },
+          })
+        )
+      );
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      });
+      await waitFor(() =>
+        expect(screen.getByLabelText('분류')).toHaveValue('faq')
+      );
+      expect(form).toHaveAttribute('aria-busy', 'true');
+      expect(button).toHaveAccessibleName('저장 중…');
       expect(button).toBeDisabled();
       fireEvent.submit(form);
       response.resolve(HttpResponse.json(postData.update));

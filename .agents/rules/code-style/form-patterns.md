@@ -50,9 +50,11 @@ export function useSignupForm(): UseFormReturn<SignUpFormInput> {
 - 초기값이 `undefined`일 때 RHF 내부 state 불일치 차단
 - 리셋 동작(`reset()`) 예측 가능
 
-기본값은 모든 입력 필드를 채운다. 게시글 폼의 공개 범위처럼 사용자가 직접 골라야 하는 선택 항목만 비워 두고, 스키마가 선택하지 않은 상태를 오류로 안내한다. 서버에서 받은 기존 값은 폼의 `reset()`으로 반영한다.
+기본값은 모든 입력 필드를 채운다. 게시글 폼의 공개 범위처럼 사용자가 직접 골라야 하는 선택 항목만 비워 두고, 스키마가 선택하지 않은 상태를 오류로 안내한다.
 
 계정처럼 같은 레코드의 서버 값이 편집 중에 갱신되는 폼은 `dirtyFields`를 구독하고 `reset(서버 값, { keepDirtyValues: true })`로 편집 중인 필드를 유지한다. 저장에 성공하면 서버가 확인한 값으로 `reset()`하여 다음 편집의 기준을 갱신한다.
+
+게시글 수정 폼은 화면에 들어올 때마다 새로 조회하고, 그 조회가 끝나면 마운트한다. 조회와 폼은 글 ID별로 마운트하고(`PostUpdateView`), 편집용 조회는 마운트마다 다른 쿼리 키를 쓰며(`useUpdatePostResource`의 `useId`) `gcTime: 0`으로 방문이 끝난 뒤 캐시에 남기지 않는다. 편집 중 같은 글을 다시 조회하면 `useUpdatePostForm`이 수정하지 않은 필드에 최신 값을 넣고 `resetDefaultValues`로 편집 기준을 갱신한다. 제출 상태와 본문 포커스는 유지하며, 제출한 적이 있으면 병합한 값으로 다시 검증한다. 본문은 편집기에 넣은 직후와 Markdown이 같으면 수정하지 않은 필드로 본다 (`Editor`가 원문을 돌려준다).
 
 ---
 
@@ -117,7 +119,7 @@ export type PostFormOutput = z.output<typeof PostFormSchema>;
 
 ### 4.3 스키마로 표현할 수 없는 조건
 
-폼 값이 아닌 진행 상태는 스키마에 넣지 않는다. 그 필드를 검증하는 모든 경로에서 확인하고 `setError()`로 안내한다. 본문 이미지를 읽는 동안의 저장 보류가 이 방식이다 (`src/entities/post/ui/Form/PostForm.tsx`, `ContentsEditor.tsx`).
+본문 이미지를 읽는 동안 저장을 누르면 `PostForm`이 요청을 보류하고 `ContentsEditor`가 본문에 사유를 표시한다. 이 안내는 파일 읽기 상태를 따르므로 재조회나 폼 재검증 중에도 유지하고 마지막 파일을 다 읽으면 해제한다.
 
 - 제출: `handleSubmit`의 성공 콜백과 실패 콜백 양쪽에서 확인한다. 실패 콜백에서도 확인해야 다른 필드에 오류가 있을 때 함께 안내된다.
 - 값이 바뀔 때의 재검증: 표시 중인 오류를 `trigger()`로 다시 확인하기 전에 진행 상태를 먼저 확인한다. 진행 중이면 그 안내를 유지한다.

@@ -2,7 +2,7 @@ import { POST_REQUEST_MAX_BYTES } from '@shared/config/request-size';
 import ValidationError from '@shared/ui/error/ValidationError';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 import { POST_IMAGE_MAX_BYTES } from '../../config/editor';
 import { type PostFormInput } from '../../model/form';
@@ -11,21 +11,30 @@ const Editor = dynamic(() => import('../Editor'), { ssr: false });
 
 interface Props {
   onImageRead: (reading: boolean) => void;
-  /** 이미지를 읽는 중이라 본문 오류를 그 안내로 바꿨으면 true를 반환한다 */
-  holdWhileReadingImages: () => boolean;
+  waitingForImages: boolean;
 }
 
 /** HTML 편집기의 입력과 오류 설명을 연결한다. */
 export default function ContentsEditor({
   onImageRead,
-  holdWhileReadingImages,
+  waitingForImages,
 }: Props) {
   const {
+    control,
     setValue,
     register,
     trigger,
     formState: { errors },
   } = useFormContext<PostFormInput>();
+  const hasContents = useWatch({
+    control,
+    name: 'contents',
+    compute: Boolean,
+  });
+  const message =
+    waitingForImages && hasContents
+      ? '이미지를 불러오는 중입니다. 잠시 후 다시 저장해 주세요.'
+      : errors.contents?.message;
 
   useEffect(() => {
     register('contents');
@@ -44,15 +53,15 @@ export default function ContentsEditor({
         onImageRead={onImageRead}
         onChange={contents => {
           setValue('contents', contents, { shouldDirty: true });
-          // 표시 중인 본문 오류는 본문이 바뀔 때 다시 확인하되, 이미지를 읽는 동안에는 그 안내를 유지한다.
-          if (errors.contents && !holdWhileReadingImages()) trigger('contents');
+          if (errors.contents || (waitingForImages && !contents))
+            void trigger('contents');
         }}
-        isInvalid={!!errors.contents}
+        isInvalid={!!message}
       />
       <ValidationError
         id="contents-error"
-        isError={!!errors.contents}
-        message={errors.contents?.message?.toString()}
+        isError={!!message}
+        message={message}
       />
     </div>
   );

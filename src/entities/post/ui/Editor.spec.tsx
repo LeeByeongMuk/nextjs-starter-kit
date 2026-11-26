@@ -7,6 +7,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { POST_IMAGE_MAX_BYTES } from '../config/editor';
@@ -100,22 +101,23 @@ describe('에디터 보안 패치', () => {
   });
 });
 
-test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 본문에 삽입한다', async () => {
+describe('본문 편집기', () => {
   const matchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
-  Object.defineProperty(window, 'matchMedia', {
-    configurable: true,
-    value: () => ({
-      matches: false,
-      addEventListener() {},
-      removeEventListener() {},
-    }),
-  });
+  const innerHTML = Object.getOwnPropertyDescriptor(
+    Element.prototype,
+    'innerHTML'
+  );
   const change = jest.fn();
   const imageRead = jest.fn();
 
-  function EditorForm() {
+  interface EditorFormProps {
+    contents: string;
+  }
+
+  function EditorForm({ contents }: EditorFormProps) {
     const methods = useForm({
-      defaultValues: { contents: '<p><img src="/sample.png" alt="예제"></p>' },
+      defaultValues: { contents },
+      values: { contents },
     });
     return (
       <FormProvider {...methods}>
@@ -124,12 +126,362 @@ test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 
     );
   }
 
-  try {
-    const { container } = render(<EditorForm />);
+  const getField = (container: HTMLElement) => {
     const field = container.querySelector<HTMLElement>(
       '.toastui-editor-ww-container [contenteditable="true"]'
     );
     if (!field) throw new Error('위지위그 편집 영역을 찾을 수 없습니다.');
+    return field;
+  };
+
+  const findExecutable = (root: ParentNode) =>
+    root.querySelector(
+      'script, [onclick], [onerror], [href^="javascript:"], [src^="javascript:"]'
+    );
+
+  /** 현재 문서의 요소에 innerHTML로 넣은 HTML을 모은다 — 이 시점에 이벤트 핸들러가 살아 있으면 브라우저가 실행한다 */
+  const collectLiveHTML = () => {
+    const assigned: string[] = [];
+    Object.defineProperty(Element.prototype, 'innerHTML', {
+      ...innerHTML,
+      set(this: Element, html: string) {
+        if (this.ownerDocument === document) assigned.push(String(html));
+        innerHTML?.set?.call(this, html);
+      },
+    });
+    return assigned;
+  };
+
+  beforeEach(() => {
+    change.mockClear();
+    imageRead.mockClear();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: () => ({
+        matches: false,
+        addEventListener() {},
+        removeEventListener() {},
+      }),
+    });
+  });
+
+  afterEach(() => {
+    if (innerHTML)
+      Object.defineProperty(Element.prototype, 'innerHTML', innerHTML);
+    if (matchMedia) Object.defineProperty(window, 'matchMedia', matchMedia);
+    else Reflect.deleteProperty(window, 'matchMedia');
+  });
+
+  describe.each([
+    {
+      html: '<p>본문<img src="/missing.png" onerror="window.__xss = true"></p>',
+      text: '본문',
+      kept: 'img[src="/missing.png"]',
+    },
+    {
+      html: '<p><a href="javascript:window.__xss = true">링크</a> 설명</p>',
+      text: '링크 설명',
+      kept: 'p',
+    },
+  ])('실행 가능한 HTML: $html', ({ html, text, kept }) => {
+    const expectSanitized = (assigned: string[], field: HTMLElement) => {
+      expect(assigned.length).toBeGreaterThan(0);
+      assigned.forEach(liveHTML =>
+        expect(
+          findExecutable(new DOMParser().parseFromString(liveHTML, 'text/html'))
+        ).toBeNull()
+      );
+      expect(findExecutable(field)).toBeNull();
+      expect(field).toHaveTextContent(text);
+      expect(field.querySelector(kept)).not.toBeNull();
+      expect(change).not.toHaveBeenCalled();
+    };
+
+    test('처음 불러온 본문은 현재 문서의 DOM으로 만들기 전에 정제한다', () => {
+      const assigned = collectLiveHTML();
+
+      const { container } = render(<EditorForm contents={html} />);
+
+      expectSanitized(assigned, getField(container));
+    });
+
+    test('다시 불러온 본문도 현재 문서의 DOM으로 만들기 전에 정제한다', () => {
+      const { container, rerender } = render(
+        <EditorForm contents="<p>처음 본문</p>" />
+      );
+      const assigned = collectLiveHTML();
+
+      rerender(<EditorForm contents={html} />);
+
+      expectSanitized(assigned, getField(container));
+    });
+  });
+
+  test('본문이 지정한 태그 이름으로 요소를 만들지 않는다', () => {
+    const { container } = render(
+      <EditorForm contents={'<p><b data-raw-html="script">굵은 글</b></p>'} />
+    );
+    const field = getField(container);
+
+    expect(field.querySelector('script')).toBeNull();
+    expect(field.querySelector('strong')).toHaveTextContent('굵은 글');
+  });
+
+  test('링크가 걸린 이미지로 끝나는 문단 뒤에 빈 문단을 만들지 않는다', () => {
+    const { container } = render(
+      <EditorForm
+        contents={
+          '<p><a href="https://example.com"><span class="image-link"><img src="/sample.png" alt="예제"></span></a><br></p>'
+        }
+      />
+    );
+    const field = getField(container);
+
+    expect(field.querySelectorAll(':scope > p')).toHaveLength(1);
+    expect(within(field).getByAltText('예제').closest('a')).toHaveAttribute(
+      'href',
+      'https://example.com'
+    );
+  });
+
+  test('빈 제목이 있는 본문을 열어도 빈 제목이 늘지 않는다', () => {
+    const { container } = render(
+      <EditorForm contents="<h2><br></h2><p>뒤</p>" />
+    );
+    const field = getField(container);
+
+    expect(field.querySelectorAll(':scope > h2')).toHaveLength(1);
+    expect(field.querySelectorAll(':scope > p')).toHaveLength(1);
+  });
+
+  const switchModes = (container: HTMLElement) => {
+    const tabs = container.querySelectorAll<HTMLElement>(
+      '.toastui-editor-mode-switch .tab-item'
+    );
+    expect(tabs).toHaveLength(2);
+    fireEvent.click(tabs[0]);
+    fireEvent.click(tabs[1]);
+  };
+
+  const pasteText = (field: HTMLElement, text: string) =>
+    fireEvent.paste(field, {
+      clipboardData: {
+        getData: (type: string) => (type === 'text/plain' ? text : ''),
+        items: [],
+      },
+    });
+
+  const undo = (field: HTMLElement) =>
+    fireEvent.keyDown(field, { key: 'z', keyCode: 90, ctrlKey: true });
+
+  describe('모드 전환', () => {
+    // jsdom은 레이아웃을 계산하지 않아 Markdown 모드가 예약하는 미리보기 스크롤 동기화 타이머가 실행되면 예외를 낸다. 예약된 타이머가 다른 테스트 도중 실행되지 않게 가짜 타이머로 버린다.
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test.each(['Markdown', 'WYSIWYG'])(
+      '%s 모드로 전환한 직후 화면을 떠나면 편집기와 예약 작업을 정리한다',
+      async mode => {
+        const destroy = jest.spyOn(ToastEditor.prototype, 'destroy');
+        const { container, unmount } = render(
+          <EditorForm contents="<p>본문</p>" />
+        );
+        const tabs = container.querySelectorAll<HTMLElement>(
+          '.toastui-editor-mode-switch .tab-item'
+        );
+        fireEvent.click(tabs[0]);
+        if (mode === 'WYSIWYG') fireEvent.click(tabs[1]);
+
+        unmount();
+        await jest.advanceTimersByTimeAsync(500);
+        expect(destroy).toHaveBeenCalledTimes(1);
+      }
+    );
+
+    test('모드만 바꿨다 돌아오면 본문을 수정한 것으로 알리지 않는다', () => {
+      const { container } = render(
+        <EditorForm contents="<p><code>a</code> 글</p>" />
+      );
+
+      switchModes(container);
+
+      expect(change).not.toHaveBeenCalled();
+    });
+
+    test('수정한 뒤 다른 모드에서 원래 내용으로 되돌리면 원문을 돌려준다', () => {
+      const contents = '<p><code>a</code> 글</p>';
+      const { container } = render(<EditorForm contents={contents} />);
+      pasteText(getField(container), '추가');
+      expect(change).toHaveBeenLastCalledWith(expect.stringContaining('추가'));
+      const tabs = container.querySelectorAll<HTMLElement>(
+        '.toastui-editor-mode-switch .tab-item'
+      );
+      fireEvent.click(tabs[0]);
+      const markdown = container.querySelector<HTMLElement>(
+        '.toastui-editor-md-container [contenteditable="true"]'
+      );
+      if (!markdown) throw new Error('Markdown 편집 영역을 찾을 수 없습니다.');
+
+      fireEvent.keyDown(markdown, { key: 'a', keyCode: 65, ctrlKey: true });
+      pasteText(markdown, '`a` 글');
+
+      expect(change).toHaveBeenLastCalledWith(contents);
+    });
+
+    test('모드를 바꾼 적이 있어도 다시 불러온 본문은 실행 취소로 되돌아가지 않는다', () => {
+      const { container, rerender } = render(
+        <EditorForm contents="<p>처음 본문</p>" />
+      );
+      const field = getField(container);
+      switchModes(container);
+
+      rerender(<EditorForm contents="<p>서버가 바꾼 본문</p>" />);
+      pasteText(field, '추가');
+      expect(field).toHaveTextContent('추가');
+      undo(field);
+      undo(field);
+
+      expect(field).toHaveTextContent('서버가 바꾼 본문');
+      expect(field).not.toHaveTextContent('추가');
+      expect(field).not.toHaveTextContent('처음 본문');
+    });
+
+    test('모드를 바꿨다 돌아온 뒤에도 다시 불러온 본문을 반영한다', () => {
+      function ConnectedForm({ contents }: EditorFormProps) {
+        const methods = useForm({
+          defaultValues: { contents },
+          values: { contents },
+          resetOptions: { keepDirtyValues: true },
+        });
+        return (
+          <FormProvider {...methods}>
+            <Editor
+              onChange={value =>
+                methods.setValue('contents', value, { shouldDirty: true })
+              }
+              onImageRead={imageRead}
+            />
+          </FormProvider>
+        );
+      }
+      const { container, rerender } = render(
+        <ConnectedForm contents="<p><code>a</code> 글</p>" />
+      );
+      switchModes(container);
+
+      rerender(<ConnectedForm contents="<p>서버가 바꾼 본문</p>" />);
+
+      expect(getField(container)).toHaveTextContent('서버가 바꾼 본문');
+    });
+  });
+
+  test('입력을 되돌려 불러온 내용과 같아지면 원문을 돌려준다', () => {
+    const contents = '<p>글 <img src="/sample.png" alt="예제"></p>';
+    const { container } = render(<EditorForm contents={contents} />);
+    const field = getField(container);
+
+    pasteText(field, '추가');
+    expect(change).toHaveBeenLastCalledWith(expect.stringContaining('추가'));
+    undo(field);
+
+    expect(change).toHaveBeenLastCalledWith(contents);
+  });
+
+  test('불러온 본문과 다시 불러온 본문은 실행 취소로 되돌아가지 않는다', () => {
+    const { container, rerender } = render(
+      <EditorForm contents="<p>처음 본문</p>" />
+    );
+    const field = getField(container);
+
+    undo(field);
+    expect(field).toHaveTextContent('처음 본문');
+    expect(change).not.toHaveBeenCalled();
+
+    rerender(<EditorForm contents="<p>서버가 바꾼 본문</p>" />);
+    pasteText(field, '추가');
+    expect(field).toHaveTextContent('추가');
+    undo(field);
+    undo(field);
+
+    expect(field).toHaveTextContent('서버가 바꾼 본문');
+    expect(field).not.toHaveTextContent('추가');
+  });
+
+  test('블록 안의 줄바꿈은 공백으로, 코드 안의 줄바꿈은 그대로 넣는다', () => {
+    const { container } = render(
+      <EditorForm
+        contents={
+          '<p><span>가<br></span>나</p><table><thead><tr><th>머리</th></tr></thead><tbody><tr><td>1<br>2</td></tr></tbody></table><pre><code>a<br>b<br></code></pre><p>끝</p>'
+        }
+      />
+    );
+    const field = getField(container);
+
+    expect(field.querySelector(':scope > p')).toHaveTextContent('가 나');
+    expect(field.querySelectorAll('td')).toHaveLength(1);
+    expect(field.querySelector('td')).toHaveTextContent('1 2');
+    expect(field.querySelector('pre code')?.textContent).toBe('a\nb');
+  });
+
+  test('줄바꿈으로 끝나는 코드가 있는 글을 고쳐 저장하고 다시 열어도 코드가 늘지 않는다', () => {
+    const edit = (contents: string) => {
+      const { container, unmount } = render(<EditorForm contents={contents} />);
+      pasteText(getField(container), '추가');
+      const saved: string = change.mock.lastCall?.[0];
+      unmount();
+      return saved;
+    };
+    const codeOf = (html: string) =>
+      new DOMParser().parseFromString(html, 'text/html').querySelector('pre')
+        ?.innerHTML;
+
+    const first = edit('<p>앞</p><pre><code>a\n<br></code></pre><p>뒤</p>');
+    const second = edit(first);
+    const third = edit(second);
+
+    expect(codeOf(first)).toBe('<code>a\n<br></code>');
+    expect(codeOf(second)).toBe(codeOf(first));
+    expect(codeOf(third)).toBe(codeOf(first));
+  });
+
+  test('코드 블록에 빈 줄이 있는 본문도 편집기에 표시한다', () => {
+    const { container } = render(
+      <EditorForm
+        contents={'<p>앞</p><pre><code>a\n\nb</code></pre><p>뒤</p>'}
+      />
+    );
+    const field = getField(container);
+
+    expect(field.querySelector('pre code')?.textContent).toBe('a\n\nb');
+    expect(field).toHaveTextContent('뒤');
+    expect(change).not.toHaveBeenCalled();
+  });
+
+  test('StrictMode가 편집기를 다시 만들어도 본문을 표시한다', () => {
+    const { container } = render(
+      <StrictMode>
+        <EditorForm contents="<p>저장된 본문</p>" />
+      </StrictMode>
+    );
+
+    expect(getField(container)).toHaveTextContent('저장된 본문');
+    expect(change).not.toHaveBeenCalled();
+  });
+
+  test('서버 본문을 편집기에 반영하고 허용 크기의 이미지 파일만 본문에 삽입하며 링크 주소를 그대로 내보낸다', async () => {
+    const { container, rerender } = render(
+      <EditorForm
+        contents={
+          '<p><img src="/sample.png" alt="예제"> <a href="https://example.com/?a=1&amp;b=2">링크</a></p>'
+        }
+      />
+    );
+    const field = getField(container);
     expect(within(field).getByAltText('예제')).toHaveAttribute(
       'src',
       '/sample.png'
@@ -160,8 +512,16 @@ test('기존 이미지 URL을 복원하고 허용 크기의 이미지 파일만 
     expect(imageRead.mock.calls).toEqual([[true], [false]]);
     expect(screen.queryByRole('alert')).toBeNull();
     expect(within(field).getByAltText('attachment.png')).toBeInTheDocument();
-  } finally {
-    if (matchMedia) Object.defineProperty(window, 'matchMedia', matchMedia);
-    else Reflect.deleteProperty(window, 'matchMedia');
-  }
+    expect(change).toHaveBeenLastCalledWith(
+      expect.stringContaining('href="https://example.com/?a=1&amp;b=2"')
+    );
+
+    change.mockClear();
+    rerender(<EditorForm contents="<p>서버에서 갱신된 본문</p>" />);
+    await waitFor(() =>
+      expect(field).toHaveTextContent('서버에서 갱신된 본문')
+    );
+    expect(change).not.toHaveBeenCalled();
+    expect(field).toBeInTheDocument();
+  });
 });

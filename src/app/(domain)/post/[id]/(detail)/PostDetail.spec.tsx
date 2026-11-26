@@ -9,6 +9,7 @@ import { getHandlerURI } from '@shared/lib/url';
 import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
+  act,
   fireEvent,
   render,
   renderHook,
@@ -156,26 +157,77 @@ describe('게시글 상세 페이지 테스트', () => {
       expect(queryClient.isMutating()).toBe(0);
     });
 
-    test('삭제를 확인하면 완료를 알리고 홈으로 이동한다', async () => {
-      const confirm = await openConfirm();
+    test('삭제 확인 중 재조회에서 편집 권한이 사라지면 기존 확인을 폐기한다', async () => {
+      await openConfirm();
+      server.use(
+        http.get(
+          getHandlerURI('/api/posts/:id'),
+          () =>
+            HttpResponse.json({
+              ...postData.getById,
+              data: { ...postData.getById.data, is_editable: false },
+            }),
+          { once: true }
+        )
+      );
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+      });
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
 
-      fireEvent.click(within(confirm).getByRole('button', { name: '삭제' }));
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['post', { id: 1 }] });
+      });
+      expect(await screen.findByRole('button', { name: '삭제' })).toBeEnabled();
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(deleteRequest).not.toHaveBeenCalled();
+    });
+
+    test('연속으로 삭제를 확인해도 한 번만 요청하고 홈 이동 전까지 다시 삭제할 수 없다', async () => {
+      const response = Promise.withResolvers<Response>();
+      server.use(
+        http.delete(getHandlerURI('/api/posts/:id'), ({ params }) => {
+          deleteRequest(params.id);
+          return response.promise;
+        })
+      );
+      const trigger = await screen.findByRole('button', { name: '삭제' });
+      trigger.focus();
+      const confirm = await openConfirm();
+      const submit = within(confirm).getByRole('button', { name: '삭제' });
+
+      act(() => {
+        fireEvent.click(submit);
+        fireEvent.click(submit);
+      });
+
+      await waitFor(() => expect(deleteRequest).toHaveBeenCalledWith('1'));
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).toHaveFocus();
+      fireEvent.click(trigger);
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+      response.resolve(HttpResponse.json(postData.delete));
 
       expect(
         await screen.findByText('게시글을 삭제했습니다.')
       ).toBeInTheDocument();
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      fireEvent.click(trigger);
       expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-      expect(deleteRequest).toHaveBeenCalledWith('1');
+      expect(deleteRequest).toHaveBeenCalledTimes(1);
       expect(mockPush).toHaveBeenCalledWith('/');
     });
 
-    test('삭제에 실패하면 실패를 알리고 화면을 유지한다', async () => {
+    test('삭제에 실패하면 같은 화면에서 다시 확인하고 삭제할 수 있다', async () => {
       server.use(
         http.delete(
           getHandlerURI('/api/posts/:id'),
-          () => new HttpResponse(null, { status: 500 })
+          () => new HttpResponse(null, { status: 500 }),
+          { once: true }
         )
       );
+      const trigger = await screen.findByRole('button', { name: '삭제' });
+      trigger.focus();
       const confirm = await openConfirm();
 
       fireEvent.click(within(confirm).getByRole('button', { name: '삭제' }));
@@ -184,6 +236,14 @@ describe('게시글 상세 페이지 테스트', () => {
         await screen.findByText('게시글을 삭제하지 못했습니다.')
       ).toBeInTheDocument();
       expect(mockPush).not.toHaveBeenCalled();
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute('aria-disabled', 'false');
+
+      const retry = await openConfirm();
+      fireEvent.click(within(retry).getByRole('button', { name: '삭제' }));
+
+      await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/'));
+      expect(deleteRequest).toHaveBeenCalledTimes(1);
     });
   });
 

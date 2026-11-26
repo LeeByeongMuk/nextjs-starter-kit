@@ -19,21 +19,18 @@ export default function PostForm({ onSave }: Props) {
   const {
     handleSubmit,
     getValues,
-    setError,
     formState: { isSubmitting },
   } = useFormContext<PostFormInput, unknown, PostFormOutput>();
   const submission = useRef<'idle' | 'submitting' | 'saved'>('idle');
   const readingImages = useRef(0);
+  const [waitingForImages, setWaitingForImages] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
   // 이미지 읽기는 폼 값이 아닌 진행 상태라 스키마 밖에서 확인한다. 빈 본문 안내 다음, 다른 본문 오류보다 먼저 안내한다.
   const holdWhileReadingImages = () => {
     if (readingImages.current === 0 || !getValues('contents')) return false;
 
-    setError('contents', {
-      type: 'imageReading',
-      message: '이미지를 불러오는 중입니다. 잠시 후 다시 저장해 주세요.',
-    });
+    setWaitingForImages(true);
     return true;
   };
 
@@ -64,8 +61,9 @@ export default function PostForm({ onSave }: Props) {
       <ContentsEditor
         onImageRead={reading => {
           readingImages.current += reading ? 1 : -1;
+          if (readingImages.current === 0) setWaitingForImages(false);
         }}
-        holdWhileReadingImages={holdWhileReadingImages}
+        waitingForImages={waitingForImages}
       />
       <IsOpenCheckbox />
       <ButtonBox isSubmitting={isSubmitting} isSaved={isSaved} />
