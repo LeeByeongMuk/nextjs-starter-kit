@@ -51,6 +51,7 @@ paths:
   - `setHTML`은 `<br>`마다 블록을 새로 만든다. 편집기가 빈 블록, 이미지, 줄바꿈으로 끝나는 코드 뒤에 붙여 내보내는 블록 끝의 `<br>`은 지우고, 블록 안의 `<br>`은 공백(코드에서는 줄바꿈)으로 바꿔 넣는다.
   - 편집기가 내보낸 HTML은 링크 주소가 한 겹 더 이스케이프되어 있어 폼에 넘기기 전에 되돌린다.
   - 편집기가 처음 채우는 내용, 폼에서 넣는 본문, 모드 전환이 만드는 변환은 플러그인으로 실행 취소 이력에서 뺀다.
+  - React 래퍼는 편집기 인스턴스를 해제하지 않는다. `Editor`가 마운트 시 인스턴스를 보관하고 레이아웃 효과의 정리 단계에서 `destroy()`를 호출해 문서 이벤트 리스너를 제거한다.
 - 패치는 원본·결과와 DOMPurify 배포물의 SHA-256을 검증하고, 예상하지 못한 파일에서는 실패한다. 반복 실행은 안전하다. `predev`와 `prebuild`도 적용 상태를 검사한다. `--ignore-scripts`로 설치했다면 `npm run postinstall`을 실행해야 한다. Docker는 설치 전에 패치 스크립트를 복사한다.
 - Toast UI 또는 DOMPurify 버전을 올릴 때는 패치의 해시와 정제 동작을 함께 검증한다. `npm test`의 에디터 보안·HTML 왕복 테스트, 실제 브라우저의 작성·수정·저장, 타입·lint·production build를 통과해야 한다. CI는 `npm audit --omit=dev`로 운영 의존성도 검사한다.
 - [minimatch 패턴 증폭](https://github.com/advisories/GHSA-g3hv-75wg-m249)은 취약 범위 `>=7 <11.0.1`에만 11.0.9를 적용한다. 기존 3.x API는 유지한다. [glob 취소 우회](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)는 `>=9 <14.0.2`에만 14.0.6을 적용한다. typescript-eslint는 수정된 minimatch를 사용하는 8.73.0이며, Jest·test-exclude의 상위 의존성이 수정 버전을 채택하면 해당 override를 제거한다.

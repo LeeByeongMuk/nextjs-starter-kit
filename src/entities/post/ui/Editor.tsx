@@ -117,6 +117,12 @@ export default function Editor({
     ['scrollSync'],
   ];
 
+  // React 래퍼가 해제하지 않는 문서 이벤트 리스너를 편집기 DOM이 분리되기 전에 정리한다.
+  useLayoutEffect(() => {
+    const instance = editorRef.current?.getInstance();
+    return () => instance?.destroy();
+  }, []);
+
   // 저장된 HTML은 setHTML로 넣는다. initialValue는 Markdown으로 해석되어 코드 블록에 빈 줄이 있으면 예외를 낸다.
   // 편집기가 보낸 값과 다를 때만 넣어 입력 중인 커서를 유지한다.
   useLayoutEffect(() => {

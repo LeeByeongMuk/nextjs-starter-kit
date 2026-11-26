@@ -284,6 +284,25 @@ describe('본문 편집기', () => {
       jest.useRealTimers();
     });
 
+    test.each(['Markdown', 'WYSIWYG'])(
+      '%s 모드로 전환한 직후 화면을 떠나면 편집기와 예약 작업을 정리한다',
+      async mode => {
+        const destroy = jest.spyOn(ToastEditor.prototype, 'destroy');
+        const { container, unmount } = render(
+          <EditorForm contents="<p>본문</p>" />
+        );
+        const tabs = container.querySelectorAll<HTMLElement>(
+          '.toastui-editor-mode-switch .tab-item'
+        );
+        fireEvent.click(tabs[0]);
+        if (mode === 'WYSIWYG') fireEvent.click(tabs[1]);
+
+        unmount();
+        await jest.advanceTimersByTimeAsync(500);
+        expect(destroy).toHaveBeenCalledTimes(1);
+      }
+    );
+
     test('모드만 바꿨다 돌아오면 본문을 수정한 것으로 알리지 않는다', () => {
       const { container } = render(
         <EditorForm contents="<p><code>a</code> 글</p>" />
