@@ -14,11 +14,17 @@ export default function useSignup() {
         survivesNavigation: true,
       });
 
-      await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirectTo: '/',
-      });
+      try {
+        await signIn('credentials', {
+          email: data.email,
+          password: data.password,
+          redirectTo: '/',
+        });
+      } catch {
+        toast.error(
+          '자동 로그인에 실패했습니다. 로그인 화면에서 다시 로그인해 주세요.'
+        );
+      }
     },
   });
 }

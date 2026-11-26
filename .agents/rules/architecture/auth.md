@@ -75,6 +75,7 @@ import { fetchSignIn } from '@features/auth-signin/api/signinService';
 - `fetchApi`는 서버에서 API 토큰을 읽는다. 회원가입·로그인은 익명으로 요청하고 보호 작업에는 API 토큰이 필요하다. 게시글 수정·삭제 등 리소스 권한은 API가 확인한다.
 - 이전 버전의 `access_token` 쿠키 및 만료 시각이 없는 JWT 세션에는 재로그인이 필요하다. 새 로그인은 `api_access_token` 쿠키를 발급하고 이전 쿠키를 정리한다.
 - 헤더 로그아웃과 회원 탈퇴는 `@shared/lib/deleteAccessToken`의 서버 액션으로 현재·이전 API 토큰 쿠키를 지운 뒤 Auth.js 로그아웃을 호출한다. Auth.js `events.signOut`도 같은 쿠키 정리를 수행한다.
+- 가입·탈퇴 API가 성공하면 같은 화면에서 재제출을 막는다. 이어지는 자동 로그인이나 로그아웃 도중 오류가 발생하면 완료된 회원 작업은 유지하고 로그인 링크 또는 헤더의 로그아웃으로 안내한다.
 - 화면의 세션과 API 토큰 쿠키는 다른 탭에서 계정을 바꾸면 잠시 어긋날 수 있다. 회원 탈퇴 서버 액션은 화면에서 탈퇴를 확인한 계정(`user_id`)을 함께 받아 API 토큰의 계정(`GET /api/users`)과 같을 때만 삭제를 요청한다. 화면도 대화상자를 연 계정의 세션이 끝나거나 바뀌면 확인을 버린다.
 
 ---

@@ -14,10 +14,14 @@ export default function useDeleteAccount() {
       toast.success('회원 탈퇴가 완료되었습니다.', {
         survivesNavigation: true,
       });
-      await deleteAccessToken();
-      await signOut({
-        redirectTo: '/',
-      });
+      try {
+        await deleteAccessToken();
+        await signOut({ redirectTo: '/' });
+      } catch {
+        toast.error(
+          '로그아웃을 완료하지 못했습니다. 상단 메뉴에서 다시 로그아웃해 주세요.'
+        );
+      }
     },
   });
 }

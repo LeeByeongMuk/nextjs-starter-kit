@@ -357,6 +357,26 @@ describe('회원가입 테스트', () => {
       await waitFor(() => expect(signIn).toHaveBeenCalledTimes(1));
     });
 
+    test('가입 뒤 자동 로그인이 실패해도 계정을 다시 등록하지 않고 로그인 경로를 제공한다', async () => {
+      jest.mocked(signIn).mockRejectedValueOnce(new Error('offline'));
+      submitAccount();
+
+      expect(
+        await screen.findByText(/자동 로그인에 실패했습니다/)
+      ).toBeVisible();
+      expect(screen.queryByText('회원가입을 완료하지 못했습니다.')).toBeNull();
+      expect(screen.getByRole('link', { name: '로그인' })).toHaveAttribute(
+        'href',
+        '/signin'
+      );
+      const submit = screen.getByRole('button', { name: '회원가입' });
+      expect(submit).toBeDisabled();
+      await act(async () => {
+        fireEvent.submit(submit);
+      });
+      expect(signupRequest).toHaveBeenCalledTimes(1);
+    });
+
     test('가입한 계정으로 로그인하는 동안 다시 제출해도 한 번만 요청하고 완료 알림을 유지한다', async () => {
       let finishSignIn = () => {};
       jest.mocked(signIn).mockImplementationOnce(

@@ -15,7 +15,7 @@ import { FormProvider } from 'react-hook-form';
 /** 인증 폼과 관련 화면으로의 이동을 제공한다. */
 export default function SignUpView() {
   const methods = useSignupForm();
-  const { mutateAsync, isPending } = useSignup();
+  const { mutateAsync, isPending, isSuccess } = useSignup();
   const submitting = useRef(false);
   const handleSignUp = async ({
     email,
@@ -40,9 +40,9 @@ export default function SignUpView() {
       <section className="mx-auto w-full max-w-md py-4 sm:py-8">
         <AuthHeader headText="회원가입" />
 
-        <div>
+        <fieldset disabled={isPending || isSuccess} aria-busy={isPending}>
           <SignUpForm handleSignUp={handleSignUp} />
-        </div>
+        </fieldset>
         <p className="mt-8 text-sm text-muted">
           이미 계정이 있나요?{' '}
           <Link

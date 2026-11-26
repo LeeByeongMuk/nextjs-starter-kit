@@ -182,9 +182,13 @@ describe('마이페이지 페이지 테스트', () => {
       const name = screen.getByLabelText('이름');
       const submit = screen.getByRole('button', { name: '변경 사항 저장' });
       fireEvent.change(name, { target: { value: '새 이름' } });
-      fireEvent.click(submit);
+      await act(async () => {
+        fireEvent.click(submit);
+        fireEvent.click(submit);
+      });
 
       await waitFor(() => expect(updateSession).toHaveBeenCalledWith({}));
+      expect(save).toHaveBeenCalledTimes(1);
       expect(save).toHaveBeenCalledWith({
         email: account.email,
         name: '새 이름',
@@ -372,6 +376,30 @@ describe('마이페이지 페이지 테스트', () => {
       expect(deleteCookie.mock.invocationCallOrder[0]).toBeLessThan(
         (signOut as jest.Mock).mock.invocationCallOrder[0]
       );
+    });
+
+    test('한 번 연 대화상자를 연속 제출해도 한 번만 탈퇴하고 로그아웃한다', async () => {
+      const dialog = openDialog();
+      const confirm = within(dialog).getByRole('button', { name: '회원 탈퇴' });
+      await act(async () => {
+        submitReason(dialog, 'reason');
+        fireEvent.click(confirm);
+      });
+
+      await waitFor(() => expect(signOut).toHaveBeenCalled());
+      expect(deleteRequest).toHaveBeenCalledTimes(1);
+      expect(signOut).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('button', { name: '회원 탈퇴' })).toBeDisabled();
+    });
+
+    test('탈퇴 뒤 로그아웃이 실패하면 로그아웃을 다시 안내하고 탈퇴를 반복하지 않는다', async () => {
+      jest.mocked(signOut).mockRejectedValueOnce(new Error('offline'));
+      submitReason(openDialog(), 'reason');
+
+      expect(await screen.findByText(/다시 로그아웃해 주세요/)).toBeVisible();
+      expect(screen.queryByText('회원 탈퇴를 완료하지 못했습니다.')).toBeNull();
+      expect(screen.getByRole('button', { name: '회원 탈퇴' })).toBeDisabled();
+      expect(deleteRequest).toHaveBeenCalledTimes(1);
     });
 
     test('회원 탈퇴 실패 시 에러 메세지가 표시된다.', async () => {

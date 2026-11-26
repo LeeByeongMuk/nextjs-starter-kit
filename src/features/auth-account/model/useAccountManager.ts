@@ -83,7 +83,9 @@ export function useAccountManager() {
   useLayoutEffect(() => {
     sessionUserId.current = userId;
   }, [userId]);
-  const canEdit = userId !== undefined;
+  const accountDeleted =
+    deleteMutate.isSuccess && deleteMutate.variables.user_id === userId;
+  const canEdit = userId !== undefined && !accountDeleted;
   const isSessionMissing = status === 'unauthenticated';
   const isLoading =
     status === 'loading' || updateMutate.isPending || deleteMutate.isPending;
@@ -121,8 +123,22 @@ export function useAccountManager() {
     setIsCheckingSession(false);
   };
 
+  const mutationPending = useRef(false);
+  const releaseMutation = () => {
+    mutationPending.current = false;
+  };
+
   const handleUpdateAccount = (data: AccountFormInput) => {
-    if (canEdit && !isLoading) updateMutate.mutate(data);
+    if (
+      !canEdit ||
+      isLoading ||
+      mutationPending.current ||
+      userId !== sessionUserId.current
+    )
+      return;
+
+    mutationPending.current = true;
+    updateMutate.mutate(data, { onSettled: releaseMutation });
   };
 
   const handleDeleteAccount = () => {
@@ -138,16 +154,22 @@ export function useAccountManager() {
     if (
       deleteDialogUserId === undefined ||
       deleteDialogUserId !== sessionUserId.current ||
-      isLoading
+      !canEdit ||
+      isLoading ||
+      mutationPending.current
     ) {
       return;
     }
 
+    mutationPending.current = true;
     setDeleteDialogUserId(undefined);
-    deleteMutate.mutate({
-      deleted_reason: deletedReason,
-      user_id: deleteDialogUserId,
-    });
+    deleteMutate.mutate(
+      {
+        deleted_reason: deletedReason,
+        user_id: deleteDialogUserId,
+      },
+      { onSettled: releaseMutation }
+    );
   };
 
   return {
