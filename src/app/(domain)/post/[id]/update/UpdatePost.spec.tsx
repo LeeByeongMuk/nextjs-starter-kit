@@ -296,6 +296,78 @@ describe('게시글 수정 테스트', () => {
     );
   });
 
+  test('재조회가 다른 필드를 갱신해도 표시 중인 검증 오류를 다시 알리지 않고 유지한다', async () => {
+    render(<UpdatePost />, { wrapper });
+    const title = await screen.findByRole('textbox', { name: '제목' });
+    fireEvent.change(title, { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    const error = await screen.findByText('제목을 입력해 주세요.');
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, type: 'faq' },
+        })
+      )
+    );
+
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveValue('faq')
+    );
+    expect(error).toBeInTheDocument();
+    expect(title).toHaveAttribute('aria-invalid', 'true');
+
+    fireEvent.change(title, { target: { value: '고친 제목' } });
+
+    await waitFor(() => expect(error).not.toBeInTheDocument());
+  });
+
+  test('재조회로 해소된 검증 오류는 지운다', async () => {
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, type: 'legacy' },
+        })
+      )
+    );
+    render(<UpdatePost />, { wrapper });
+    await screen.findByRole('textbox', { name: '제목' });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveAttribute(
+        'aria-invalid',
+        'true'
+      )
+    );
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, type: 'faq' },
+        })
+      )
+    );
+
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveValue('faq')
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText('분류')).toHaveAttribute(
+        'aria-invalid',
+        'false'
+      )
+    );
+  });
+
   test('재조회 실패 후에도 편집을 계속하고 다른 글로 이동하면 새 글의 값으로 시작한다', async () => {
     const { rerender } = render(<UpdatePost />, { wrapper });
     const title = await screen.findByRole('textbox', { name: '제목' });

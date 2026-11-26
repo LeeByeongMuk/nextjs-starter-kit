@@ -2,6 +2,7 @@
 
 import { isPostType } from '@entities/post';
 import { useParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 import { type UpdatePostResourceRes } from '../api/types';
 import { UpdatePostFormOutput } from './form';
@@ -20,6 +21,19 @@ export function useUpdatePostManager(post: UpdatePostResourceRes['data']) {
     isOpen: post.is_open ? '1' : '0',
   });
   const { mutateAsync, isPending } = useUpdatePost();
+  const {
+    trigger,
+    formState: { isSubmitted },
+  } = methods;
+  const merged = useRef(post);
+
+  // 서버 값을 병합하면 표시 중인 오류가 낡을 수 있다. 제출한 적이 있는 폼은 병합한 값으로 다시 검증한다.
+  useEffect(() => {
+    if (merged.current === post) return;
+
+    merged.current = post;
+    if (isSubmitted) void trigger();
+  }, [post, isSubmitted, trigger]);
 
   const handleUpdatePost = (data: UpdatePostFormOutput) =>
     mutateAsync({
