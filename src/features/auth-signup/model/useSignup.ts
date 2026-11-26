@@ -1,3 +1,4 @@
+import { documentNavigation } from '@shared/lib/url';
 import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
@@ -14,13 +15,15 @@ export default function useSignup() {
         survivesNavigation: true,
       });
 
-      try {
-        await signIn('credentials', {
-          email: data.email,
-          password: data.password,
-          redirectTo: '/',
-        });
-      } catch {
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+        redirectTo: '/',
+      }).catch(() => undefined);
+      if (result?.ok && !result.error && result.url) {
+        documentNavigation.assign('/');
+      } else {
         toast.error(
           '자동 로그인에 실패했습니다. 로그인 화면에서 다시 로그인해 주세요.'
         );

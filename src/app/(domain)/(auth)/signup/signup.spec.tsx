@@ -6,7 +6,7 @@ import userData from '@shared/api/mocks/data/user.json';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { spyOnToast } from '@shared/lib/testing/toast';
-import { getHandlerURI } from '@shared/lib/url';
+import { documentNavigation, getHandlerURI } from '@shared/lib/url';
 import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -298,7 +298,14 @@ describe('회원가입 테스트', () => {
 
     beforeEach(() => {
       signupRequest.mockClear();
-      jest.mocked(signIn).mockClear();
+      jest.spyOn(documentNavigation, 'assign').mockImplementation(() => {});
+      jest.mocked(signIn).mockReset().mockResolvedValue({
+        ok: true,
+        status: 200,
+        url: 'http://localhost/',
+        error: undefined,
+        code: undefined,
+      });
       server.use(
         http.post(getHandlerURI('/api/users/signup'), async ({ request }) => {
           signupRequest(await request.json());
@@ -316,10 +323,12 @@ describe('회원가입 테스트', () => {
         expect(signIn).toHaveBeenCalledWith('credentials', {
           email: account.email,
           password: account.password,
+          redirect: false,
           redirectTo: '/',
         })
       );
       expect(signIn).toHaveBeenCalledTimes(1);
+      expect(documentNavigation.assign).toHaveBeenCalledWith('/');
       expect(signupRequest).toHaveBeenCalledTimes(1);
       expect(signupRequest).toHaveBeenCalledWith(account);
       expect(toastCalls.success).toHaveBeenCalledWith(
@@ -377,6 +386,23 @@ describe('회원가입 테스트', () => {
       expect(signupRequest).toHaveBeenCalledTimes(1);
     });
 
+    test('자동 로그인 응답이 인증을 거절하면 홈으로 이동하지 않는다', async () => {
+      jest.mocked(signIn).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        url: null,
+        error: 'CredentialsSignin',
+        code: 'credentials',
+      });
+      submitAccount();
+
+      expect(
+        await screen.findByText(/자동 로그인에 실패했습니다/)
+      ).toBeVisible();
+      expect(documentNavigation.assign).not.toHaveBeenCalled();
+      expect(screen.getByRole('button', { name: '회원가입' })).toBeDisabled();
+    });
+
     test('가입한 계정으로 로그인하는 동안 다시 제출해도 한 번만 요청하고 완료 알림을 유지한다', async () => {
       let finishSignIn = () => {};
       jest.mocked(signIn).mockImplementationOnce(
@@ -388,7 +414,7 @@ describe('회원가입 테스트', () => {
                 code: undefined,
                 status: 200,
                 ok: true,
-                url: null,
+                url: 'http://localhost/',
               });
           })
       );
@@ -447,6 +473,7 @@ describe('회원가입 테스트', () => {
       expect(signIn).toHaveBeenCalledWith('credentials', {
         email: 'test@email.com',
         password: 'wrongPassword',
+        redirect: false,
         redirectTo: '/',
       });
     });
