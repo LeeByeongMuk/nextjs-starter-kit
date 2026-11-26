@@ -17,7 +17,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { cookies } from 'next/headers';
 import { signIn } from 'next-auth/react';
 import React from 'react';

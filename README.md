@@ -47,11 +47,11 @@ AI 에이전트 스킬 설치는 `npm run setup -- --skills`로 선택할 수 �
 | 앱·UI | Next.js 16 · React 19 · TypeScript 6 · Tailwind CSS 4 · sonner 2 |
 | API·폼 | TanStack Query 5 · 자체 `fetchApi` · React Hook Form 7 · Zod 4 |
 | 인증·본문 입력 | NextAuth 5 beta · Toast UI Editor |
-| 테스트·개발 API | Jest 30 · Testing Library · MSW 2 · Express |
+| 테스트·개발 API | Jest 30 · Testing Library · MSW 3 · Express |
 
 FSD 레이어는 `app → views → widgets → features → entities → shared` 순서로 의존합니다. 슬라이스 외부에서는 루트 `index.ts`의 Public API를 사용합니다. [아키텍처 규칙](.agents/rules/architecture/fsd-architecture.md), [라이브러리 유지·전환 결정](.agents/rules/infra/library-decisions.md), [최신화 범위와 검증 기록](docs/workflows/starter-modernization/brief.md)을 참고하세요. 정확한 패키지 버전은 lockfile이 결정합니다.
 
-TypeScript 7·ESLint 10·MSW 3의 일괄 도입은 호환성과 마이그레이션 비용 때문에 보류합니다. NextAuth는 v5 beta를 유지하며, 안정판 확인 없이 `@latest`를 설치하지 않습니다.
+TypeScript 7·ESLint 10의 일괄 도입은 호환성과 마이그레이션 비용 때문에 보류합니다. NextAuth는 v5 beta를 유지하며, 안정판 확인 없이 `@latest`를 설치하지 않습니다.
 
 ## mock과 실제 API의 계약
 
@@ -86,7 +86,7 @@ GitHub Actions의 `build.yml`은 `.nvmrc`에 지정된 Node.js에서 단일 `che
 
 `pr-policy.yml`은 브랜치 이름과 PR 제목을 검사합니다. CodeQL은 GitHub default setup으로 유지합니다.
 
-Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. [라이브러리 결정](.agents/rules/infra/library-decisions.md)에서 보류한 TypeScript·ESLint·MSW 메이저와 Node 런타임 메이저를 따르는 `@types/node` 메이저는 버전 업데이트에서 제외합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
+Dependabot은 npm과 GitHub Actions를 월간 확인하고 minor·patch 업데이트를 묶습니다. npm 보안 업데이트는 별도 그룹으로 묶으며 메이저 업데이트는 개별 검토합니다. [라이브러리 결정](.agents/rules/infra/library-decisions.md)에서 보류한 TypeScript·ESLint 메이저와 Node 런타임 메이저를 따르는 `@types/node` 메이저는 버전 업데이트에서 제외합니다. 버전 업데이트 PR 상한은 npm 3개, GitHub Actions 2개입니다.
 
 ## 검증
 

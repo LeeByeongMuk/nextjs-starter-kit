@@ -5,12 +5,12 @@ paths:
 
 # Major Dependency Migration History
 
-> 작성일: 2026-03-12 · 최종 갱신: 2026-11-25
+> 작성일: 2026-03-12 · 최종 갱신: 2026-11-26
 > 대상 브랜치: `develop` · 현재 실행 환경과 보류 근거: [library-decisions.md](./library-decisions.md)
 
 ## 개요
 
-2026-03 ~ 2026-07에 걸쳐 완료된 메이저 의존성 마이그레이션의 이력과 핵심 결정을 기록한다. 원본은 Phase별 절차서였으나 전 Phase 완료 후 요약본으로 압축했다. 향후 업그레이드 판단(도입/보류)은 [library-decisions.md](./library-decisions.md)가 정본이다.
+2026-03 ~ 2026-07에 걸쳐 완료된 메이저 의존성 마이그레이션과 그 뒤에 진행한 메이저 전환의 이력, 핵심 결정을 기록한다. 원본은 Phase별 절차서였으나 전 Phase 완료 후 요약본으로 압축했다. 향후 업그레이드 판단(도입/보류)은 [library-decisions.md](./library-decisions.md)가 정본이다.
 
 ## 실행 환경·도구 정리 (2026-11-08)
 
@@ -46,6 +46,7 @@ paths:
 | @types/node              | 25 → 26           | 타입 전용, 영향 없음 (원 계획의 목표는 25였고 이후 26으로 재상향)                                                                                           | #155 |
 | eslint-plugin-boundaries | 6 → 7             | FSD 린트 강화와 함께 적용 — 강제 항목은 [fsd-architecture.md](../architecture/fsd-architecture.md) §8 참조                                                  | #155 |
 | 패키지 매니저            | 혼재 → npm 단일화 | `pnpm-lock.yaml` 삭제, `packageManager: npm@11.6.2` 명시                                                                                                    | #155 |
+| msw                      | 2 → 3             | ESM 전용 — Jest transformIgnore 예외 확대. Express mock은 폐기된 `@mswjs/http-middleware`에서 `@msw/serve`로 교체, import는 `msw/http`                      | #198 |
 
 이후 마이너/패치는 Dependabot이 담당한다 (예: next 16.2.3 → 16.2.6, #151).
 
@@ -59,7 +60,7 @@ paths:
 
 ## 트러블슈팅 기록 (재발 방지)
 
-- **msw ESM 의존성 호이스팅**: msw는 2.13.4부터 ESM 전용 `@open-draft/deferred-promise` 3.x를 쓰고 `@mswjs/interceptors`는 2.x를 쓴다. 어느 버전이 최상위로 호이스팅되는지는 잠금 파일에 따라 바뀐다. 2026-11-12 의존성 갱신 전에는 3.x가 `node_modules/msw/node_modules` 아래에 있어 `msw`와 `@open-draft` 중 하나만 빠져도 테스트가 실패했다. 갱신 후에는 3.x가 최상위에 있어 `msw`를 빼도 통과하지만 `@open-draft`를 빼면 전체 suite가 `Must use import to load ES Module`로 실패한다. 다시 중첩될 수 있으므로 `jest.config.ts` transformIgnorePatterns 예외에 둘 다 유지한다. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
+- **msw ESM 의존성**: msw 3은 ESM 전용이고 의존성 `@msw/url`, `@mswjs/interceptors`, `@open-draft/until`, `rettime`, `until-async`, `cookie` 2도 ESM 전용이다. Jest는 CommonJS로 실행하므로 `jest.config.ts` transformIgnorePatterns 예외로 모두 변환해야 하고, 하나라도 빠지면 전체 suite가 `Must use import to load ES Module`로 실패한다. 예외는 경로의 `node_modules/` 구간마다 판정한다. `cookie` 2는 Express가 쓰는 0.7과 함께 설치되어 `node_modules/msw/node_modules` 아래에 중첩되므로 바깥 `msw`와 안쪽 `cookie`가 모두 목록에 있어야 한다. 오류 문구가 안내하는 Jest의 네이티브 `require(esm)`은 Node를 `--experimental-vm-modules`로 실행할 때만 동작하므로 쓰지 않는다. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@msw`, `@mswjs`, `@open-draft`, `cookie`
 - **ts-jest 버전 오해**: "Jest 30이니 ts-jest도 30" 이 아니다. ts-jest는 29.4부터 Jest 30을 지원하며 30 메이저가 없다. 원 계획서의 `ts-jest@^30` 목표는 오기였고, 당시에는 `^29.4.x`를 사용했다. 현재는 `next/jest` SWC로 단일화해 ts-jest를 제거했다
 - **@toast-ui/react-editor**: 업스트림이 2026-11-15에 유지보수를 종료했다. 마지막 릴리스는 3.2.4(에디터 3.2.3)이고, 이 저장소는 보안 패치 대상 배포물인 3.2.3(에디터 3.2.2)에 고정한다. `overrides`로 `react: "^19"` 강제 설치 중이며, 동작 이상 시 대체 에디터(BlockNote, TipTap, Plate) 전환 검토 — [library-decisions.md](./library-decisions.md) 참조
 - **next-auth/react 테스트 mock**: jsdom에서 세션 프로바이더 모킹용 — 당시 `src/tests/mocks/`, 현행은 `src/shared/lib/testing/nextAuthReact.tsx` (`jest.config.ts` moduleNameMapper로 매핑)

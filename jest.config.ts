@@ -36,9 +36,12 @@ const extraTransformPkgs = [
   'until-async',
   'next-auth',
   '@auth',
-  // MSW의 중첩 ESM 의존성도 변환하도록 두 경로를 함께 허용한다.
   'msw',
+  '@msw',
+  '@mswjs',
   '@open-draft',
+  // msw가 쓰는 cookie 2는 node_modules/msw 아래에 중첩 설치된다. 예외는 경로의 node_modules 구간마다 판정하므로 안쪽 패키지 이름도 둔다.
+  'cookie',
 ];
 
 const nextConfig = createJestConfig(config);

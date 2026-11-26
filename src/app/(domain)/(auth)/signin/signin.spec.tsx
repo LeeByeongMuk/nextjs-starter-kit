@@ -4,7 +4,7 @@ import { queryToasts, spyOnToast } from '@shared/lib/testing/toast';
 import { documentNavigation } from '@shared/lib/url';
 import Toaster from '@shared/ui/toast/Toaster';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 
 const origin = window.location.origin;
 const authOrigin = 'https://auth.example';

@@ -8,13 +8,13 @@ paths:
 
 # Testing Guide
 
-> 대상: **Jest 30 + Testing Library + MSW 2**
+> 대상: **Jest 30 + Testing Library + MSW 3**
 > 상위 문서: [`.agents/rules/code-style/code-conventions.md`](../code-style/code-conventions.md)
 
 ## 1. 환경 구성
 
 - 러너: Jest 30 — `jest.config.ts`
-- DOM: `jest-fixed-jsdom` (MSW 2 호환 fork)
+- DOM: `jest-fixed-jsdom` (MSW 호환 fork)
 - Setup: `jest.setup.ts` — MSW `testServer` 부트와 핸들러 초기화, `console.error` 억제, 알림·`sessionStorage` 비우기, `<dialog>` 보완
 - `next-auth/react` 모킹: `jest.config.ts`의 `moduleNameMapper`가 `src/shared/lib/testing/nextAuthReact.tsx`로 연결한다
 - 알림·대화상자: 앱이 네이티브 `alert`·`confirm`·`prompt`를 쓰지 않으므로 mock하지 않고, 화면에 렌더된 결과를 단언한다.
@@ -39,11 +39,14 @@ const extraTransformPkgs = [
   'next-auth',
   '@auth',
   'msw',
+  '@msw',
+  '@mswjs',
   '@open-draft',
+  'cookie',
 ];
 ```
 
-NextAuth / Auth.js 계열은 ESM 전환이 잦다. msw가 쓰는 ESM 전용 `@open-draft/deferred-promise` 3.x는 `@mswjs/interceptors`가 쓰는 2.x와 함께 설치되므로 npm 호이스팅에 따라 위치가 바뀐다. 현재 잠금 파일에서는 최상위 `node_modules/@open-draft`에 있어 `@open-draft` 예외로 변환된다. `node_modules/msw/node_modules` 아래로 중첩되면 바깥 패키지 `msw`도 예외 목록에 있어야 변환되므로 두 예외를 함께 유지한다. **테스트가 갑자기 깨지면 여기를 먼저 확인**. 예외 추가 시 `npm test` 전체 재실행 필수.
+NextAuth / Auth.js 계열은 ESM 전환이 잦다. `msw` 3은 ESM 전용이고 의존성 `@msw/url`, `@mswjs/interceptors`, `@open-draft/until`, `rettime`, `until-async`, `cookie` 2도 ESM 전용이다. Jest는 CommonJS로 실행하므로 모두 예외 목록에 두어 변환하며, 하나라도 빠지면 전체 suite가 `Must use import to load ES Module`로 실패한다. 변환 예외는 경로의 `node_modules/` 구간마다 판정한다. `cookie` 2는 Express가 쓰는 0.7과 함께 설치되어 `node_modules/msw/node_modules` 아래에 중첩되므로 바깥 패키지 `msw`와 안쪽 패키지 `cookie`가 모두 목록에 있어야 한다. **테스트가 갑자기 깨지면 여기를 먼저 확인**. 예외 추가 시 `npm test` 전체 재실행 필수.
 
 ---
 
@@ -75,10 +78,12 @@ NextAuth / Auth.js 계열은 ESM 전환이 잦다. msw가 쓰는 ESM 전용 `@op
 
 ### 5.1 기본 핸들러
 
-도메인별로 `src/shared/api/mocks/handlers/*.ts`에 분리하고 `handlers/index.ts`에서 합친다. 경로는 `getHandlerURI()`로 만든다:
+도메인별로 `src/shared/api/mocks/handlers/*.ts`에 분리하고 `handlers/index.ts`에서 합친다. `http`와 `HttpResponse`는 `msw/http`에서 가져오고 경로는 `getHandlerURI()`로 만든다:
 
 ```ts
 // src/shared/api/mocks/handlers/userHandler.ts
+import { http, HttpResponse } from 'msw/http';
+
 export const userHandler = [
   http.post(getHandlerURI('/api/users/signin'), () =>
     HttpResponse.json(userData.signin)
@@ -101,7 +106,7 @@ server.use(
 
 ### 5.3 개발 서버용 MSW
 
-`src/shared/api/mocks/server.ts`는 Express 기반 독립 mock 서버다. `npm run mock`은 잠금 파일에 포함된 `tsx`로 실행하며 테스트의 `setupServer`와 분리된다. 브라우저 Service Worker는 사용하지 않는다.
+`src/shared/api/mocks/server.ts`는 Express 기반 독립 mock 서버다. `@msw/serve/express`의 `createMiddleware`가 테스트와 같은 핸들러로 응답하고, 핸들러가 없는 요청은 Express가 404로 응답한다. CORS와 요청 본문 크기 제한은 그 앞의 Express 미들웨어가 처리한다. `npm run mock`은 잠금 파일에 포함된 `tsx`로 실행하며 테스트의 `setupServer`와 분리된다. 브라우저 Service Worker는 사용하지 않는다.
 
 ---
 

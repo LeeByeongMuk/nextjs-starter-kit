@@ -1,5 +1,5 @@
 import { server } from '@shared/api/mocks/testServer';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { z } from 'zod';
 
 import { fetchApi } from './api';

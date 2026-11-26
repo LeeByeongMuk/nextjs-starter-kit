@@ -1,7 +1,7 @@
 import { server } from '@shared/api/mocks/testServer';
 import { TOKEN_KEY } from '@shared/config/auth';
 import { getHandlerURI } from '@shared/lib/url';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { cookies } from 'next/headers';
 import { ZodError } from 'zod';
 

@@ -16,7 +16,7 @@ model: sonnet
 
 - **Jest 30** + `next/jest`(SWC) + `jest-fixed-jsdom`
 - **Testing Library**: `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom`
-- **MSW 2.x**: HTTP 모킹 (`http.get`, `http.post` 등)
+- **MSW 3.x**: HTTP 모킹 (`http.get`, `http.post` 등)
 - **NextAuth mock**: `src/shared/lib/testing/nextAuthReact.tsx`
 
 ## 테스트 파일 위치
@@ -106,7 +106,7 @@ describe('useSomething', () => {
 ### API Service 테스트
 
 ```typescript
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { server } from '@shared/api/mocks/testServer';
 import { getHandlerURI } from '@shared/lib/url';
 import { fetchSomething } from '../someService';

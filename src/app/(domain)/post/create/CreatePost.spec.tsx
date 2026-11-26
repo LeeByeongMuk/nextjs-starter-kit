@@ -13,7 +13,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { cookies } from 'next/headers';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';

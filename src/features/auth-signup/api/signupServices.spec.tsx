@@ -1,6 +1,6 @@
 import { server } from '@shared/api/mocks/testServer';
 import { getHandlerURI } from '@shared/lib/url';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 
 import { fetchSignUp } from './signupServices';
 import { type SignUpReq } from './types';
