@@ -54,7 +54,7 @@ export function useSignupForm(): UseFormReturn<SignUpFormInput> {
 
 계정처럼 같은 레코드의 서버 값이 편집 중에 갱신되는 폼은 `dirtyFields`를 구독하고 `reset(서버 값, { keepDirtyValues: true })`로 편집 중인 필드를 유지한다. 저장에 성공하면 서버가 확인한 값으로 `reset()`하여 다음 편집의 기준을 갱신한다.
 
-게시글 수정 폼은 글 ID별로 최초 조회가 끝나면 마운트한다. 같은 글을 다시 조회할 때는 `values`와 `resetOptions.keepDirtyValues`로 사용자가 수정한 필드를 보존하고, 나머지 필드에 최신 값을 반영한다. 재조회 중에도 본문 편집기를 유지해 입력 포커스를 보존한다.
+게시글 수정 폼은 글 ID별로 최초 조회가 끝나면 마운트한다. 같은 글을 다시 조회할 때는 `values`와 `resetOptions.keepDirtyValues`로 사용자가 수정한 필드를 보존하고, 나머지 필드에 최신 값을 반영한다. 재조회 중에도 본문 편집기를 유지해 입력 포커스를 보존한다. 본문은 편집기에 넣은 직후와 Markdown이 같으면 수정하지 않은 필드로 본다 (`Editor`가 원문을 돌려준다).
 
 ---
 
