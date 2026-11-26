@@ -5,7 +5,7 @@ paths:
 
 # Major Dependency Migration History
 
-> 작성일: 2026-03-12 · 최종 갱신: 2026-11-25
+> 작성일: 2026-03-12 · 최종 갱신: 2026-11-26
 > 대상 브랜치: `develop` · 현재 실행 환경과 보류 근거: [library-decisions.md](./library-decisions.md)
 
 ## 개요
@@ -61,7 +61,7 @@ paths:
 
 - **msw ESM 의존성 호이스팅**: msw는 2.13.4부터 ESM 전용 `@open-draft/deferred-promise` 3.x를 쓰고 `@mswjs/interceptors`는 2.x를 쓴다. 어느 버전이 최상위로 호이스팅되는지는 잠금 파일에 따라 바뀐다. 2026-11-12 의존성 갱신 전에는 3.x가 `node_modules/msw/node_modules` 아래에 있어 `msw`와 `@open-draft` 중 하나만 빠져도 테스트가 실패했다. 갱신 후에는 3.x가 최상위에 있어 `msw`를 빼도 통과하지만 `@open-draft`를 빼면 전체 suite가 `Must use import to load ES Module`로 실패한다. 다시 중첩될 수 있으므로 `jest.config.ts` transformIgnorePatterns 예외에 둘 다 유지한다. 전체 예외 목록: `rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`
 - **ts-jest 버전 오해**: "Jest 30이니 ts-jest도 30" 이 아니다. ts-jest는 29.4부터 Jest 30을 지원하며 30 메이저가 없다. 원 계획서의 `ts-jest@^30` 목표는 오기였고, 당시에는 `^29.4.x`를 사용했다. 현재는 `next/jest` SWC로 단일화해 ts-jest를 제거했다
-- **@toast-ui/react-editor**: 업스트림이 2026-11-15에 유지보수를 종료했다. 마지막 릴리스는 3.2.4(에디터 3.2.3)이고, 이 저장소는 보안 패치 대상 배포물인 3.2.3(에디터 3.2.2)에 고정한다. `overrides`로 `react: "^19"` 강제 설치 중이며, 동작 이상 시 대체 에디터(BlockNote, TipTap, Plate) 전환 검토 — [library-decisions.md](./library-decisions.md) 참조
+- **@toast-ui/react-editor**: 업스트림이 2026-11-15에 유지보수를 종료했다. 이 저장소는 마지막 릴리스인 3.2.4(에디터 3.2.3)에 고정하고 설치 패치를 적용한다. `overrides`로 `react: "^19"` 강제 설치 중이며, 동작 이상 시 대체 에디터(BlockNote, TipTap, Plate) 전환 검토 — [library-decisions.md](./library-decisions.md) 참조
 - **next-auth/react 테스트 mock**: jsdom에서 세션 프로바이더 모킹용 — 당시 `src/tests/mocks/`, 현행은 `src/shared/lib/testing/nextAuthReact.tsx` (`jest.config.ts` moduleNameMapper로 매핑)
 
 ## 보류 중인 메이저

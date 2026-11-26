@@ -65,6 +65,7 @@ describe('에디터 보안 패치', () => {
     '<p onclick="window.__xss = true">본문<img src="/missing.png" onerror="window.__xss = true"></p><script>window.__xss = true</script>',
     '<a href="javascript:window.__xss = true">링크</a>',
     '<math><mtext><table><mglyph><style><!--</style><img title="--><img src=/missing.png onerror=window.__xss=true>">',
+    '<p><b data-raw-html="script">window.__xss = true</b></p>',
   ])('외부 HTML의 실행 가능한 태그와 속성을 제거한다: %s', html => {
     editor.setHTML(html, false);
     const result = document.createElement('div');
@@ -72,6 +73,28 @@ describe('에디터 보안 패치', () => {
 
     expect(result.querySelector('script, [onclick], [onerror]')).toBeNull();
     expect(result.querySelector('[href^="javascript:"]')).toBeNull();
+  });
+
+  test('붙여넣은 HTML이 지정한 태그 이름으로 요소를 만들지 않는다', () => {
+    const field = container.querySelector<HTMLElement>(
+      '.toastui-editor-ww-container [contenteditable="true"]'
+    );
+    if (!field) throw new Error('위지위그 편집 영역을 찾을 수 없습니다.');
+
+    fireEvent.paste(field, {
+      clipboardData: {
+        getData: (type: string) =>
+          type === 'text/html'
+            ? '<p><b data-raw-html="script">굵은 글</b></p>'
+            : '',
+        items: [],
+      },
+    });
+    const result = document.createElement('div');
+    result.innerHTML = editor.getHTML();
+
+    expect(result.querySelector('script')).toBeNull();
+    expect(result.querySelector('strong')).toHaveTextContent('굵은 글');
   });
 
   test('표·링크·이미지·코드를 저장한 뒤 다시 편집해도 유지한다', () => {
