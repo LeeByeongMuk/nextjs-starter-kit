@@ -34,19 +34,29 @@ jest.mock('next-auth/react');
 jest.mock('next/dynamic', () => () => {
   function MockEditor({
     onChange,
+    onImageRead,
     isInvalid,
   }: {
     onChange: (value: string) => void;
+    onImageRead: (reading: boolean) => void;
     isInvalid: boolean;
   }) {
     return (
-      <textarea
-        value={useWatch({ name: 'contents' })}
-        aria-label="본문"
-        aria-invalid={isInvalid}
-        aria-describedby={isInvalid ? 'contents-error' : undefined}
-        onChange={event => onChange(event.target.value)}
-      />
+      <>
+        <textarea
+          value={useWatch({ name: 'contents' })}
+          aria-label="본문"
+          aria-invalid={isInvalid}
+          aria-describedby={isInvalid ? 'contents-error' : undefined}
+          onChange={event => onChange(event.target.value)}
+        />
+        <button type="button" onClick={() => onImageRead(true)}>
+          이미지 읽기 시작
+        </button>
+        <button type="button" onClick={() => onImageRead(false)}>
+          이미지 읽기 완료
+        </button>
+      </>
     );
   }
   return MockEditor;
@@ -368,6 +378,32 @@ describe('게시글 수정 테스트', () => {
     );
   });
 
+  test('첨부 중 재조회해도 저장을 막은 이유는 파일 읽기가 끝날 때까지 보인다', async () => {
+    render(<UpdatePost />, { wrapper });
+    await screen.findByLabelText('제목');
+    fireEvent.click(screen.getByRole('button', { name: '이미지 읽기 시작' }));
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    const message = await screen.findByText(/이미지를 불러오는 중입니다/);
+    server.use(
+      http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+        HttpResponse.json({
+          ...postData.getEdit,
+          data: { ...postData.getEdit.data, title: '새 제목' },
+        })
+      )
+    );
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('제목')).toHaveValue('새 제목')
+    );
+    expect(message).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: '이미지 읽기 완료' }));
+    await waitFor(() => expect(message).not.toBeInTheDocument());
+  });
+
   test('재조회 실패 후에도 편집을 계속하고 다른 글로 이동하면 새 글의 값으로 시작한다', async () => {
     const { rerender } = render(<UpdatePost />, { wrapper });
     const title = await screen.findByRole('textbox', { name: '제목' });
@@ -506,6 +542,22 @@ describe('게시글 수정 테스트', () => {
       const form = button.form;
       fireEvent.submit(form);
       await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+      server.use(
+        http.get(getHandlerURI('/api/posts/:id/edit'), () =>
+          HttpResponse.json({
+            ...postData.getEdit,
+            data: { ...postData.getEdit.data, type: 'faq' },
+          })
+        )
+      );
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['posts', { id: 1 }] });
+      });
+      await waitFor(() =>
+        expect(screen.getByLabelText('분류')).toHaveValue('faq')
+      );
+      expect(form).toHaveAttribute('aria-busy', 'true');
+      expect(button).toHaveAccessibleName('저장 중…');
       expect(button).toBeDisabled();
       fireEvent.submit(form);
       response.resolve(HttpResponse.json(postData.update));
