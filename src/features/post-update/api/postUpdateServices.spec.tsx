@@ -2,7 +2,7 @@ import { server } from '@shared/api/mocks/testServer';
 import { TOKEN_KEY } from '@shared/config/auth';
 import { POST_REQUEST_MAX_BYTES } from '@shared/config/request-size';
 import { getHandlerURI } from '@shared/lib/url';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { cookies } from 'next/headers';
 
 import { fetchUpdatePost, fetchUpdatePostResource } from './postUpdateServices';

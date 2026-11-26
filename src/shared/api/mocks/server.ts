@@ -1,4 +1,4 @@
-import { createMiddleware } from '@mswjs/http-middleware';
+import { createMiddleware } from '@msw/serve/express';
 import { handlers } from '@shared/api/mocks/handlers';
 import { POST_REQUEST_MAX_BYTES } from '@shared/config/request-size';
 import cors from 'cors';

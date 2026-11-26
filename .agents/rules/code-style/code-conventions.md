@@ -153,7 +153,7 @@ export type PostType = z.infer<typeof PostTypeSchema>;
   export function useDeletePost() { ... }
   ```
 - **파일 헤더 주석은 두지 않는다** — export JSDoc과 중복. 파일은 `import`부터 시작한다. 헤더 한 줄은 **export JSDoc만으로 파일 역할이 안 드러나는 경우에 한해** 허용 (예: export 없는 스크립트, 여러 fetch를 묶은 api 파일). 이 경우에도 한 줄만
-- 본문 주석은 **코드가 보여주지 못하는 제약**을 적을 때만 (예: "msw의 ESM 전용 의존성은 호이스팅에 따라 중첩될 수 있어 `msw`도 transform 예외에 둔다")
+- 본문 주석은 **코드가 보여주지 못하는 제약**을 적을 때만 (예: "msw가 쓰는 cookie 2는 node_modules/msw 아래에 중첩 설치된다. 예외는 경로의 node_modules 구간마다 판정하므로 안쪽 패키지 이름도 둔다")
 - TODO는 `TODO(추적키): 사유` 형식만. 추적 키 없는 TODO 금지
 - `eslint-disable`은 반드시 **사유 주석과 함께, 해당 라인에만** (`-next-line`). 파일 전체 disable 금지
 

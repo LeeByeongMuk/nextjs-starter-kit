@@ -7,7 +7,7 @@ import { deleteAccessToken } from '@shared/lib/deleteAccessToken';
 import { getHandlerURI } from '@shared/lib/url';
 import Header from '@shared/ui/layout/Header';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import NextAuth, { type NextAuthConfig } from 'next-auth';

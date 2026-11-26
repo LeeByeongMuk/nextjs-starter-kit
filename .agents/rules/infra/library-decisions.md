@@ -26,19 +26,18 @@ paths:
 - `@types/node`는 Node 런타임 메이저(26)에 맞춰 올린다. 그래서 Dependabot 버전 업데이트에서 `@types/node` 메이저를 제외한다.
 - 설치는 `npm ci`로 재현한다. 정확한 패키지 버전은 `package-lock.json`이 정본이다. `npm run setup`도 `npm ci`를 실행하며 AI 스킬은 `--skills`로 선택 설치한다.
 - 운영 의존성만 설치할 때는 같은 잠금 파일로 `npm ci --omit=dev`를 실행한다. `prepare`는 Husky가 설치된 환경에서 훅을 설정하며, `HUSKY=0`이면 건너뛴다.
-- npm 11.20은 `allowScripts`에 기록되지 않은 의존성 install script도 실행하지만 설치할 때마다 경고한다. `package.json`의 `allowScripts`에 실행 여부를 기록한다. `esbuild`는 플랫폼 바이너리를 확인해 CLI에 연결하므로 승인한다. `fsevents`는 실행할 스크립트가 없고, `@parcel/watcher`는 `npm_config_build_from_source`일 때만 빌드하며, `msw`는 `msw.workerDirectory` 설정이 없으면 아무 작업도 하지 않으므로 거부한다. install script가 있는 의존성이 새로 생기면 `npm install-scripts ls`로 확인한 뒤 승인 또는 거부를 기록한다. `npm install-scripts prune`은 설치되지 않은 패키지의 항목도 지우므로 Linux에서 실행하면 macOS 전용 `fsevents` 항목이 빠진다. 이 항목이 없으면 macOS에서 설치할 때 다시 경고하므로 prune이 지운 `fsevents` 항목은 되돌린다.
+- npm 11.20은 `allowScripts`에 기록되지 않은 의존성 install script도 실행하지만 설치할 때마다 경고한다. `package.json`의 `allowScripts`에 실행 여부를 기록한다. `esbuild`는 플랫폼 바이너리를 확인해 CLI에 연결하므로 승인한다. `fsevents`는 실행할 스크립트가 없고 `@parcel/watcher`는 `npm_config_build_from_source`일 때만 빌드하므로 거부한다. install script가 있는 의존성이 새로 생기면 `npm install-scripts ls`로 확인한 뒤 승인 또는 거부를 기록한다. `npm install-scripts prune`은 설치되지 않은 패키지의 항목도 지우므로 Linux에서 실행하면 macOS 전용 `fsevents` 항목이 빠진다. 이 항목이 없으면 macOS에서 설치할 때 다시 경고하므로 prune이 지운 `fsevents` 항목은 되돌린다.
 - Next/React, Tailwind/PostCSS 플러그인, TanStack Query/devtools/ESLint 플러그인은 각 peer 범위에 맞춰 함께 갱신한다. 같은 메이저라도 타입·lint·테스트·production build를 통과해야 한다.
 - React 19는 Toast UI wrapper의 공식 peer(`^17.0.1`) 밖이다. 기존 override를 유지하며 에디터 작성·수정·저장 흐름을 실제 브라우저에서 확인한다.
 
-| 보류 대상          | 현재 선택과 근거                                                                                                                                                           | 재검토 조건                                     |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| TypeScript 7       | 6.0.3 유지. typescript-eslint 8.73.0의 TypeScript 지원 범위는 `>=4.8.4 <6.1.0`                                                                                             | parser와 Next 도구 체인이 7 지원                |
-| ESLint 10          | 9.39.5 유지. ESLint 9는 지원이 끝났지만 eslint-config-next 16.4.6이 쓰는 eslint-plugin-react 7.37.5 peer가 `^9.7`까지만 지원                                               | React 플러그인 및 커스텀 규칙 호환              |
-| MSW 3              | 2.15.0 유지. Express mock의 `@mswjs/http-middleware` 0.10.3은 `@msw/serve`로 대체되며 폐기됐고, MSW 3에서 제거된 `handleRequest()`를 호출해 `npm run mock`이 동작하지 않음 | Express mock을 `@msw/serve`로 옮길 때 함께 전환 |
-| NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음                                                                                                                       | v5 안정판 출시                                  |
-| npm 12             | Node LTS에 동봉된 npm 11.20.0으로 설치 정책 통일                                                                                                                           | 별도 메이저 전환 검증                           |
+| 보류 대상          | 현재 선택과 근거                                                                                                             | 재검토 조건                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| TypeScript 7       | 6.0.3 유지. typescript-eslint 8.73.0의 TypeScript 지원 범위는 `>=4.8.4 <6.1.0`                                               | parser와 Next 도구 체인이 7 지원   |
+| ESLint 10          | 9.39.5 유지. ESLint 9는 지원이 끝났지만 eslint-config-next 16.4.6이 쓰는 eslint-plugin-react 7.37.5 peer가 `^9.7`까지만 지원 | React 플러그인 및 커스텀 규칙 호환 |
+| NextAuth v5 stable | 5.0.0-beta.32 유지. `latest`인 4.24.15로 내리지 않음                                                                         | v5 안정판 출시                     |
+| npm 12             | Node LTS에 동봉된 npm 11.20.0으로 설치 정책 통일                                                                             | 별도 메이저 전환 검증              |
 
-근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.1), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest), [MSW 3 변경점](https://github.com/mswjs/msw/releases/tag/v3.0.0), [http-middleware 폐기 안내](https://registry.npmjs.org/@mswjs/http-middleware/latest), [ESLint 지원 정책](https://eslint.org/version-support).
+근거: [Node LTS](https://nodejs.org/en/blog/release/v26.13.1), [Next registry](https://registry.npmjs.org/next/latest), [React registry](https://registry.npmjs.org/react/latest), [TypeScript ESLint 지원](https://typescript-eslint.io/users/dependency-versions/), [React ESLint peer](https://registry.npmjs.org/eslint-plugin-react/latest), [NextAuth 태그](https://registry.npmjs.org/next-auth), [Toast UI peer](https://registry.npmjs.org/@toast-ui/react-editor/latest), [Next Jest 구성](https://nextjs.org/docs/app/guides/testing/jest), [ESLint 지원 정책](https://eslint.org/version-support).
 
 ---
 
@@ -57,7 +56,7 @@ paths:
 | [Jest → Vitest](#jest--vitest)                                                      | **유지 (Jest 30)**         | 테스트 파일 > 30 또는 CI 테스트 시간 > 3분     |
 | [폼/API 런타임 검증: Zod](#zod)                                                     | **유지**                   | 스키마 코드가 번들 사이즈 경보를 유발할 때     |
 | [`classnames` → `clsx`](#classnames--clsx)                                          | **제거 (사용처 없음)**     | 복잡한 조건부 스타일·variants가 필요할 때      |
-| [MSW 2](#msw-2)                                                                     | **유지**                   | —                                              |
+| [MSW 3](#msw-3)                                                                     | **유지**                   | —                                              |
 | [Toast UI Editor → TipTap/Lexical](#toast-ui-editor--tiptaplexical)                 | **유지 (보류)**            | Editor 성능·SSR 이슈 재발 또는 협업 기능 요구  |
 | [Prettier + ESLint → Biome](#prettier--eslint--biome)                               | **유지**                   | ESLint 플러그인 호환 대란 또는 lint 시간 > 30s |
 | [NextAuth v5 beta → stable](#nextauth-v5-beta--stable)                              | **stable 즉시 업그레이드** | stable 릴리스 시                               |
@@ -69,7 +68,7 @@ paths:
 
 ## Jest → Vitest
 
-- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 2 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@open-draft`). 페이지 통합과 인증·에디터·설치 패치 회귀 테스트를 실행한다. 커버리지 60% 기준
+- **현황**: Jest 30 + `next/jest` SWC, `ts-node` 설정 로더, `jest-fixed-jsdom`, MSW 3 연동. `jest.config.ts`에 ESM 패키지 transformIgnore 예외(`rettime`, `until-async`, `next-auth`, `@auth`, `msw`, `@msw`, `@mswjs`, `@open-draft`, `cookie`). 페이지 통합과 인증·에디터·설치 패치 회귀 테스트를 실행한다. 커버리지 60% 기준
 - **교체 찬**: Vitest가 ESM 네이티브 + SWC/esbuild 기반으로 빠름. `transformIgnorePatterns` 같은 수동 튜닝 불필요. Vite 생태계와 호환
 - **교체 반**:
   - Jest 30은 최신 메이저, 기능 결함 없음
@@ -103,14 +102,16 @@ paths:
 
 ---
 
-## MSW 2
+## MSW 3
 
-- **현황**: 테스트/개발 모두에서 핵심 인프라. `src/shared/api/mocks/testServer.ts`(Jest), `src/shared/api/mocks/server.ts`(Express dev 서버), 공통 user/post 핸들러와 페이지 통합 테스트
+- **현황**: `msw` 3과 `@msw/serve`. 테스트/개발 모두에서 핵심 인프라. `src/shared/api/mocks/testServer.ts`(Jest의 `setupServer`), `src/shared/api/mocks/server.ts`(Express dev 서버, `@msw/serve/express`의 `createMiddleware`로 같은 핸들러를 적용), 공통 user/post 핸들러와 페이지 통합 테스트. 사용 규칙은 [unit-testing.md](../testing/unit-testing.md) §5
 - **교체 찬**: 없음 — 대안(Mirage, nock)은 모두 기능/유지보수에서 MSW에 뒤짐
 - **교체 반**: N/A
 - **비용**: N/A
 - **결정**: **유지**
 - **재검토 조건**: 없음
+- **함께 갱신**: `@msw/serve`의 peer는 `msw ^3.0.0`, `express ^5.0.0`이다. 세 패키지는 이 범위에 맞춰 함께 올린다
+- **Jest 설정**: `msw` 3과 일부 의존성은 ESM 전용이다. Jest는 CommonJS로 실행하므로 `jest.config.ts`의 transformIgnore 예외로 변환한다 ([unit-testing.md](../testing/unit-testing.md) §2)
 
 ---
 
