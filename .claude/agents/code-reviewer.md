@@ -39,7 +39,7 @@ model: sonnet
 
 - `'use client'`가 필요한 곳에만 있는지 (useState, useEffect, 이벤트 핸들러, 브라우저 API)
 - `'use client'` 경계를 최대한 잎 노드로 내렸는지
-- Client Component에서 서버 전용 코드(process.env 직접 접근, getServerSession 등) 사용하지 않는지
+- Client Component에서 서버 전용 코드(process.env 직접 접근, `server-only` 모듈, `auth()` 등) 사용하지 않는지
 - `app/**/page.tsx`가 views만 import하고 얇게 유지되는지
 
 ### 5. 타입 안전성
@@ -57,12 +57,12 @@ model: sonnet
 ```bash
 npm run tsc       # 타입 체크
 npm run lint      # boundaries 위반 포함
+npm run prettier  # src 포맷 검사
 npm test          # Jest
 npm run build     # 프로덕션 빌드
 ```
 
 ## References
 
-- `.agents/rules/architecture/fsd-architecture.md` — FSD 규칙 전체
 - `.agents/rules/architecture/fsd-architecture.md` — FSD 정본 스펙 + 배치 프리플라이트
 - `eslint.config.mjs` — boundaries 설정

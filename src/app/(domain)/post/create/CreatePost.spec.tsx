@@ -3,6 +3,7 @@ import { useCreatePost } from '@features/post-create';
 import { server } from '@shared/api/mocks/testServer';
 import { getQueryClient } from '@shared/api/tanstack-query/client';
 import { getHandlerURI } from '@shared/lib/url';
+import Toaster from '@shared/ui/toast/Toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
@@ -80,6 +81,7 @@ describe('게시글 생성 테스트', () => {
 
     // given - 게시글 생성 페이지가 그려진다
     render(<CreatePost />, { wrapper });
+    render(<Toaster />);
   });
 
   afterEach(() => {
@@ -282,7 +284,9 @@ describe('게시글 생성 테스트', () => {
       expect(
         await screen.findByRole('button', { name: '저장 완료' })
       ).toBeDisabled();
-      expect(window.alert).toHaveBeenCalledWith('게시글을 등록했습니다.');
+      expect(
+        await screen.findByText('게시글을 등록했습니다.')
+      ).toBeInTheDocument();
       expect(mockPush).toHaveBeenCalledWith('/post/1');
       expect(form).toBeInTheDocument();
       await waitFor(() => expect(form).toHaveAttribute('aria-busy', 'false'));
@@ -314,9 +318,9 @@ describe('게시글 생성 테스트', () => {
 
       // then - 에러 알럿이 출력된다
       await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(
-        '게시글을 등록하지 못했습니다.'
-      );
+      expect(
+        await screen.findByText('게시글을 등록하지 못했습니다.')
+      ).toBeInTheDocument();
     });
   });
 });

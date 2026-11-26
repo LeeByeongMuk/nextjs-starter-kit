@@ -49,14 +49,13 @@ paths:
 - 패치는 원본·결과와 DOMPurify 배포물의 SHA-256을 검증하고, 예상하지 못한 파일에서는 실패한다. 반복 실행은 안전하다. `predev`와 `prebuild`도 적용 상태를 검사한다. `--ignore-scripts`로 설치했다면 `npm run postinstall`을 실행해야 한다. Docker는 설치 전에 패치 스크립트를 복사한다.
 - Toast UI 또는 DOMPurify 버전을 올릴 때는 패치의 해시와 정제 동작을 함께 검증한다. `npm test`의 에디터 보안·HTML 왕복 테스트, 실제 브라우저의 작성·수정·저장, 타입·lint·production build를 통과해야 한다. CI는 `npm audit --omit=dev`로 운영 의존성도 검사한다.
 - [minimatch 패턴 증폭](https://github.com/advisories/GHSA-g3hv-75wg-m249)은 취약 범위 `>=7 <11.0.1`에만 11.0.9를 적용한다. 기존 3.x API는 유지한다. [glob 취소 우회](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)는 `>=9 <14.0.2`에만 14.0.6을 적용한다. typescript-eslint는 수정된 minimatch를 사용하는 8.73.0이며, Jest·test-exclude의 상위 의존성이 수정 버전을 채택하면 해당 override를 제거한다.
-- **잔여 위험:** [picomatch GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf)는 2.3.2·4.0.7에 영향을 주며 공식 수정판이 없다. 이 저장소에서는 lint·Jest·파일 탐색 도구의 개발 의존성이고 `src`가 직접 호출하지 않는다. 공격자가 제어하는 반복 extglob 패턴과 대상 문자열이 들어오면 CPU를 소진할 수 있으므로 개발 도구에 외부 입력을 패턴으로 전달하지 않는다. 개발 의존성을 포함한 `npm audit`는 계속 실패할 수 있으며 이 권고를 숨기거나 해결 처리하지 않는다. 공식 수정판 또는 검증된 완전한 패치가 나오면 다시 검토한다.
 
 ## 결정 요약
 
 | 후보                                                                                | 결정                       | 재검토 조건                                    |
 | ----------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------- |
 | [Jest → Vitest](#jest--vitest)                                                      | **유지 (Jest 30)**         | 테스트 파일 > 30 또는 CI 테스트 시간 > 3분     |
-| [폼/API 런타임 검증: Zod](#zod-도입)                                                | **도입 (별도 PR)**         | 즉시 유효 — 후속 `feat/zod-validation`         |
+| [폼/API 런타임 검증: Zod](#zod)                                                     | **유지**                   | 스키마 코드가 번들 사이즈 경보를 유발할 때     |
 | [`classnames` → `clsx`](#classnames--clsx)                                          | **제거 (사용처 없음)**     | 복잡한 조건부 스타일·variants가 필요할 때      |
 | [MSW 2](#msw-2)                                                                     | **유지**                   | —                                              |
 | [Toast UI Editor → TipTap/Lexical](#toast-ui-editor--tiptaplexical)                 | **유지 (보류)**            | Editor 성능·SSR 이슈 재발 또는 협업 기능 요구  |
@@ -64,6 +63,7 @@ paths:
 | [NextAuth v5 beta → stable](#nextauth-v5-beta--stable)                              | **stable 즉시 업그레이드** | stable 릴리스 시                               |
 | [HTTP client (ky/ofetch)](#http-client-kyofetch)                                    | **유지 (자체 `fetchApi`)** | 재시도/타임아웃/인터셉터 중 2개 이상 필요      |
 | [npm workspaces + `packages/eslint-config`](#npm-workspaces--packageseslint-config) | **보류**                   | 두 번째 앱 또는 외부 소비자 발생 시            |
+| [토스트 알림: `sonner`](#토스트-알림-sonner)                                        | **도입**                   | 스타일 주입을 막는 CSP 요구가 생길 때          |
 
 ---
 
@@ -82,28 +82,16 @@ paths:
 
 ---
 
-## Zod 도입
+## Zod
 
-- **현황**: 폼은 `React Hook Form`의 `register()` 인라인 룰을 사용한다. 서버 액션은 식별자와 요청값을 각각 확인한다. API 응답 타입과 전달 필드는 함수별로 정의한다.
-- **교체 찬** (도입 찬):
-  - **폼 검증 단일화**: `zodResolver(schema)`로 RHF + Zod 연동 → 검증 룰을 한 곳에서 관리
-  - **API 경계 안전성**: `fetchApi<Schema>()`가 응답을 런타임 파싱 → 서버 스펙 변경 시 즉시 감지
-  - **에러 포맷 표준화**: `ApiError` 스키마 → `onError`에서 일관된 메시지 추출
-  - **타입 추론 통합**: `z.infer<typeof SignInReqSchema>` → 수동 `interface` 제거
-- **교체 반**: 기존 폼과 서버 액션의 검증 규칙 및 오류 처리를 스키마로 이관해야 함
-- **비용**: Small (2~4h)
-- **결정**: **도입** (별도 PR `feat/zod-validation`)
-- **재검토 조건**: 즉시 유효
-
-### Zod 도입 체크리스트 (후속 PR)
-
-1. `npm i zod @hookform/resolvers`
-2. 각 `src/features/*/api/types.ts`를 Zod 스키마로 재작성하고 기존 `interface`는 `z.infer<...>`로 대체
-   - 우선순위: `auth-signin` → `auth-signup` → `post-create` → `post-update` → `post-list`
-3. `src/features/*/model/use<Slice>Form.ts`에 `zodResolver(schema)` 연결
-4. `src/shared/lib/api.ts`의 `fetchApi<T>()`에 optional `schema?: ZodSchema<T>` 파라미터 추가 → 있으면 `schema.parse(json)`
-5. `src/shared/api/types.ts`에 `ApiErrorSchema` 정의 → 중앙 에러 핸들러 기반 확보
-6. 테스트: 기존 `*.spec.tsx` 통과 + 신규 스키마 단위 테스트(`*.schema.spec.ts`)
+- **현황**: `zod` 4와 `@hookform/resolvers` 7. 폼은 `model/form.ts`의 스키마를 `zodResolver`로 연결하고, 서버 액션은 `api/types.ts`의 요청 스키마로 입력을 확인한다. `fetchApi`는 `schema` 옵션으로 받은 응답 스키마로 API 응답을 검증해 선언한 필드만 반환한다. 요청·응답·폼 타입은 스키마에서 유도한다. 사용 규칙은 [폼 규칙](../code-style/form-patterns.md) §4와 [데이터 페칭 규칙](../architecture/data-fetching.md) §7을 따른다.
+- **교체 찬**: 없음 — 폼 검증 규칙, 서버 액션 입력 확인, API 응답 검증, 타입 선언을 스키마 하나로 유지한다
+- **교체 반**: N/A
+- **비용**: N/A
+- **결정**: **유지**
+- **재검토 조건**: 폼 청크의 스키마 코드가 번들 사이즈 경보를 유발할 때 같은 패키지의 `zod/mini` 전환을 검토한다
+- **함께 갱신**: `@hookform/resolvers`의 peer는 `react-hook-form ^7.55.0`, `zod ^3.25.0 || ^4.0.0`이다. 세 패키지는 이 범위에 맞춰 함께 올린다
+- **적용하지 않는 곳**: API 오류 응답의 본문은 스키마로 읽지 않는다. `fetchApi`는 비정상 응답의 HTTP 상태만 `ApiError`로 전달하고, 서버 액션이 던진 오류의 메시지는 production 빌드에서 브라우저로 전달되지 않는다
 
 ---
 
@@ -128,11 +116,12 @@ paths:
 
 ## Toast UI Editor → TipTap/Lexical
 
-- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정의 공용 `PostForm`에서 `ContentsEditor`가 `Editor`를 클라이언트 전용으로 로드한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override를 적용한다.
+- **현황**: `@toast-ui/editor` + `@toast-ui/react-editor`. 작성·수정의 공용 `PostForm`에서 `ContentsEditor`가 `Editor`를 클라이언트 전용으로 로드한다. 게시글 상세는 저장된 HTML을 표시한다. React 19 override를 적용한다. 업스트림 저장소(nhn/tui.editor)는 2026-11-15에 유지보수 종료를 공지하고 보관되었다. 마지막 릴리스는 에디터 3.2.3과 React wrapper 3.2.4이며 내장 DOMPurify는 2.3.3 그대로다.
 - **교체 찬**:
   - Toast UI 배포물의 오래된 DOMPurify는 [의존성 보안 패치](#의존성-보안-패치)로 교체한다. 상위 패키지가 수정된 정제기를 배포하기 전까지 설치 패치와 HTML 왕복 검증을 직접 유지해야 한다.
   - 번들 크기(Toast UI 3.2MB+) 큼
   - React 19 대응이 override 의존 → 장기적 리스크
+  - 업스트림이 유지보수를 종료해 이후 결함·보안 수정이 제공되지 않는다
   - 현대적 대안: **TipTap**(Prosemirror, headless, 생태계 풍부), **Lexical**(Meta, 확장성 높음)
 - **교체 반**:
   - 에디터 코드는 작성·수정 폼에서 동적으로 로드함
@@ -195,15 +184,34 @@ paths:
 
 ## npm workspaces + `packages/eslint-config`
 
-- **현황**: 커스텀 ESLint 룰은 루트 `eslint-rules/fsd-relative-imports.mjs` 1파일, FSD 정책은 `eslint.config.mjs`에 인라인. 모노레포 워크스페이스 없음
+- **현황**: 커스텀 ESLint 룰은 루트 `eslint-rules/`의 2파일(`comment-conventions.mjs`, `fsd-relative-imports.mjs`), FSD 정책은 `eslint.config.mjs`에 인라인. 모노레포 워크스페이스 없음
 - **도입 찬**: 터보레포식 `packages/eslint-config`로 분리하면 설정이 패키지 단위로 캡슐화되고, 여러 앱이 생겼을 때 공유 가능
 - **도입 반**:
   - 단일 앱 레포 — 공유할 두 번째 소비자가 없음
-  - 옮길 실체가 룰 1파일 + 설정 블록뿐. workspaces를 켜면 install 호이스팅·lint-staged 경로·CI 캐시 등 관리 표면만 증가
+  - 옮길 실체가 룰 2파일 + 설정 블록뿐. workspaces를 켜면 install 호이스팅·lint-staged 경로·CI 캐시 등 관리 표면만 증가
   - "2곳 이상에서 실제 재사용될 때 승격" 원칙과 충돌
 - **비용**: Small~Medium (workspaces 전환 + 경로 재배선 + CI 검증)
 - **결정**: **보류** (2026-07-13)
 - **재검토 조건**: 이 레포에 두 번째 앱이 생겨 모노레포로 전환하거나, 다른 레포가 이 ESLint 설정을 소비하게 될 때. 그때 npm workspaces + `packages/eslint-config`(자체 스코프 패키지)로 승격
+
+---
+
+## 토스트 알림 (sonner)
+
+- **현황**: `sonner` 2. `src/shared/ui/toast/`의 래퍼(`toast`, `Toaster`)로만 사용하고 슬라이스는 `sonner`를 직접 import하지 않는다. `unstyled` 모드에 프로젝트 토큰 유틸리티를 적용하며 알림 영역은 루트 레이아웃에 한 번 둔다. 사용 규칙은 [code-conventions.md](../code-style/code-conventions.md) §3
+- **도입 찬**:
+  - 네이티브 `alert()`와 달리 흐름을 막지 않고 토큰·OS 다크 모드·모션 감소 설정을 따른다
+  - React 18·19를 peer로 선언하고 런타임 의존성이 없다
+  - `aria-live` 알림 영역, 알림 영역으로 이동하는 단축키(Alt+T), 닫기 버튼, 스와이프 닫기를 제공한다
+- **도입 반**:
+  - 스타일시트를 런타임에 `<style>` 요소로 주입한다. 인라인 스타일을 금지하는 CSP에서는 이 주입이 차단된다
+  - 주입된 규칙은 캐스케이드 레이어 밖이라 같은 속성의 Tailwind 유틸리티보다 우선한다. 겹치는 속성(토스트의 포커스 표시)은 `!` 유틸리티로 지정한다
+- **버린 대안**:
+  - `react-hot-toast` — `goober` 런타임 CSS-in-JS에 의존해 유틸리티 클래스 전용 스타일 원칙([styling.md](../code-style/styling.md) §1)과 맞지 않는다
+  - 자체 구현 — 라이브 영역, 타이머 일시정지, 제스처, 포커스 처리를 직접 유지해야 한다
+- **비용**: Small
+- **결정**: **도입**
+- **재검토 조건**: 런타임 스타일 주입을 허용할 수 없는 CSP 요구가 생기거나, 사용 중인 React 메이저에 대한 peer 지원이 끊길 때
 
 ---
 

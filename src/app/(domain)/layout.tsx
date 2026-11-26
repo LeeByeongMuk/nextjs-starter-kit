@@ -2,6 +2,7 @@ import '@styles/globals.css';
 
 import Layout from '@shared/ui/layout';
 import Provider from '@shared/ui/provider';
+import Toaster from '@shared/ui/toast/Toaster';
 import type { Metadata } from 'next';
 import React from 'react';
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <Provider>
           <Layout>{children}</Layout>
         </Provider>
+        <Toaster />
       </body>
     </html>
   );

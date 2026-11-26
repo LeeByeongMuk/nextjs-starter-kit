@@ -1,18 +1,41 @@
-import { type UserData } from '@entities/auth';
-import { ApiResponse } from '@shared/api/types';
+import { UserDataSchema } from '@entities/auth';
+import { ApiResponseSchema } from '@shared/api/types';
+import { z } from 'zod';
 
-export interface UpdateAccountReq {
-  email: string;
-  name: string;
-  nickname: string;
-}
+/** 회원 정보 수정 요청 스키마 — 입력 규칙은 폼이 확인하고 서버 액션은 형식만 확인한다 */
+export const UpdateAccountReqSchema = z.object({
+  email: z.string(),
+  name: z.string(),
+  nickname: z.string(),
+});
 
-export interface UpdateAccountRes extends ApiResponse {
-  data: UserData;
-}
+/** 회원 정보 수정 요청 */
+export type UpdateAccountReq = z.infer<typeof UpdateAccountReqSchema>;
 
-export interface DeleteAccountReq {
-  deleted_reason: string;
-}
+/** 회원 정보 수정 응답 스키마 */
+export const UpdateAccountResSchema = ApiResponseSchema.extend({
+  data: UserDataSchema,
+});
 
-export type DeleteAccountRes = ApiResponse;
+/** 회원 정보 수정 응답 */
+export type UpdateAccountRes = z.infer<typeof UpdateAccountResSchema>;
+
+/** 회원 탈퇴 요청 스키마 — 화면에서 탈퇴를 확인한 계정을 함께 받아 그 계정일 때만 탈퇴시킨다 */
+export const DeleteAccountReqSchema = z.object({
+  deleted_reason: z.string(),
+  user_id: z.string(),
+});
+
+/** 회원 탈퇴 요청 */
+export type DeleteAccountReq = z.infer<typeof DeleteAccountReqSchema>;
+
+/** API 토큰이 가리키는 회원의 식별자 조회 응답 스키마 */
+export const AccountIdResSchema = z.object({
+  data: UserDataSchema.pick({ id: true }),
+});
+
+/** 회원 탈퇴 응답 스키마 */
+export const DeleteAccountResSchema = ApiResponseSchema.default({});
+
+/** 회원 탈퇴 응답 */
+export type DeleteAccountRes = z.infer<typeof DeleteAccountResSchema>;

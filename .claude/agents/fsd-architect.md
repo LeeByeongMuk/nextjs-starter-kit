@@ -46,13 +46,13 @@ model: sonnet
 
 ## 세그먼트 구성 (.agents/rules/architecture/fsd-architecture.md §3)
 
-| 세그먼트 | 내용 |
-|---------|------|
-| `ui/` | React 컴포넌트 |
-| `model/` | 상태/훅/뷰모델/폼 타입 |
-| `api/` | 서버 통신, 요청/응답 타입 |
-| `lib/` | 슬라이스 로컬 헬퍼 |
-| `config/` | 상수, enum |
+| 세그먼트  | 내용                      |
+| --------- | ------------------------- |
+| `ui/`     | React 컴포넌트            |
+| `model/`  | 상태/훅/뷰모델/폼 타입    |
+| `api/`    | 서버 통신, 요청/응답 타입 |
+| `lib/`    | 슬라이스 로컬 헬퍼        |
+| `config/` | 상수, 설정값              |
 
 비어 있을 세그먼트는 만들지 않는다.
 
@@ -82,7 +82,6 @@ Public API: index.ts에 export할 심볼
 
 ## References
 
-- `.agents/rules/architecture/fsd-architecture.md` — FSD 전체 규칙
 - `.agents/rules/architecture/fsd-architecture.md` — FSD 정본 스펙 + 배치 프리플라이트
 - `src/app/` — 현재 라우트 구조
 - `src/views/` — 현재 views 구성

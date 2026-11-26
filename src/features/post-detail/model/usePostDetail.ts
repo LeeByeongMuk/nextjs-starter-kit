@@ -2,7 +2,7 @@
 
 import { useDeletePost } from '@entities/post';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import usePost from './usePost';
 
@@ -14,16 +14,23 @@ export default function usePostDetail() {
 
   const { data, isError, isLoading, isFetching } = usePost();
   const { mutate } = useDeletePost();
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const handleRedirectBack = useCallback(() => {
     router.back();
   }, [router]);
 
   const handleDeletePost = useCallback(() => {
-    const confirm = window.confirm('이 게시글을 삭제할까요?');
-    if (confirm) {
-      mutate();
-    }
+    setIsDeleteConfirmOpen(true);
+  }, []);
+
+  const handleCancelDeletePost = useCallback(() => {
+    setIsDeleteConfirmOpen(false);
+  }, []);
+
+  const handleConfirmDeletePost = useCallback(() => {
+    setIsDeleteConfirmOpen(false);
+    mutate();
   }, [mutate]);
 
   return {
@@ -32,7 +39,10 @@ export default function usePostDetail() {
     isError,
     isLoading,
     isFetching,
+    isDeleteConfirmOpen,
     handleRedirectBack,
     handleDeletePost,
+    handleCancelDeletePost,
+    handleConfirmDeletePost,
   };
 }

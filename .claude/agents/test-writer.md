@@ -14,20 +14,20 @@ model: sonnet
 
 ## Test Stack
 
-- **Jest 30** + `ts-jest` + `jest-fixed-jsdom`
+- **Jest 30** + `next/jest`(SWC) + `jest-fixed-jsdom`
 - **Testing Library**: `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom`
 - **MSW 2.x**: HTTP 모킹 (`http.get`, `http.post` 등)
 - **NextAuth mock**: `src/shared/lib/testing/nextAuthReact.tsx`
 
 ## 테스트 파일 위치
 
-정본은 `.agents/rules/testing/unit-testing.md` §4. 확장자는 `.spec.tsx`/`.spec.ts` 고정 — `.test.*` 사용 금지.
+정본은 `.agents/rules/testing/unit-testing.md` §4. 확장자는 `.spec.tsx` 고정 — `.test.*` 사용 금지.
 
-| 대상                           | 위치                                     | 예시                  |
-| ------------------------------ | ---------------------------------------- | --------------------- |
-| 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx` (페이지 옆 배치) | `signin.spec.tsx`     |
-| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 `model/` 또는 `api/`       | `usePostList.spec.ts` |
-| 컴포넌트 렌더 테스트           | feature view 레벨 통합으로 대체          | —                     |
+| 대상                           | 위치                                                                          | 예시                     |
+| ------------------------------ | ----------------------------------------------------------------------------- | ------------------------ |
+| 페이지 통합 테스트 (현행)      | `src/app/**/*.spec.tsx` (페이지 옆 배치)                                      | `signin.spec.tsx`        |
+| 훅 / 서비스 단위 테스트 (권장) | 슬라이스 내부 `model/` 또는 `api/`                                            | `usePostList.spec.tsx`   |
+| 컴포넌트 테스트                | 컴포넌트 옆 (`ui/`) — 화면 흐름으로 만들기 어려운 상태를 가진 공용 컴포넌트만 | `ConfirmDialog.spec.tsx` |
 
 ```
 src/app/(domain)/(auth)/signin/
@@ -36,10 +36,10 @@ src/app/(domain)/(auth)/signin/
 src/features/post-list/
 ├── model/
 │   ├── usePostList.ts
-│   └── usePostList.spec.ts  # 훅 단위 테스트 (권장)
+│   └── usePostList.spec.tsx # 훅 단위 테스트 (권장)
 └── api/
     ├── postsServices.ts
-    └── postsServices.spec.ts
+    └── postsServices.spec.tsx
 ```
 
 ## 테스트 패턴
@@ -108,12 +108,13 @@ describe('useSomething', () => {
 ```typescript
 import { http, HttpResponse } from 'msw';
 import { server } from '@shared/api/mocks/testServer';
+import { getHandlerURI } from '@shared/lib/url';
 import { fetchSomething } from '../someService';
 
 describe('fetchSomething', () => {
   it('returns data', async () => {
     server.use(
-      http.get('*/api/something', () => {
+      http.get(getHandlerURI('/api/something'), () => {
         return HttpResponse.json({ ok: true, data: [] });
       })
     );
@@ -125,7 +126,7 @@ describe('fetchSomething', () => {
 
 ### NextAuth Mock 사용
 
-`jest.config.ts`의 moduleNameMapper가 `next-auth/react`를 `src/shared/lib/testing/nextAuthReact.tsx`로 매핑한다. `useSession`/`signIn`/`signOut`이 이미 `jest.fn()`이므로 그대로 캐스팅해 오버라이드한다.
+`jest.config.ts`의 moduleNameMapper가 `next-auth/react`를 `src/shared/lib/testing/nextAuthReact.tsx`로 매핑한다. `useSession`/`signIn`/`signOut`이 이미 `jest.fn()`이므로 `jest.mocked()`로 감싸 오버라이드한다.
 
 ```typescript
 import { useSession, signIn } from 'next-auth/react';
@@ -133,11 +134,26 @@ import { useSession, signIn } from 'next-auth/react';
 jest.mock('next-auth/react');
 
 beforeEach(() => {
-  (useSession as jest.Mock).mockReturnValue({
-    data: { user: { name: 'tester' } },
+  jest.mocked(useSession).mockReturnValue({
+    data: {
+      user: {
+        id: '1',
+        email: 'tester@example.com',
+        name: 'tester',
+        nickname: 'tester',
+      },
+      expires: '',
+    },
     status: 'authenticated',
+    update: jest.fn(),
   });
-  (signIn as jest.Mock).mockResolvedValue({ ok: true });
+  jest.mocked(signIn).mockResolvedValue({
+    error: undefined,
+    code: undefined,
+    status: 200,
+    ok: true,
+    url: null,
+  });
 });
 ```
 
@@ -146,7 +162,9 @@ beforeEach(() => {
 - `describe` 블록으로 대상 단위 그룹화
 - `it` 문은 행위 기반으로 작성 (영문 또는 한글)
 - MSW handler는 테스트별로 `server.use()`로 오버라이드
-- QueryClient는 테스트마다 새로 생성 (캐시 격리)
+- 조회만 검증하면 QueryClient를 테스트마다 새로 생성 (캐시 격리). 변경 요청의 실패 알림까지 검증하면 앱의 `getQueryClient()` 사용
+- 알림은 `render(<Toaster />)` 후 `findByText`로 확인. 뜨지 않아야 하는 흐름은 `@shared/lib/testing/toast`의 `spyOnToast()`로 확인 (unit-testing.md §1)
+- 네이티브 `alert`·`confirm`·`prompt`를 mock하지 않는다 — 대화상자는 `getByRole('dialog' | 'alertdialog')`로 찾는다
 - `waitFor`로 비동기 상태 변화 대기
 - 사용자 인터랙션은 `fireEvent` 사용 (`@testing-library/user-event`는 미설치 — 도입 시 예시 갱신)
 

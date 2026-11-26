@@ -1,12 +1,18 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { documentNavigation } from '@shared/lib/url';
+import { toast } from '@shared/ui/toast';
 import { type FormEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { signInCredentials } from '../api/signInCredentials';
-import { SignInReq } from '../api/types';
 import { resolveCallbackUrl } from '../lib/resolveCallbackUrl';
+import {
+  SIGN_IN_DEFAULT_VALUES,
+  type SignInFormInput,
+  SignInFormSchema,
+} from './form';
 
 const requestError = '로그인 요청을 완료하지 못했습니다. 다시 시도해 주세요.';
 
@@ -14,11 +20,9 @@ const requestError = '로그인 요청을 완료하지 못했습니다. 다시 �
 export function useSignInForm() {
   const submitting = useRef(false);
   const [isBusy, setIsBusy] = useState(false);
-  const methods = useForm<SignInReq>({
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+  const methods = useForm<SignInFormInput>({
+    defaultValues: SIGN_IN_DEFAULT_VALUES,
+    resolver: zodResolver(SignInFormSchema),
   });
 
   const handleSignIn = async (event: FormEvent<HTMLFormElement>) => {
@@ -26,6 +30,7 @@ export function useSignInForm() {
     if (submitting.current) return;
 
     submitting.current = true;
+    toast.dismiss();
     let navigating = false;
     let failureMessage: string | undefined;
     try {
@@ -52,7 +57,7 @@ export function useSignInForm() {
         setIsBusy(false);
       }
     }
-    if (failureMessage) alert(failureMessage);
+    if (failureMessage) toast.error(failureMessage);
   };
 
   return { handleSignIn, isBusy, methods };

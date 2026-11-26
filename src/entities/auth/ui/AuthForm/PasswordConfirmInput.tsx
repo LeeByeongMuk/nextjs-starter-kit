@@ -1,3 +1,5 @@
+'use client';
+
 import ValidationError from '@shared/ui/error/ValidationError';
 import { useFormContext } from 'react-hook-form';
 
@@ -5,7 +7,6 @@ import { useFormContext } from 'react-hook-form';
 export default function PasswordConfirmInput() {
   const {
     register,
-    getValues,
     formState: { errors },
   } = useFormContext();
   return (
@@ -25,11 +26,7 @@ export default function PasswordConfirmInput() {
           errors.passwordConfirmation ? 'passwordConfirmation-error' : undefined
         }
         className="mt-2 block min-h-12 w-full rounded border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted"
-        {...register('passwordConfirmation', {
-          required: '비밀번호 확인을 입력해 주세요.',
-          validate: value =>
-            getValues('password') === value || '비밀번호가 일치하지 않습니다.',
-        })}
+        {...register('passwordConfirmation')}
       />
       <ValidationError
         id="passwordConfirmation-error"

@@ -1,5 +1,5 @@
 ---
-description: "기능 개발 파이프라인: 설계 → 구현 → 테스트 → 리뷰 자동 실행"
+description: '기능 개발 파이프라인: 설계 → 구현 → 테스트 → 리뷰 자동 실행'
 ---
 
 사용자가 요청한 기능을 다음 파이프라인으로 처리한다. 각 단계를 순서대로 실행하고, 이전 단계 결과를 다음 단계에 전달한다.
@@ -59,7 +59,9 @@ code-reviewer 에이전트를 호출하여 전체 변경 사항을 검증한다:
 ```bash
 npm run tsc
 npm run lint
+npm run prettier
 npm test
+npm run build
 ```
 
 모두 통과하면 변경 요약을 보고한다.

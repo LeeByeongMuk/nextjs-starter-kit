@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 
@@ -13,12 +14,10 @@ export default function useDeletePost() {
 
   return useMutation({
     mutationFn: () => fetchDeletePost({ id }),
+    meta: { errorMessage: '게시글을 삭제하지 못했습니다.' },
     onSuccess: () => {
-      alert('게시글을 삭제했습니다.');
+      toast.success('게시글을 삭제했습니다.');
       router.push('/');
-    },
-    onError: () => {
-      alert('게시글을 삭제하지 못했습니다.');
     },
   });
 }

@@ -18,7 +18,7 @@ Tailwind 유틸리티를 JSX의 `className`에 리터럴로 작성한다. `cn()`
 조건부 클래스는 템플릿 리터럴 + 삼항으로 처리:
 
 ```tsx
-<button className={`px-4 py-2 ${isActive ? 'bg-teal-600 text-white' : 'bg-gray-300 text-gray-700'}`}>
+<button className={`px-4 py-2 ${isActive ? 'bg-accent text-inverse' : 'bg-surface text-muted'}`}>
 ```
 
 재검토 조건은 `.agents/rules/infra/library-decisions.md` §classnames → clsx 참조.

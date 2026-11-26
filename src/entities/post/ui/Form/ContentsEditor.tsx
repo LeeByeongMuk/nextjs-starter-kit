@@ -1,53 +1,34 @@
 import { POST_REQUEST_MAX_BYTES } from '@shared/config/request-size';
 import ValidationError from '@shared/ui/error/ValidationError';
 import dynamic from 'next/dynamic';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { serializePostBody } from '../../api/serializePostBody';
 import { POST_IMAGE_MAX_BYTES } from '../../config/editor';
 import { type PostFormInput } from '../../model/form';
 
 const Editor = dynamic(() => import('../Editor'), { ssr: false });
 
+interface Props {
+  onImageRead: (reading: boolean) => void;
+  /** 이미지를 읽는 중이라 본문 오류를 그 안내로 바꿨으면 true를 반환한다 */
+  holdWhileReadingImages: () => boolean;
+}
+
 /** HTML 편집기의 입력과 오류 설명을 연결한다. */
-export default function ContentsEditor() {
+export default function ContentsEditor({
+  onImageRead,
+  holdWhileReadingImages,
+}: Props) {
   const {
     setValue,
     register,
+    trigger,
     formState: { errors },
   } = useFormContext<PostFormInput>();
-  const readingImages = useRef(0);
 
   useEffect(() => {
-    register('contents', {
-      required: '본문을 입력해 주세요.',
-      validate: (contents, values) => {
-        if (readingImages.current > 0) {
-          return '이미지를 불러오는 중입니다. 잠시 후 다시 저장해 주세요.';
-        }
-
-        const body = serializePostBody({
-          ...values,
-          contents,
-          is_open: values.isOpen === '1',
-        });
-        if (
-          new TextEncoder().encode(body).byteLength > POST_REQUEST_MAX_BYTES
-        ) {
-          return `글 전체가 ${POST_REQUEST_MAX_BYTES / 1024} KiB를 넘습니다. 이미지나 본문을 줄인 뒤 다시 저장해 주세요.`;
-        }
-
-        const template = document.createElement('template');
-        template.innerHTML = contents;
-        return (
-          !!(
-            template.content.textContent?.trim() ||
-            template.content.querySelector('img, video, iframe, audio, hr')
-          ) || '본문을 입력해 주세요.'
-        );
-      },
-    });
+    register('contents');
   }, [register]);
   return (
     <div className="mt-6">
@@ -60,15 +41,12 @@ export default function ContentsEditor() {
         KiB까지 저장할 수 있습니다.
       </p>
       <Editor
-        onImageRead={reading => {
-          readingImages.current += reading ? 1 : -1;
+        onImageRead={onImageRead}
+        onChange={contents => {
+          setValue('contents', contents, { shouldDirty: true });
+          // 표시 중인 본문 오류는 본문이 바뀔 때 다시 확인하되, 이미지를 읽는 동안에는 그 안내를 유지한다.
+          if (errors.contents && !holdWhileReadingImages()) trigger('contents');
         }}
-        onChange={contents =>
-          setValue('contents', contents, {
-            shouldDirty: true,
-            shouldValidate: !!errors.contents,
-          })
-        }
         isInvalid={!!errors.contents}
       />
       <ValidationError

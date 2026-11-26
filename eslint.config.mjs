@@ -38,7 +38,7 @@ const config = [
       'unused-imports': unusedImports,
     },
     rules: {
-      'no-alert': 'off',
+      'no-alert': 'error',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',

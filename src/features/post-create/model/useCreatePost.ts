@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -11,12 +12,10 @@ export default function useCreatePost() {
   const router = useRouter();
   return useMutation({
     mutationFn: (req: CreatePostReq) => fetchCreatePost(req),
+    meta: { errorMessage: '게시글을 등록하지 못했습니다.' },
     onSuccess: res => {
-      alert('게시글을 등록했습니다.');
+      toast.success('게시글을 등록했습니다.');
       router.push(`/post/${res.data.id}`);
-    },
-    onError: () => {
-      alert('게시글을 등록하지 못했습니다.');
     },
   });
 }

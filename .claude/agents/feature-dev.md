@@ -19,7 +19,7 @@ src/features/<domain>-<action>/
 ├── model/         # 훅, 상태, 폼 타입
 ├── api/           # fetch 함수, 요청/응답 타입
 ├── lib/           # 로컬 헬퍼 (비공개)
-├── config/        # 상수, enum
+├── config/        # 상수, 설정값
 └── index.ts       # Public API (외부 노출 심볼만)
 ```
 
@@ -44,41 +44,99 @@ export default function useSomething(params: SomeReq) {
 ### Mutation Hook (model/)
 
 ```typescript
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
+import { fetchDeleteSomething } from '../api/someService';
 
 export default function useDeleteSomething(id: number) {
   const router = useRouter();
   return useMutation({
     mutationFn: () => fetchDeleteSomething({ id }),
+    meta: { errorMessage: '삭제하지 못했습니다.' },
     onSuccess: () => {
+      toast.success('삭제했습니다.');
       router.push('/');
     },
   });
 }
 ```
 
-에러 피드백에 `alert()` 신규 도입 금지 — 기존 코드의 `alert()`는 교체 대상이므로 따라 쓰지 않는다 (`.agents/rules/code-style/code-conventions.md` §3.4).
+실패 알림은 훅에 두지 않는다 — `meta.errorMessage`를 주면 `QueryClient`가 알린다. 네이티브 `alert()`·`confirm()`·`prompt()`는 금지이며 확인은 `@shared/ui/dialog/ConfirmDialog`를 쓴다 (`.agents/rules/code-style/code-conventions.md` §3).
 
 ### API Service (api/)
 
-```typescript
-import { fetchApi } from '@shared/lib/api';
-import type { SomeReq, SomeRes } from './types';
+요청·응답은 `api/types.ts`에 Zod 스키마로 선언하고 타입을 유도한다. 서버 액션은 요청 스키마로 입력을 확인하고 `fetchApi`의 `schema` 옵션으로 응답을 검증한다 (`.agents/rules/architecture/data-fetching.md` §7).
 
-export const fetchSomething = async (params: SomeReq) => {
-  const url = `/api/something?${new URLSearchParams(params)}`;
-  return (await fetchApi(url, { method: 'GET' })) as SomeRes;
+```typescript
+// api/types.ts
+import { ApiResponseSchema } from '@shared/api/types';
+import { z } from 'zod';
+
+export const SomeReqSchema = z.object({ page: z.int().positive() });
+export type SomeReq = z.infer<typeof SomeReqSchema>;
+
+export const SomeResSchema = ApiResponseSchema.extend({
+  data: z.array(z.object({ id: z.number(), title: z.string() })),
+});
+export type SomeRes = z.infer<typeof SomeResSchema>;
+```
+
+```typescript
+// api/someService.ts
+'use server';
+
+import { fetchApi } from '@shared/lib/api';
+
+import { SomeReq, SomeReqSchema, SomeRes, SomeResSchema } from './types';
+
+export const fetchSomething = async (req: SomeReq): Promise<SomeRes> => {
+  const parsed = SomeReqSchema.safeParse(req);
+  if (!parsed.success) {
+    throw new Error('조회 조건을 확인해 주세요.');
+  }
+
+  const params = new URLSearchParams({ page: String(parsed.data.page) });
+  return fetchApi(`/api/something?${params}`, {
+    method: 'GET',
+    schema: SomeResSchema,
+  });
 };
 ```
 
 ### React Hook Form (model/)
 
+검증 규칙과 문구는 `model/form.ts`의 스키마에 두고 `zodResolver`로 연결한다. `register()` 인라인 룰은 쓰지 않는다 (`.agents/rules/code-style/form-patterns.md` §4).
+
 ```typescript
+// model/form.ts
+import { z } from 'zod';
+
+const titleRequired = '제목을 입력해 주세요.';
+
+export const SomeFormSchema = z.object({
+  title: z.string(titleRequired).min(1, titleRequired),
+});
+export type SomeFormInput = z.input<typeof SomeFormSchema>;
+export const SOME_DEFAULT_VALUES: SomeFormInput = { title: '' };
+```
+
+```typescript
+// model/useSomeForm.ts
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
+import {
+  SOME_DEFAULT_VALUES,
+  type SomeFormInput,
+  SomeFormSchema,
+} from './form';
+
 export default function useSomeForm() {
-  return useForm<SomeFormData>({
-    defaultValues: { title: '', type: '' },
+  return useForm<SomeFormInput>({
+    defaultValues: SOME_DEFAULT_VALUES,
+    resolver: zodResolver(SomeFormSchema),
   });
 }
 ```

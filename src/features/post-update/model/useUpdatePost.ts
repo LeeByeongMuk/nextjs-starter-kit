@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from '@shared/ui/toast';
 import { useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 
@@ -14,12 +15,10 @@ export default function useUpdatePost() {
 
   return useMutation({
     mutationFn: (req: UpdatePostReq) => fetchUpdatePost(req),
+    meta: { errorMessage: '게시글을 수정하지 못했습니다.' },
     onSuccess: async () => {
-      alert('게시글을 수정했습니다.');
+      toast.success('게시글을 수정했습니다.');
       router.push(`/post/${id}`);
-    },
-    onError: () => {
-      alert('게시글을 수정하지 못했습니다.');
     },
   });
 }

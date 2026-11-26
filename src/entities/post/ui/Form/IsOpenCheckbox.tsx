@@ -30,9 +30,7 @@ export default function IsOpenCheckbox() {
               value={option.value}
               aria-describedby={errors.isOpen ? 'isOpen-error' : undefined}
               className="size-4 border-line bg-surface text-accent focus:ring-accent"
-              {...register('isOpen', {
-                required: '공개 범위를 선택해 주세요.',
-              })}
+              {...register('isOpen')}
             />
             {option.label}
           </label>

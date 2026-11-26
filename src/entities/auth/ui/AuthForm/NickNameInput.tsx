@@ -1,3 +1,5 @@
+'use client';
+
 import ValidationError from '@shared/ui/error/ValidationError';
 import { useFormContext } from 'react-hook-form';
 
@@ -24,14 +26,7 @@ export default function NickNameInput({ defaultValue }: Props) {
         aria-invalid={!!errors.nickname}
         aria-describedby={errors.nickname ? 'nickname-error' : undefined}
         className="mt-2 block min-h-12 w-full rounded border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted"
-        {...register('nickname', {
-          required: '닉네임을 입력해 주세요.',
-          minLength: { value: 2, message: '닉네임은 2자 이상 입력해 주세요.' },
-          maxLength: {
-            value: 30,
-            message: '닉네임은 30자 이하로 입력해 주세요.',
-          },
-        })}
+        {...register('nickname')}
       />
       <ValidationError
         id="nickname-error"

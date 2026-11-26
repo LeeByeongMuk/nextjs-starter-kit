@@ -22,9 +22,7 @@ export default function SearchInput() {
           aria-invalid={Boolean(errors.q)}
           aria-describedby={errors.q ? 'post-search-error' : undefined}
           className="min-h-12 w-full rounded-md border-line bg-surface py-2.5 pr-24 pl-4 text-sm text-ink caret-accent placeholder:text-muted focus:border-accent focus:ring-accent"
-          {...register('q', {
-            minLength: 2,
-          })}
+          {...register('q')}
         />
 
         <button
@@ -55,7 +53,7 @@ export default function SearchInput() {
           role="alert"
           className="mt-2 text-sm text-danger"
         >
-          검색어를 2자 이상 입력하거나 비워 주세요.
+          {errors.q.message?.toString()}
         </p>
       )}
     </div>

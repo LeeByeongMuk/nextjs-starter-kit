@@ -7,15 +7,15 @@ import { PasswordInput } from '@entities/auth';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { SignUpReq } from '../api/types';
+import { SignUpFormInput } from '../model/form';
 
 interface SignUpFormProps {
-  handleSignUp: (req: SignUpReq) => void;
+  handleSignUp: (data: SignUpFormInput) => void;
 }
 
 /** 인증 정보를 검증한 뒤 제출한다. */
 export default function SignUpForm({ handleSignUp }: SignUpFormProps) {
-  const { handleSubmit } = useFormContext<SignUpReq>();
+  const { handleSubmit } = useFormContext<SignUpFormInput>();
 
   return (
     <form

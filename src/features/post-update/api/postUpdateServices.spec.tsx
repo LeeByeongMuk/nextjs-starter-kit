@@ -59,6 +59,29 @@ describe('게시글 수정 서버 액션', () => {
     );
   });
 
+  test('응답에 식별자가 없어도 수정 결과를 실패로 만들지 않는다', async () => {
+    server.use(
+      http.put(getHandlerURI('/api/posts/42'), () =>
+        HttpResponse.json({ data: {} })
+      )
+    );
+
+    await expect(fetchUpdatePost(post)).resolves.toEqual({ data: {} });
+  });
+
+  test('편집용 데이터에 분류가 없어도 폼에서 다시 고를 수 있게 전달한다', async () => {
+    const { type: _type, id: _id, ...resource } = post;
+    server.use(
+      http.get(getHandlerURI('/api/posts/42/edit'), () =>
+        HttpResponse.json({ data: resource })
+      )
+    );
+
+    await expect(fetchUpdatePostResource({ id: post.id })).resolves.toEqual({
+      data: resource,
+    });
+  });
+
   test('유효하지 않은 식별자 또는 크기 초과는 API 요청 전에 거절한다', async () => {
     await expect(fetchUpdatePost({ ...post, id: 4.2 })).rejects.toThrow(
       '게시글 번호를 확인해 주세요.'

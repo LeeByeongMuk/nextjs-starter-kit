@@ -36,30 +36,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth(request => ({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (
-          typeof credentials?.email !== 'string' ||
-          typeof credentials?.password !== 'string' ||
-          !credentials.email.trim() ||
-          !credentials.password.trim()
-        ) {
-          return null;
-        }
-
-        const signInData = await fetchSignIn({
-          email: credentials.email,
-          password: credentials.password,
-        });
+        const signInData = await fetchSignIn(credentials);
         if (signInData === null) return null;
 
         const { id, access_token: accessToken } = signInData;
-        if (
-          !Number.isSafeInteger(id) ||
-          typeof accessToken !== 'string' ||
-          !accessToken.trim()
-        ) {
-          return null;
-        }
-
         const {
           data: { email, name, nickname },
         } = await fetchUser(accessToken);

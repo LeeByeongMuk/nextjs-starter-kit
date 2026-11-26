@@ -60,7 +60,7 @@ import { fetchSignIn } from '@features/auth-signin/api/signinService';
 
 ## 4. Credentials Provider
 
-`authorize`는 이메일·비밀번호가 유효한 문자열인지 확인하고 `fetchSignIn()`으로 API 로그인을 수행한다. 새 API 토큰으로 `fetchUser()`를 호출한다. 두 요청에 성공한 경우 토큰 쿠키를 저장하고 프로필과 절대 만료 시각을 반환한다.
+`authorize`는 `fetchSignIn()`으로 API 로그인을 수행한다. `fetchSignIn()`은 이메일·비밀번호가 공백이 아닌 문자열인지 스키마로 확인하고 맞지 않으면 로그인 실패로 처리한다. 응답의 인증 정보(`data`)에 회원 식별자와 API 토큰이 모두 있어야 로그인하며, 인증 정보를 쓸 수 없으면 로그인 실패로 처리한다. 응답이 인증 정보를 아예 싣지 않으면 오류를 전달하고 로그인 화면은 요청 실패로 안내한다. 새 API 토큰으로 `fetchUser()`를 호출한다. 두 요청에 성공한 경우 토큰 쿠키를 저장하고 프로필과 절대 만료 시각을 반환한다.
 
 `authorize`는 API 로그인이 HTTP 401을 반환하면 Auth.js에 자격 증명 실패(`CredentialsSignin`)를 알린다. 로그인 성공 시 반환된 user 객체는 JWT 콜백의 `user` 파라미터로 전달된다.
 
@@ -75,6 +75,8 @@ import { fetchSignIn } from '@features/auth-signin/api/signinService';
 - `fetchApi`는 서버에서 API 토큰을 읽는다. 회원가입·로그인은 익명으로 요청하고 보호 작업에는 API 토큰이 필요하다. 게시글 수정·삭제 등 리소스 권한은 API가 확인한다.
 - 이전 버전의 `access_token` 쿠키 및 만료 시각이 없는 JWT 세션에는 재로그인이 필요하다. 새 로그인은 `api_access_token` 쿠키를 발급하고 이전 쿠키를 정리한다.
 - 헤더 로그아웃과 회원 탈퇴는 `@shared/lib/deleteAccessToken`의 서버 액션으로 현재·이전 API 토큰 쿠키를 지운 뒤 Auth.js 로그아웃을 호출한다. Auth.js `events.signOut`도 같은 쿠키 정리를 수행한다.
+- 가입·탈퇴 API가 성공하면 같은 화면에서 재제출을 막는다. 자동 로그인이나 탈퇴 후 로그아웃이 성공하면 브라우저에서 현재 출처의 홈(`/`)으로 이동해 완료 알림을 이어서 표시한다. 자동 로그인에 실패하면 로그인 링크로, 로그아웃에 실패하면 헤더의 로그아웃으로 안내한다.
+- 화면의 세션과 API 토큰 쿠키는 다른 탭에서 계정을 바꾸면 잠시 어긋날 수 있다. 회원 탈퇴 서버 액션은 화면에서 탈퇴를 확인한 계정(`user_id`)을 함께 받아 API 토큰의 계정(`GET /api/users`)과 같을 때만 삭제를 요청한다. 화면도 대화상자를 연 계정의 세션이 끝나거나 바뀌면 확인을 버린다.
 
 ---
 

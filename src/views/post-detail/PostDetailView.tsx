@@ -5,6 +5,7 @@ import {
   PostDetailActions,
   usePostDetail,
 } from '@features/post-detail';
+import ConfirmDialog from '@shared/ui/dialog/ConfirmDialog';
 import Link from 'next/link';
 
 /** 조회 오류와 로딩을 분리한 읽기 화면이다. */
@@ -15,8 +16,11 @@ export default function PostDetailView() {
     isError,
     isLoading,
     isFetching,
+    isDeleteConfirmOpen,
     handleRedirectBack,
     handleDeletePost,
+    handleCancelDeletePost,
+    handleConfirmDeletePost,
   } = usePostDetail();
 
   if (isError)
@@ -53,6 +57,13 @@ export default function PostDetailView() {
           handleDeletePost={handleDeletePost}
         />
       )}
+      <ConfirmDialog
+        open={isDeleteConfirmOpen}
+        title="이 게시글을 삭제할까요?"
+        confirmLabel="삭제"
+        onConfirm={handleConfirmDeletePost}
+        onCancel={handleCancelDeletePost}
+      />
     </section>
   );
 }

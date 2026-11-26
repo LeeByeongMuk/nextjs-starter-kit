@@ -9,27 +9,27 @@ paths:
 
 ## 프리플라이트 (새 코드 작성 전 순서대로 확인)
 
-1. **Type 이름**: API 경계 타입이면 `interface` + `Req`/`Res` suffix — §1.1
+1. **Type 이름**: API 경계 값은 `api/types.ts`의 `<이름>Schema`와 거기서 유도한 `Req`/`Res` 타입 — §1.1
 2. **TanStack Query 훅** — [`data-fetching.md`](../architecture/data-fetching.md)
    - 위치: 여러 슬라이스 공용 → `entities/<e>/model/`, 한 슬라이스 전용 → `features/<slice>/model/`
    - 쿼리키: `[entity, paramsObject]` 고정 (파라미터는 항상 객체 래핑)
 3. **React Hook Form** — [`form-patterns.md`](../code-style/form-patterns.md)
-   - 파일 3분할: `model/form.ts` + `model/use<Slice>Form.ts` + `ui/<Slice>Form.tsx`
+   - 파일 3분할: `model/form.ts`(Zod 스키마·입력 타입·기본값) + `model/use<Slice>Form.ts`(`zodResolver` 연결) + `ui/<Slice>Form.tsx`. `register()` 인라인 룰 금지
    - `useForm()` 호출에 **`defaultValues` 필수**
    - `FormProvider` + `useFormContext()` (prop drilling 금지)
-4. **에러 피드백**: **신규 `alert()` 호출 금지** — §3.4
+4. **피드백**: 완료·실패 알림은 `@shared/ui/toast`의 `toast`, 확인은 `@shared/ui/dialog/ConfirmDialog` — 네이티브 `alert()`·`confirm()`·`prompt()` 금지 — §3
 5. **NextAuth deep-import**: `src/app/auth/config.ts`에서만 허용. 다른 곳에서 복제 금지 — [`auth.md`](../architecture/auth.md) §2
 6. **테스트**: 파일명 `*.spec.tsx` 고정, MSW 오버라이드는 `server.use(http....)` — [`unit-testing.md`](../testing/unit-testing.md)
 
 **Hard rules** (ESLint가 못 잡는 것 포함).
 
 - `useForm()`에서 `defaultValues` 누락 → 작성 전에 반드시 추가
-- `alert()` 신규 호출 → 작성 금지 (기존 호출은 교체 대상)
+- `alert()`·`confirm()`·`prompt()` 호출 → 금지 (ESLint `no-alert`가 error). 알림은 `toast`, 확인·입력은 대화상자 — §3
 - TS `enum` 사용 → as-const union으로 대체 — §1.4
 - `QueryClient` 새로 생성 → `src/shared/api/tanstack-query/client.ts`만 사용
 - `classnames` 신규 import → 금지 (사용처가 없어 의존성 제거) — [`styling.md`](./styling.md) §1
 
-**라이브러리 추가**: 새 런타임 의존성을 제안하기 전에 [`library-decisions.md`](../infra/library-decisions.md) 결정 테이블을 확인한다. "유지" 결정이 박힌 후보의 역(교체)을 무단 제안하지 말 것. 재검토 조건이 충족됐다면 그 조건을 인용해 사용자에게 확인 요청. 예외: **Zod**는 "도입" 결정이므로 후속 PR에서 능동 적용 가능.
+**라이브러리 추가**: 새 런타임 의존성을 제안하기 전에 [`library-decisions.md`](../infra/library-decisions.md) 결정 테이블을 확인한다. "유지" 결정이 박힌 후보의 역(교체)을 무단 제안하지 말 것. 재검토 조건이 충족됐다면 그 조건을 인용해 사용자에게 확인 요청.
 
 **When in doubt**: 새 패턴을 도입하기 전에 사용자에게 묻는다. 컨벤션에서 벗어난 한 줄은 수개월 후 표준을 오염시킨다.
 
@@ -44,7 +44,7 @@ paths:
 | 주제                                     | 문서                                                                              |
 | ---------------------------------------- | --------------------------------------------------------------------------------- |
 | 데이터 페칭 (TanStack Query, `fetchApi`) | [`.agents/rules/architecture/data-fetching.md`](../architecture/data-fetching.md) |
-| 폼 (React Hook Form)                     | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md)     |
+| 폼 (React Hook Form, Zod)                | [`.agents/rules/code-style/form-patterns.md`](../code-style/form-patterns.md)     |
 | 인증 (NextAuth v5)                       | [`.agents/rules/architecture/auth.md`](../architecture/auth.md)                   |
 | 스타일링 (Tailwind v4)                   | [`.agents/rules/code-style/styling.md`](../code-style/styling.md)                 |
 | 테스팅 (Jest / RTL / MSW)                | [`.agents/rules/testing/unit-testing.md`](../testing/unit-testing.md)             |
@@ -70,43 +70,47 @@ paths:
 - `moduleResolution: bundler`, `module: esnext`, `isolatedModules: true` — 신규 파일은 항상 ESM 문법 사용
 - import 순서: ESLint `simple-import-sort` 자동 정렬 (`npm run lint:fix`)에 위임. 수동 조정 금지
 
-### 1.1 요청/응답 타입: `interface` + `Req`/`Res` suffix
+### 1.1 요청/응답 타입: 스키마에서 유도 + `Req`/`Res` suffix
 
-API 경계를 넘나드는 타입은 `interface`로 선언하고 `Req`/`Res` suffix를 붙인다.
+API 경계를 넘나드는 값은 `api/types.ts`에 Zod 스키마로 선언하고 타입은 스키마에서 유도한다. 스키마는 `<이름>Schema`, 타입은 `Schema`를 뺀 같은 이름을 쓰며 `Req`/`Res` suffix로 끝낸다.
 
 ```ts
-// src/features/auth-signin/api/types.ts
-export interface SignInReq {
-  email: string;
-  password: string;
-}
+// src/features/auth-signup/api/types.ts
+/** 회원가입 응답 스키마 — 화면에서 쓰는 계정 식별자만 남긴다 */
+export const SignUpResSchema = ApiResponseSchema.extend({
+  data: z.object({ id: z.number() }),
+});
 
-export interface SignInRes extends ApiResponse {
-  accessToken: string;
-  user: User;
-}
+/** 회원가입 응답 */
+export type SignUpRes = z.infer<typeof SignUpResSchema>;
 ```
 
-근거 파일: `src/features/auth-signin/api/types.ts`, `src/features/post-list/api/types.ts`.
+- 요청 스키마는 서버 액션이 받는 값의 형식을, 응답 스키마는 화면이 쓰는 필드를 선언한다 — [`data-fetching.md`](../architecture/data-fetching.md) §7
+- 사용자 입력 규칙은 요청 스키마가 아니라 폼 스키마에 둔다 — [`form-patterns.md`](./form-patterns.md) §4
+- 스키마로 검증하지 않는 요청 형태(식별자만 받는 `DeletePostReq` 등)는 `interface`로 선언한다. 쓰이지 않는 스키마는 만들지 않는다
 
-### 1.2 도메인 모델 / 폼 입력: `interface` + `PascalCase`
+근거 파일: `src/features/auth-signup/api/types.ts`, `src/features/post-list/api/types.ts`.
 
-도메인 모델(`Post`, `User`), 폼 입력 타입(`CreatePostFormInput`)은 `interface`. 이유: 추후 선언 병합·확장 여지.
+### 1.2 폼 입력 타입 / 스키마가 없는 객체 타입
+
+- 폼 입력 타입은 `model/form.ts`의 폼 스키마에서 유도한다 (`SignUpFormInput`, `PostFormInput`) — [`form-patterns.md`](./form-patterns.md) §4.2
+- 스키마가 없는 객체 타입(컴포넌트 props, 훅 인자, 검증하지 않는 요청 형태)은 `interface` + `PascalCase`로 선언한다
 
 ### 1.3 단순 별칭 / 유니온: `type`
 
 ```ts
-export type DeletePostRes = ApiResponse;
-export type PostType = 'notice' | 'general';
+export type CreatePostReq = PostBody;
+type SignInResult = 'success' | 'invalid-credentials' | 'unavailable';
 ```
 
 ### 1.4 `enum` 대신 as-const union
 
-런타임 객체를 불필요하게 만드는 TS `enum`은 사용하지 않는다.
+런타임 객체를 불필요하게 만드는 TS `enum`은 사용하지 않는다. 검증에도 쓰는 값 집합은 `z.enum()`에서 타입을 유도한다.
 
 ```ts
-export const POST_TYPES = ['notice', 'general'] as const;
-export type PostType = (typeof POST_TYPES)[number];
+// src/entities/post/model/types.ts
+export const PostTypeSchema = z.enum(['notice', 'faq', 'free']);
+export type PostType = z.infer<typeof PostTypeSchema>;
 ```
 
 ### 1.5 `I*`/`T*` 타입 접두사 금지 (ESLint 강제)
@@ -121,9 +125,9 @@ export type PostType = (typeof POST_TYPES)[number];
 | --------------- | ---------------------------- | ---------------------------------- |
 | 컴포넌트 파일   | `PascalCase.tsx`             | `PostListItem.tsx`                 |
 | 훅 파일         | `camelCase.ts`, `use` 접두사 | `useCreatePostForm.ts`             |
-| 서비스 / 유틸   | `camelCase.ts`               | `signinService.ts`, `fetchApi.ts`  |
-| API 타입 전용   | `types.ts`                   | `src/features/*/api/types.ts`      |
-| 폼 타입 전용    | `form.ts`                    | `src/features/*/model/form.ts`     |
+| 서비스 / 유틸   | `camelCase.ts`               | `signinService.ts`, `date.ts`      |
+| API 스키마·타입 | `types.ts`                   | `src/features/*/api/types.ts`      |
+| 폼 스키마·타입  | `form.ts`                    | `src/features/*/model/form.ts`     |
 | 상수            | `<domain>.ts`                | `src/entities/post/config/post.ts` |
 | 슬라이스 barrel | `index.ts` (고정)            | `src/features/post-list/index.ts`  |
 | 테스트          | `<file>.spec.tsx`            | `signin.spec.tsx`                  |
@@ -149,7 +153,6 @@ export type PostType = (typeof POST_TYPES)[number];
   export function useDeletePost() { ... }
   ```
 - **파일 헤더 주석은 두지 않는다** — export JSDoc과 중복. 파일은 `import`부터 시작한다. 헤더 한 줄은 **export JSDoc만으로 파일 역할이 안 드러나는 경우에 한해** 허용 (예: export 없는 스크립트, 여러 fetch를 묶은 api 파일). 이 경우에도 한 줄만
-  > 글로벌 CLAUDE.md §6("새 파일 첫 줄 한국어 헤더")은 이 프로젝트에선 위 규칙으로 구체화된다 — export JSDoc이 §6의 "역할 한 줄"을 대신하므로 최상단 헤더는 생략한다.
 - 본문 주석은 **코드가 보여주지 못하는 제약**을 적을 때만 (예: "msw의 ESM 전용 의존성은 호이스팅에 따라 중첩될 수 있어 `msw`도 transform 예외에 둔다")
 - TODO는 `TODO(추적키): 사유` 형식만. 추적 키 없는 TODO 금지
 - `eslint-disable`은 반드시 **사유 주석과 함께, 해당 라인에만** (`-next-line`). 파일 전체 disable 금지
@@ -165,26 +168,33 @@ export type PostType = (typeof POST_TYPES)[number];
 
 ## 3. 에러 / 피드백 정책
 
-### 3.1 현행
+### 3.1 알림 (토스트)
 
-- Mutation 성공: `router.push(...)` + `alert('완료되었습니다.')`
-- Mutation 실패: `alert(error.message)`
-- 입력 검증 실패: RHF `errors` 객체 → 폼 필드 아래 텍스트 렌더
+- 동작의 완료·실패는 `@shared/ui/toast`의 `toast.success(...)` / `toast.error(...)`로 알린다. 슬라이스에서 `sonner`를 직접 import하지 않는다 (라이브러리 선정 근거는 [`library-decisions.md`](../infra/library-decisions.md) §토스트 알림)
+- 알림 영역 `@shared/ui/toast/Toaster`는 루트 레이아웃(`src/app/(domain)/layout.tsx`)에 한 번만 둔다
+- 성공 알림은 잠시 뒤 사라진다. 오류 알림은 닫기 버튼을 누르거나 다음 요청을 시작할 때까지 남는다 — 변경 요청(mutation)과 로그인 시도는 시작할 때 표시 중인 알림을 닫는다
+- Mutation 실패는 `QueryClient`가 한곳에서 알린다. 각 mutation은 `meta.errorMessage`에 문구만 지정한다 — [`data-fetching.md`](../architecture/data-fetching.md) §5
+- 가입·탈퇴처럼 알림 직후 전체 문서 이동이 이어지면 `toast.success(message, { survivesNavigation: true })`를 쓴다. 표시를 마치기 전에 문서가 바뀌면 같은 출처의 다음 문서에서 한 번 더 표시한다. `toast.dismiss()`는 다음 문서에 표시할 알림도 지운다
+- 새 변경 요청은 표시 중인 알림을 닫으므로, 요청이 진행 중일 때는 같은 동작을 다시 제출하지 않게 막는다. 렌더된 `isPending`은 연속 제출을 막지 못하므로 제출 순간 잠그는 ref를 쓴다 (`SignUpView`의 가입 요청)
+- 문구는 고정 문자열로 쓰고 서버 오류 원문을 넣지 않는다. 알림은 `aria-live="polite"` 영역으로 전달된다
 
-### 3.2 문제
+### 3.2 확인과 추가 입력 (대화상자)
 
-브라우저 네이티브 `alert()`는 접근성(포커스 강탈), 스타일 커스텀 불가, 비동기 제어(UX 흐름 끊김) 모두 취약. 프로덕션 표준이 될 수 없음.
+- 되돌릴 수 없는 동작은 `@shared/ui/dialog/ConfirmDialog`로 확인받는다. 열리면 취소에 초점을 둔다
+- 확인에 입력이 필요하면 `@shared/ui/dialog/Dialog` 안에 폼을 둔다 (예: `src/features/auth-account/ui/DeleteAccountDialog.tsx`)
+- 대화상자는 네이티브 `<dialog>`의 모달 동작(배경 비활성화, Esc 닫기, 닫힌 뒤 초점 복귀)을 쓰고, 열림 상태는 상위가 `open`으로 제어한다
+- 대화상자가 열린 동안 바깥의 알림 영역은 조작할 수 없다. 대화상자 안에서 생긴 오류는 대화상자 안에 표시한다
+- 대화상자의 열림 상태와 입력은 그것을 연 대상에 묶는다. 대상이 바뀌면 닫고 입력을 버린다 — 탈퇴 대화상자는 연 계정의 세션이 끝나거나 다른 계정으로 바뀌면 닫힌다 (`useAccountManager`). 입력은 `key`로 대화상자를 새로 만들지 않고 `reset()`으로 비운다. 열린 `<dialog>`를 DOM에서 그냥 제거하면 브라우저가 초점을 되돌리지 않는다
+- 확인 뒤 요청하는 동안 여는 버튼이 비활성화되면 브라우저가 초점을 되돌리지 못한다. 요청이 실패해 버튼을 다시 쓸 수 있게 되면 한 번만, 사용자가 그사이 옮기지 않은 초점을 직접 되돌린다 (`useAccountManager`)
 
-### 3.3 목표 (후속 PR)
+### 3.3 화면 안의 상태
 
-- 토스트 라이브러리 도입 (`sonner` 또는 `react-hot-toast` — 선정은 별도 PR)
-- `src/shared/ui/toast/` 래퍼 레이어 → 슬라이스는 `toast.success(...)` / `toast.error(...)` 호출
-- 중앙 Mutation 에러 핸들러: `QueryClient`의 `defaultOptions.mutations.onError`에서 토스트 자동 표시
+- 입력 검증 실패: RHF `errors` → 필드 아래 `ValidationError` (`aria-invalid`·`aria-describedby` 연결)
+- 조회 실패·빈 결과·로딩은 해당 화면 안에 표시한다. 토스트로 대체하지 않는다
 
-### 3.4 지금의 규칙
+### 3.4 금지
 
-- **신규 코드에서 `alert()` 도입 금지**
-- 기존 `alert()` 호출은 토스트 도입 PR에서 일괄 교체 — 개별 PR에서 섞지 않음
+- 네이티브 `alert()`·`confirm()`·`prompt()` — 초점을 빼앗고 스타일을 맞출 수 없으며 흐름을 막는다. ESLint `no-alert`가 error로 막는다
 
 ---
 
